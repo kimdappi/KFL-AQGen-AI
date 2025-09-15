@@ -1,0 +1,41 @@
+{
+  "worksheet": {
+    "id": "string",
+    "title": "string",
+    "difficulty": "easy|medium|hard",
+    "target_audience": {
+      "nationality": "string",
+      "age_range": "string",
+      "gender": "string"
+    },
+    "sections": [
+      {
+        "section_id": "string",
+        "section_type": "reading|grammar|vocabulary|listening|writing",
+        "title": "string",
+        "instructions": "string",
+        "items": [
+          {
+            "item_id": "string",
+            "item_type": "multiple_choice|fill_blank|short_answer|essay",
+            "question": "string",
+            "options": ["string"],
+            "correct_answer": "string",
+            "explanation": "string",
+            "difficulty_points": 1,
+            "kpop_context": {
+              "artist": "string",
+              "song": "string",
+              "concept": "string"
+            }
+          }
+        ]
+      }
+    ],
+    "metadata": {
+      "created_at": "string",
+      "estimated_time": "string",
+      "total_points": 100
+    }
+  }
+}

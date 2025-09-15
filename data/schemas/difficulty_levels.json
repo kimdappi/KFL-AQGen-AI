@@ -1,0 +1,28 @@
+{
+  "difficulty_levels": {
+    "easy": {
+      "description": "Beginner level Korean",
+      "vocabulary_complexity": "basic",
+      "grammar_points": ["basic_particles", "present_tense", "simple_questions"],
+      "sentence_length": "short",
+      "cultural_context": "minimal",
+      "target_age": "12-16"
+    },
+    "medium": {
+      "description": "Intermediate level Korean",
+      "vocabulary_complexity": "intermediate",
+      "grammar_points": ["past_tense", "future_tense", "honorifics", "complex_sentences"],
+      "sentence_length": "medium",
+      "cultural_context": "moderate",
+      "target_age": "16-20"
+    },
+    "hard": {
+      "description": "Advanced level Korean",
+      "vocabulary_complexity": "advanced",
+      "grammar_points": ["conditional", "passive_voice", "complex_honorifics", "literary_forms"],
+      "sentence_length": "long",
+      "cultural_context": "extensive",
+      "target_age": "20+"
+    }
+  }
+}
