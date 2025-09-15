@@ -1,7 +1,7 @@
 """
 critic_agent.py - 생성된 문제의 품질과 적절성을 검증하는 에이전트
 """
-from base_agent import BaseAgent
+from .base_agent import BaseAgent
 from typing import Dict, Any, List
 import logging
 from datetime import datetime

@@ -1,0 +1,251 @@
+{
+  "metadata": {
+    "difficulty": "intermediate",
+    "interest": "kpop",
+    "age_group": "20대",
+    "created_at": "2025-09-15T21:52:12.072764",
+    "total_questions": 14
+  },
+  "questions": [
+    {
+      "type": "multiple_choice",
+      "question": "다음 문장의 의미는?: '많은 팬들이 TXT의 비하인드를 기다리고 있습니다....'",
+      "options": [
+        "kpop와 관련이 있다",
+        "kpop와 관련이 없다",
+        "내용을 이해하기 어렵다",
+        "모두 맞다"
+      ],
+      "answer": "1",
+      "explanation": "이 문장은 kpop에 관한 내용입니다.",
+      "points": 7
+    },
+    {
+      "type": "multiple_choice",
+      "question": "다음 문장의 의미는?: 'BTS의 뮤직비디오는 팬덤에서 큰 인기를 얻었습니다....'",
+      "options": [
+        "kpop와 관련이 있다",
+        "kpop와 관련이 없다",
+        "내용을 이해하기 어렵다",
+        "모두 맞다"
+      ],
+      "answer": "1",
+      "explanation": "이 문장은 kpop에 관한 내용입니다.",
+      "points": 7
+    },
+    {
+      "type": "multiple_choice",
+      "question": "다음 문장의 의미는?: '2017년에 데뷔한 NCT는 현재 브이라이브로 유명합니다....'",
+      "options": [
+        "kpop와 관련이 있다",
+        "kpop와 관련이 없다",
+        "내용을 이해하기 어렵다",
+        "모두 맞다"
+      ],
+      "answer": "1",
+      "explanation": "이 문장은 kpop에 관한 내용입니다.",
+      "points": 7
+    },
+    {
+      "type": "multiple_choice",
+      "question": "다음 문장의 의미는?: '2017년에 데뷔한 aespa는 현재 팬미팅로 유명합니다....'",
+      "options": [
+        "kpop와 관련이 있다",
+        "kpop와 관련이 없다",
+        "내용을 이해하기 어렵다",
+        "모두 맞다"
+      ],
+      "answer": "1",
+      "explanation": "이 문장은 kpop에 관한 내용입니다.",
+      "points": 7
+    },
+    {
+      "type": "multiple_choice",
+      "question": "다음 문장의 의미는?: '많은 팬들이 BLACKPINK의 비하인드를 기다리고 있습니다....'",
+      "options": [
+        "kpop와 관련이 있다",
+        "kpop와 관련이 없다",
+        "내용을 이해하기 어렵다",
+        "모두 맞다"
+      ],
+      "answer": "1",
+      "explanation": "이 문장은 kpop에 관한 내용입니다.",
+      "points": 7
+    },
+    {
+      "type": "multiple_choice",
+      "question": "다음 문장의 의미는?: '요즘 TWICE가 시즌그리팅 관련 활동을 활발히 하고 있어요....'",
+      "options": [
+        "kpop와 관련이 있다",
+        "kpop와 관련이 없다",
+        "내용을 이해하기 어렵다",
+        "모두 맞다"
+      ],
+      "answer": "1",
+      "explanation": "이 문장은 kpop에 관한 내용입니다.",
+      "points": 7
+    },
+    {
+      "type": "fill_blank",
+      "sentence": "많은 팬들이 _____ 비하인드를 기다리고 있습니다.",
+      "answer": "TXT의",
+      "hints": [
+        "글자 수: 4"
+      ],
+      "points": 5
+    },
+    {
+      "type": "fill_blank",
+      "sentence": "BTS의 뮤직비디오는 팬덤에서 큰 _____ 얻었습니다.",
+      "answer": "인기를",
+      "hints": [
+        "글자 수: 3"
+      ],
+      "points": 5
+    },
+    {
+      "type": "fill_blank",
+      "sentence": "2017년에 _____ NCT는 현재 브이라이브로 유명합니다.",
+      "answer": "데뷔한",
+      "hints": [
+        "글자 수: 3"
+      ],
+      "points": 5
+    },
+    {
+      "type": "fill_blank",
+      "sentence": "2017년에 데뷔한 _____ 현재 팬미팅로 유명합니다.",
+      "answer": "aespa는",
+      "hints": [
+        "글자 수: 6"
+      ],
+      "points": 5
+    },
+    {
+      "type": "fill_blank",
+      "sentence": "많은 팬들이 BLACKPINK의 _____ 기다리고 있습니다.",
+      "answer": "비하인드를",
+      "hints": [
+        "글자 수: 5"
+      ],
+      "points": 5
+    },
+    {
+      "type": "true_false",
+      "statement": "많은 팬들이 TXT의 비하인드를 기다리고 있습니다.",
+      "answer": true,
+      "explanation": "원문과 비교하여 판단하세요.",
+      "points": 3
+    },
+    {
+      "type": "true_false",
+      "statement": "BTS의 뮤직비디오는 않 팬덤에서 큰 인기를 얻었습니다.",
+      "answer": false,
+      "explanation": "원문과 비교하여 판단하세요.",
+      "points": 3
+    },
+    {
+      "type": "true_false",
+      "statement": "2017년에 데뷔한 NCT는 않 현재 브이라이브로 유명합니다.",
+      "answer": false,
+      "explanation": "원문과 비교하여 판단하세요.",
+      "points": 3
+    }
+  ],
+  "answer_key": [
+    {
+      "number": 1,
+      "type": "multiple_choice",
+      "correct": "1",
+      "explanation": "이 문장은 kpop에 관한 내용입니다."
+    },
+    {
+      "number": 2,
+      "type": "multiple_choice",
+      "correct": "1",
+      "explanation": "이 문장은 kpop에 관한 내용입니다."
+    },
+    {
+      "number": 3,
+      "type": "multiple_choice",
+      "correct": "1",
+      "explanation": "이 문장은 kpop에 관한 내용입니다."
+    },
+    {
+      "number": 4,
+      "type": "multiple_choice",
+      "correct": "1",
+      "explanation": "이 문장은 kpop에 관한 내용입니다."
+    },
+    {
+      "number": 5,
+      "type": "multiple_choice",
+      "correct": "1",
+      "explanation": "이 문장은 kpop에 관한 내용입니다."
+    },
+    {
+      "number": 6,
+      "type": "multiple_choice",
+      "correct": "1",
+      "explanation": "이 문장은 kpop에 관한 내용입니다."
+    },
+    {
+      "number": 7,
+      "type": "fill_blank",
+      "correct": "TXT의",
+      "hints": [
+        "글자 수: 4"
+      ]
+    },
+    {
+      "number": 8,
+      "type": "fill_blank",
+      "correct": "인기를",
+      "hints": [
+        "글자 수: 3"
+      ]
+    },
+    {
+      "number": 9,
+      "type": "fill_blank",
+      "correct": "데뷔한",
+      "hints": [
+        "글자 수: 3"
+      ]
+    },
+    {
+      "number": 10,
+      "type": "fill_blank",
+      "correct": "aespa는",
+      "hints": [
+        "글자 수: 6"
+      ]
+    },
+    {
+      "number": 11,
+      "type": "fill_blank",
+      "correct": "비하인드를",
+      "hints": [
+        "글자 수: 5"
+      ]
+    },
+    {
+      "number": 12,
+      "type": "true_false",
+      "correct": "참",
+      "explanation": "원문과 비교하여 판단하세요."
+    },
+    {
+      "number": 13,
+      "type": "true_false",
+      "correct": "거짓",
+      "explanation": "원문과 비교하여 판단하세요."
+    },
+    {
+      "number": 14,
+      "type": "true_false",
+      "correct": "거짓",
+      "explanation": "원문과 비교하여 판단하세요."
+    }
+  ]
+}

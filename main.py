@@ -1,5 +1,5 @@
 """
-main.py - 한국어 학습 문제지 생성 시스템 메인 파일
+main.py - 한국어 학습 문제지 생성 시스템 메인 파일 (수정본)
 """
 import os
 import sys
@@ -8,10 +8,10 @@ import logging
 from datetime import datetime
 from typing import Dict, Any
 
-# 에이전트 임포트
+# 에이전트 임포트 (경로 수정)
 from agents.base_agent import BaseAgent
 from agents.kpop_agent import InterestAgent
-from agents.worksheet_agent import WorksheetAgent
+from agents.worksheet_agent import WorksheetAgent  
 from agents.critic_agent import CriticAgent
 
 # 로깅 설정
@@ -39,7 +39,7 @@ class KoreanTestGenerator:
         
         # 에이전트 초기화
         self.interest_agent = InterestAgent(model_name)
-        self.testpaper_agent = TestPaperAgent(model_name)
+        self.worksheet_agent = WorksheetAgent(model_name)  # testpaper_agent → worksheet_agent
         self.critic_agent = CriticAgent(model_name)
         
         # 결과 저장 디렉토리
@@ -79,26 +79,43 @@ class KoreanTestGenerator:
             if 'error' in interest_result:
                 raise Exception(f"콘텐츠 생성 실패: {interest_result['error']}")
             
+            # ====== 생성된 문장 출력 추가 ======
             logger.info(f"✅ {len(interest_result['content'])}개 문장 생성 완료")
+            print("\n" + "="*60)
+            print("📖 생성된 학습 문장들:")
+            print("="*60)
+            for i, sentence in enumerate(interest_result.get('content', []), 1):
+                print(f"{i}. {sentence}")
+            print("="*60 + "\n")
             
+            # 출처 정보도 출력
+            if 'sources' in interest_result:
+                print("📌 참고 출처:")
+                for source in interest_result['sources']:
+                    print(f"  - {source.get('title', 'Unknown')} ({source.get('source', '')})")
+                print()
+            # ====================================
+
             # 2단계: 문제지 생성
             logger.info("\n📝 2단계: 문제지 생성 중...")
-            testpaper_result = self.testpaper_agent.process({
+            
+            # WorksheetAgent의 process 메서드 호출
+            worksheet_result = self.worksheet_agent.process({
                 'content': interest_result['content'],
                 'difficulty': difficulty,
                 'interest': interest,
                 'age_group': age_group
             })
             
-            if 'error' in testpaper_result:
-                raise Exception(f"문제지 생성 실패: {testpaper_result['error']}")
+            if 'error' in worksheet_result:
+                raise Exception(f"문제지 생성 실패: {worksheet_result['error']}")
             
-            logger.info(f"✅ {len(testpaper_result['questions'])}개 문제 생성 완료")
+            logger.info(f"✅ {len(worksheet_result['questions'])}개 문제 생성 완료")
             
             # 3단계: 문제 검증
             logger.info("\n📝 3단계: 문제 품질 검증 중...")
             critic_result = self.critic_agent.process({
-                'questions': testpaper_result['questions'],
+                'questions': worksheet_result['questions'],
                 'difficulty': difficulty,
                 'interest': interest,
                 'age_group': age_group,
@@ -113,7 +130,9 @@ class KoreanTestGenerator:
             # 4단계: 최종 문제지 생성 (검증 통과 문제만)
             if critic_result['approved_questions']:
                 logger.info("\n📝 4단계: 최종 문제지 생성 중...")
-                final_result = self.testpaper_agent.process({
+                
+                # 승인된 문제로만 다시 처리
+                final_result = self.worksheet_agent.process({
                     'content': interest_result['content'],
                     'difficulty': difficulty,
                     'interest': interest,
@@ -121,15 +140,15 @@ class KoreanTestGenerator:
                     'questions': critic_result['approved_questions']  # 승인된 문제만 사용
                 })
                 
-                pdf_path = final_result.get('pdf_path', testpaper_result.get('pdf_path'))
+                pdf_path = final_result.get('pdf_path', worksheet_result.get('pdf_path'))
             else:
                 logger.warning("⚠️ 승인된 문제가 없어 원본 문제지를 사용합니다.")
-                pdf_path = testpaper_result.get('pdf_path')
+                pdf_path = worksheet_result.get('pdf_path')
             
             # 5단계: 결과 저장
             result = self._save_results({
                 'interest_content': interest_result,
-                'testpaper': testpaper_result,
+                'worksheet': worksheet_result,  # testpaper → worksheet
                 'evaluation': critic_result,
                 'pdf_path': pdf_path,
                 'metadata': {
@@ -147,6 +166,8 @@ class KoreanTestGenerator:
             
         except Exception as e:
             logger.error(f"❌ 문제지 생성 실패: {e}")
+            import traceback
+            logger.error(traceback.format_exc())  # 상세 에러 로그
             return {'error': str(e)}
     
     def _save_results(self, results: Dict) -> Dict:
@@ -183,7 +204,7 @@ class KoreanTestGenerator:
         
         print(f"\n📈 생성 결과:")
         print(f"  - 생성된 콘텐츠: {len(result.get('interest_content', {}).get('content', []))}개")
-        print(f"  - 생성된 문제: {len(result.get('testpaper', {}).get('questions', []))}개")
+        print(f"  - 생성된 문제: {len(result.get('worksheet', {}).get('questions', []))}개")
         print(f"  - 승인된 문제: {len(evaluation.get('approved_questions', []))}개")
         print(f"  - 거부된 문제: {len(evaluation.get('rejected_questions', []))}개")
         
@@ -313,6 +334,8 @@ def main():
         print("\n\n⚠️ 사용자에 의해 중단되었습니다.")
     except Exception as e:
         logger.error(f"❌ 시스템 오류: {e}")
+        import traceback
+        logger.error(traceback.format_exc())
         print(f"\n❌ 시스템 오류가 발생했습니다: {e}")
         print("\n도움이 필요하면 로그 파일을 확인하세요: korean_test_generator.log")
 
