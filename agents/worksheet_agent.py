@@ -1,5 +1,6 @@
 """
-worksheet_agent.py - 한국어 학습 워크시트/문제지 생성 에이전트
+worksheet_agent.py - 한국어 학습 워크시트/문제지 생성 에이전트 
+현재는 문제지 스키마를 가지고 오고 있지는 않고, 문제지 프롬프트 기준으로 생성만 전담 -> 추후 Retrieval 기반으로 가야겠죠
 """
 from agents.base_agent import BaseAgent
 from typing import Dict, Any, List
@@ -43,7 +44,7 @@ class WorksheetAgent(BaseAgent):
             }
         }
         
-        # 난이도별 설정
+        # 난이도별 설정 (임시)
         self.difficulty_configs = {
             'beginner': {
                 'multiple_choice': 50,
@@ -190,7 +191,7 @@ class WorksheetAgent(BaseAgent):
         
         return {
             'type': 'multiple_choice',
-            'question': f"다음 문장의 의미는?: '{sentence[:50]}...'",
+            'question': f"다음 문장의 의미는?: '{sentence[:50]}.'",
             'options': options,
             'answer': "1",
             'explanation': f"이 문장은 {interest}에 관한 내용입니다.",

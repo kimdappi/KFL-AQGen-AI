@@ -50,7 +50,7 @@ K-POP 콘텐츠 기반 한국어 학습 워크시트 자동 생성 시스템입�
 
 ## 설정 및 커스터마이즈
 
-- `config.py`에서 데이터 경로, 난이도, MCP 옵션 등 조정 가능
+- `config.py`에서 데이터 경로, 난이도, MCP 옵션 등 조정 가능 (예정)
 - 난이도/세대별 상세 설정은 `data/schemas/difficulty_levels.json` 참고
 - 워크시트 구조는 `data/schemas/worksheet_schema.json`에서 확인
 
@@ -86,9 +86,10 @@ K-POP 콘텐츠 기반 한국어 학습 워크시트 자동 생성 시스템입�
 ## 향후 개선 방향
 
 - 실제 MCP 연동 및 K-POP 실시간 정보 활용
+- Retreival or Agentic RAG 적용
 - PDF 템플릿 자동 생성/파싱
 - 웹 기반 UI 및 API 제공
 - 다국어/다문화 지원
 
 ---
-문의: ezzyoung
+by : ezzyoung

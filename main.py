@@ -79,7 +79,7 @@ class KoreanTestGenerator:
             if 'error' in interest_result:
                 raise Exception(f"콘텐츠 생성 실패: {interest_result['error']}")
             
-            # ====== 생성된 문장 출력 추가 ======
+            # ====== 생성된 문장 출력 추가 : 문장은 prompting 기반으로만 되어 있고 정보 Retrieval 은 안하는 것  ======
             logger.info(f"✅ {len(interest_result['content'])}개 문장 생성 완료")
             print("\n" + "="*60)
             print("📖 생성된 학습 문장들:")
@@ -88,7 +88,7 @@ class KoreanTestGenerator:
                 print(f"{i}. {sentence}")
             print("="*60 + "\n")
             
-            # 출처 정보도 출력
+            # 출처 정보도 출력 (현재는 더미 기준)
             if 'sources' in interest_result:
                 print("📌 참고 출처:")
                 for source in interest_result['sources']:
@@ -294,7 +294,7 @@ def main():
         model_map = {
             '1': 'skt/kogpt2-base-v2',
             '2': 'EleutherAI/polyglot-ko-1.3b',
-            '3': None
+            '3': None #모델 안쓰는 버전
         }
         
         model_name = model_map.get(model_choice)

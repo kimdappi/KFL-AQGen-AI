@@ -143,7 +143,7 @@ class InterestAgent(BaseAgent):
         templates = self.difficulty_templates[difficulty]
         
         # 템플릿 기반 문장 생성
-        for _ in range(10):  # 10개 문장 생성
+        for _ in range(10):  # 10개 문장 생성 (조절 가능)
             template = random.choice(templates['patterns'])
             
             # 데이터 선택
