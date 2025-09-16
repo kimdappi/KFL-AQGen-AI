@@ -1,0 +1,496 @@
+{
+  "interest_content": {
+    "content": [
+      "ATEEZ는 2019년에 데뷔했어요.",
+      "NCT는 2019년에 데뷔했어요.",
+      "BLACKPINK 콘서트에 가고 싶어요.",
+      "ENHYPEN의 새 노래가 나왔어요.",
+      "TWICE 콘서트에 가고 싶어요.",
+      "NCT 콘서트에 가고 싶어요.",
+      "저는 ENHYPEN를 좋아해요.",
+      "TWICE는 2019년에 데뷔했어요.",
+      "NCT는 2024년에 데뷔했어요.",
+      "TWICE 콘서트에 가고 싶어요."
+    ],
+    "sources": [
+      {
+        "title": "BTS 프로필",
+        "source": "K-POP Database",
+        "type": "artist_info",
+        "url": "https://kpop.example.com/BTS"
+      },
+      {
+        "title": "SEVENTEEN 프로필",
+        "source": "K-POP Database",
+        "type": "artist_info",
+        "url": "https://kpop.example.com/SEVENTEEN"
+      },
+      {
+        "title": "NCT 프로필",
+        "source": "K-POP Database",
+        "type": "artist_info",
+        "url": "https://kpop.example.com/NCT"
+      },
+      {
+        "title": "2015-2024 K-POP 역사",
+        "source": "K-POP History",
+        "type": "historical",
+        "description": "3.5-4세대 K-POP, 글로벌 진출 세대"
+      }
+    ],
+    "metadata": {
+      "age_group": "20대",
+      "difficulty": "beginner",
+      "generation": "3.5-4세대 K-POP, 글로벌 진출 세대",
+      "years": "2015-2024",
+      "timestamp": "2025-09-16T20:13:07.549478"
+    },
+    "validation_result": {
+      "approved_sentences": [
+        "ATEEZ는 2019년에 데뷔했어요.",
+        "NCT는 2019년에 데뷔했어요.",
+        "BLACKPINK 콘서트에 가고 싶어요.",
+        "ENHYPEN의 새 노래가 나왔어요.",
+        "TWICE 콘서트에 가고 싶어요.",
+        "NCT 콘서트에 가고 싶어요.",
+        "저는 ENHYPEN를 좋아해요.",
+        "TWICE는 2019년에 데뷔했어요.",
+        "NCT는 2024년에 데뷔했어요.",
+        "TWICE 콘서트에 가고 싶어요."
+      ],
+      "rejected_sentences": [],
+      "suggestions": [
+        "📝 20대 대상으로는 적절하나 일부 개선 필요"
+      ],
+      "overall_score": 0.764,
+      "metadata": {
+        "age_group": "20대",
+        "era": "3.5-4세대 (2015-2024)",
+        "total_evaluated": 10,
+        "approved_count": 10,
+        "rejected_count": 0,
+        "evaluation_time": "2025-09-16T20:13:07.549811"
+      },
+      "needs_regeneration": false
+    },
+    "total_attempts": 1
+  },
+  "worksheet": {
+    "questions": [
+      {
+        "type": "객관식",
+        "question": "다음 문장의 내용으로 올바른 것은?",
+        "options": [
+          "TWICE에 대한 내용이다",
+          "TWICE와 관련이 없다",
+          "다른 아티스트에 대한 내용이다",
+          "K-POP과 무관한 내용이다"
+        ],
+        "answer": "1",
+        "explanation": "정답은 1번입니다. 원문을 잘 읽어보세요.",
+        "points": 5,
+        "source_sentence": "TWICE 콘서트에 가고 싶어요."
+      },
+      {
+        "type": "객관식",
+        "question": "다음 문장의 내용으로 올바른 것은?",
+        "options": [
+          "BLACKPINK에 대한 내용이다",
+          "BLACKPINK와 관련이 없다",
+          "다른 아티스트에 대한 내용이다",
+          "K-POP과 무관한 내용이다"
+        ],
+        "answer": "1",
+        "explanation": "정답은 1번입니다. 원문을 잘 읽어보세요.",
+        "points": 5,
+        "source_sentence": "BLACKPINK 콘서트에 가고 싶어요."
+      },
+      {
+        "type": "객관식",
+        "question": "다음 문장의 내용으로 올바른 것은?",
+        "options": [
+          "NCT에 대한 내용이다",
+          "NCT와 관련이 없다",
+          "다른 아티스트에 대한 내용이다",
+          "K-POP과 무관한 내용이다"
+        ],
+        "answer": "1",
+        "explanation": "정답은 1번입니다. 원문을 잘 읽어보세요.",
+        "points": 5,
+        "source_sentence": "NCT는 2024년에 데뷔했어요."
+      },
+      {
+        "type": "객관식",
+        "question": "[문법 질문]션생생한 문법 표현을 알려주세요.이션난이도: advancedity혜영난이도: aimlessity혜영해설: [문법]션문장 구조와 문법에 관한 내용을 알려주세요.이션문장에서 문장 성분이 어떻게 쓰이는지 설명해 주세요.혜영문장 안에서 문장성분을 찾고, 문법적으로 맞게 쓰인 것을 고르는 문제가 출제되었습니다.혜영난이도: advanceity혜영해설: [문법]션문장의 구조와 문법에 대한 기본적인 내용을 파악하도록 하였습니다.혜영난이도: advancedity혜영해설: [문법]션문장의 구성 요소를 찾고, 문법적으로 알맞은 것을 고르는 문제가 출제되었습니다.혜영난이도: advanceity혜영해설: [문법]션문장의 구조",
+        "options": [
+          "TWICE에 대한 내용이다",
+          "TWICE와 관련이 없다",
+          "다른 아티스트에 대한 내용이다",
+          "K-POP과 무관한 내용이다"
+        ],
+        "answer": "1",
+        "explanation": "정답은 1번입니다. 원문을 잘 읽어보세요.",
+        "points": 5,
+        "source_sentence": "TWICE는 2019년에 데뷔했어요."
+      },
+      {
+        "type": "객관식",
+        "question": "다음 문장의 내용으로 올바른 것은?",
+        "options": [
+          "NCT에 대한 내용이다",
+          "NCT와 관련이 없다",
+          "다른 아티스트에 대한 내용이다",
+          "K-POP과 무관한 내용이다"
+        ],
+        "answer": "1",
+        "explanation": "정답은 1번입니다. 원문을 잘 읽어보세요.",
+        "points": 5,
+        "source_sentence": "NCT 콘서트에 가고 싶어요."
+      },
+      {
+        "type": "객관식",
+        "question": "다음 문장의 내용으로 올바른 것은?",
+        "options": [
+          "ATEEZ에 대한 내용이다",
+          "ATEEZ와 관련이 없다",
+          "다른 아티스트에 대한 내용이다",
+          "K-POP과 무관한 내용이다"
+        ],
+        "answer": "1",
+        "explanation": "정답은 1번입니다. 원문을 잘 읽어보세요.",
+        "points": 5,
+        "source_sentence": "ATEEZ는 2019년에 데뷔했어요."
+      },
+      {
+        "type": "빈칸채우기",
+        "question": "저는 _____를 좋아해요.",
+        "answer": "ENHYPEN",
+        "explanation": "정답: ENHYPEN\n이 단어는 문장에서 핵심 정보를 나타냅니다.",
+        "points": 3,
+        "source_sentence": "저는 ENHYPEN를 좋아해요."
+      },
+      {
+        "type": "빈칸채우기",
+        "question": "_____의 새 노래가 나왔어요.",
+        "answer": "ENHYPEN",
+        "explanation": "정답: ENHYPEN\n이 단어는 문장에서 핵심 정보를 나타냅니다.",
+        "points": 3,
+        "source_sentence": "ENHYPEN의 새 노래가 나왔어요."
+      },
+      {
+        "type": "참거짓",
+        "question": "NCT는 2019년에 데뷔했어요.",
+        "answer": true,
+        "explanation": "제시된 문장은 원문과 동일한 내용입니다.",
+        "points": 3,
+        "source_sentence": "NCT는 2019년에 데뷔했어요."
+      },
+      {
+        "type": "참거짓",
+        "question": "Stray Kids 콘서트에 가고 싶어요.",
+        "answer": false,
+        "explanation": "원문: TWICE 콘서트에 가고 싶어요.\n변경된 부분을 확인하세요.",
+        "points": 3,
+        "source_sentence": "TWICE 콘서트에 가고 싶어요."
+      }
+    ],
+    "output_path": "output\\worksheet_kpop_20대_beginner_20250916_202228.json",
+    "metadata": {
+      "difficulty": "beginner",
+      "interest": "kpop",
+      "age_group": "20대",
+      "total_questions": 10,
+      "source_sentences": 10,
+      "created_at": "2025-09-16T20:22:28.848219"
+    },
+    "final_evaluation": {
+      "evaluation": {
+        "average_score": 0.798,
+        "total_questions": 10,
+        "passed_questions": 10,
+        "failed_questions": 0
+      },
+      "approved_questions": [
+        {
+          "type": "객관식",
+          "question": "다음 문장의 내용으로 올바른 것은?",
+          "options": [
+            "TWICE에 대한 내용이다",
+            "TWICE와 관련이 없다",
+            "다른 아티스트에 대한 내용이다",
+            "K-POP과 무관한 내용이다"
+          ],
+          "answer": "1",
+          "explanation": "정답은 1번입니다. 원문을 잘 읽어보세요.",
+          "points": 5,
+          "source_sentence": "TWICE 콘서트에 가고 싶어요."
+        },
+        {
+          "type": "객관식",
+          "question": "다음 문장의 내용으로 올바른 것은?",
+          "options": [
+            "BLACKPINK에 대한 내용이다",
+            "BLACKPINK와 관련이 없다",
+            "다른 아티스트에 대한 내용이다",
+            "K-POP과 무관한 내용이다"
+          ],
+          "answer": "1",
+          "explanation": "정답은 1번입니다. 원문을 잘 읽어보세요.",
+          "points": 5,
+          "source_sentence": "BLACKPINK 콘서트에 가고 싶어요."
+        },
+        {
+          "type": "객관식",
+          "question": "다음 문장의 내용으로 올바른 것은?",
+          "options": [
+            "NCT에 대한 내용이다",
+            "NCT와 관련이 없다",
+            "다른 아티스트에 대한 내용이다",
+            "K-POP과 무관한 내용이다"
+          ],
+          "answer": "1",
+          "explanation": "정답은 1번입니다. 원문을 잘 읽어보세요.",
+          "points": 5,
+          "source_sentence": "NCT는 2024년에 데뷔했어요."
+        },
+        {
+          "type": "객관식",
+          "question": "[문법 질문]션생생한 문법 표현을 알려주세요.이션난이도: advancedity혜영난이도: aimlessity혜영해설: [문법]션문장 구조와 문법에 관한 내용을 알려주세요.이션문장에서 문장 성분이 어떻게 쓰이는지 설명해 주세요.혜영문장 안에서 문장성분을 찾고, 문법적으로 맞게 쓰인 것을 고르는 문제가 출제되었습니다.혜영난이도: advanceity혜영해설: [문법]션문장의 구조와 문법에 대한 기본적인 내용을 파악하도록 하였습니다.혜영난이도: advancedity혜영해설: [문법]션문장의 구성 요소를 찾고, 문법적으로 알맞은 것을 고르는 문제가 출제되었습니다.혜영난이도: advanceity혜영해설: [문법]션문장의 구조",
+          "options": [
+            "TWICE에 대한 내용이다",
+            "TWICE와 관련이 없다",
+            "다른 아티스트에 대한 내용이다",
+            "K-POP과 무관한 내용이다"
+          ],
+          "answer": "1",
+          "explanation": "정답은 1번입니다. 원문을 잘 읽어보세요.",
+          "points": 5,
+          "source_sentence": "TWICE는 2019년에 데뷔했어요."
+        },
+        {
+          "type": "객관식",
+          "question": "다음 문장의 내용으로 올바른 것은?",
+          "options": [
+            "NCT에 대한 내용이다",
+            "NCT와 관련이 없다",
+            "다른 아티스트에 대한 내용이다",
+            "K-POP과 무관한 내용이다"
+          ],
+          "answer": "1",
+          "explanation": "정답은 1번입니다. 원문을 잘 읽어보세요.",
+          "points": 5,
+          "source_sentence": "NCT 콘서트에 가고 싶어요."
+        },
+        {
+          "type": "객관식",
+          "question": "다음 문장의 내용으로 올바른 것은?",
+          "options": [
+            "ATEEZ에 대한 내용이다",
+            "ATEEZ와 관련이 없다",
+            "다른 아티스트에 대한 내용이다",
+            "K-POP과 무관한 내용이다"
+          ],
+          "answer": "1",
+          "explanation": "정답은 1번입니다. 원문을 잘 읽어보세요.",
+          "points": 5,
+          "source_sentence": "ATEEZ는 2019년에 데뷔했어요."
+        },
+        {
+          "type": "빈칸채우기",
+          "question": "저는 _____를 좋아해요.",
+          "answer": "ENHYPEN",
+          "explanation": "정답: ENHYPEN\n이 단어는 문장에서 핵심 정보를 나타냅니다.",
+          "points": 3,
+          "source_sentence": "저는 ENHYPEN를 좋아해요."
+        },
+        {
+          "type": "빈칸채우기",
+          "question": "_____의 새 노래가 나왔어요.",
+          "answer": "ENHYPEN",
+          "explanation": "정답: ENHYPEN\n이 단어는 문장에서 핵심 정보를 나타냅니다.",
+          "points": 3,
+          "source_sentence": "ENHYPEN의 새 노래가 나왔어요."
+        },
+        {
+          "type": "참거짓",
+          "question": "NCT는 2019년에 데뷔했어요.",
+          "answer": true,
+          "explanation": "제시된 문장은 원문과 동일한 내용입니다.",
+          "points": 3,
+          "source_sentence": "NCT는 2019년에 데뷔했어요."
+        },
+        {
+          "type": "참거짓",
+          "question": "Stray Kids 콘서트에 가고 싶어요.",
+          "answer": false,
+          "explanation": "원문: TWICE 콘서트에 가고 싶어요.\n변경된 부분을 확인하세요.",
+          "points": 3,
+          "source_sentence": "TWICE 콘서트에 가고 싶어요."
+        }
+      ],
+      "rejected_questions": [],
+      "suggestions": [
+        "문제 품질이 양호하나 개선 여지가 있습니다."
+      ],
+      "overall_score": 0.798,
+      "metadata": {
+        "age_group": "20대",
+        "total_evaluated": 10,
+        "approved_count": 10,
+        "rejected_count": 0,
+        "evaluation_time": "2025-09-16T20:22:28.848512"
+      },
+      "regeneration_reason": "최대 시도 횟수 도달",
+      "needs_regeneration": false
+    },
+    "total_attempts": 3
+  },
+  "evaluation": {
+    "evaluation": {
+      "average_score": 0.798,
+      "total_questions": 10,
+      "passed_questions": 10,
+      "failed_questions": 0
+    },
+    "approved_questions": [
+      {
+        "type": "객관식",
+        "question": "다음 문장의 내용으로 올바른 것은?",
+        "options": [
+          "TWICE에 대한 내용이다",
+          "TWICE와 관련이 없다",
+          "다른 아티스트에 대한 내용이다",
+          "K-POP과 무관한 내용이다"
+        ],
+        "answer": "1",
+        "explanation": "정답은 1번입니다. 원문을 잘 읽어보세요.",
+        "points": 5,
+        "source_sentence": "TWICE 콘서트에 가고 싶어요."
+      },
+      {
+        "type": "객관식",
+        "question": "다음 문장의 내용으로 올바른 것은?",
+        "options": [
+          "BLACKPINK에 대한 내용이다",
+          "BLACKPINK와 관련이 없다",
+          "다른 아티스트에 대한 내용이다",
+          "K-POP과 무관한 내용이다"
+        ],
+        "answer": "1",
+        "explanation": "정답은 1번입니다. 원문을 잘 읽어보세요.",
+        "points": 5,
+        "source_sentence": "BLACKPINK 콘서트에 가고 싶어요."
+      },
+      {
+        "type": "객관식",
+        "question": "다음 문장의 내용으로 올바른 것은?",
+        "options": [
+          "NCT에 대한 내용이다",
+          "NCT와 관련이 없다",
+          "다른 아티스트에 대한 내용이다",
+          "K-POP과 무관한 내용이다"
+        ],
+        "answer": "1",
+        "explanation": "정답은 1번입니다. 원문을 잘 읽어보세요.",
+        "points": 5,
+        "source_sentence": "NCT는 2024년에 데뷔했어요."
+      },
+      {
+        "type": "객관식",
+        "question": "[문법 질문]션생생한 문법 표현을 알려주세요.이션난이도: advancedity혜영난이도: aimlessity혜영해설: [문법]션문장 구조와 문법에 관한 내용을 알려주세요.이션문장에서 문장 성분이 어떻게 쓰이는지 설명해 주세요.혜영문장 안에서 문장성분을 찾고, 문법적으로 맞게 쓰인 것을 고르는 문제가 출제되었습니다.혜영난이도: advanceity혜영해설: [문법]션문장의 구조와 문법에 대한 기본적인 내용을 파악하도록 하였습니다.혜영난이도: advancedity혜영해설: [문법]션문장의 구성 요소를 찾고, 문법적으로 알맞은 것을 고르는 문제가 출제되었습니다.혜영난이도: advanceity혜영해설: [문법]션문장의 구조",
+        "options": [
+          "TWICE에 대한 내용이다",
+          "TWICE와 관련이 없다",
+          "다른 아티스트에 대한 내용이다",
+          "K-POP과 무관한 내용이다"
+        ],
+        "answer": "1",
+        "explanation": "정답은 1번입니다. 원문을 잘 읽어보세요.",
+        "points": 5,
+        "source_sentence": "TWICE는 2019년에 데뷔했어요."
+      },
+      {
+        "type": "객관식",
+        "question": "다음 문장의 내용으로 올바른 것은?",
+        "options": [
+          "NCT에 대한 내용이다",
+          "NCT와 관련이 없다",
+          "다른 아티스트에 대한 내용이다",
+          "K-POP과 무관한 내용이다"
+        ],
+        "answer": "1",
+        "explanation": "정답은 1번입니다. 원문을 잘 읽어보세요.",
+        "points": 5,
+        "source_sentence": "NCT 콘서트에 가고 싶어요."
+      },
+      {
+        "type": "객관식",
+        "question": "다음 문장의 내용으로 올바른 것은?",
+        "options": [
+          "ATEEZ에 대한 내용이다",
+          "ATEEZ와 관련이 없다",
+          "다른 아티스트에 대한 내용이다",
+          "K-POP과 무관한 내용이다"
+        ],
+        "answer": "1",
+        "explanation": "정답은 1번입니다. 원문을 잘 읽어보세요.",
+        "points": 5,
+        "source_sentence": "ATEEZ는 2019년에 데뷔했어요."
+      },
+      {
+        "type": "빈칸채우기",
+        "question": "저는 _____를 좋아해요.",
+        "answer": "ENHYPEN",
+        "explanation": "정답: ENHYPEN\n이 단어는 문장에서 핵심 정보를 나타냅니다.",
+        "points": 3,
+        "source_sentence": "저는 ENHYPEN를 좋아해요."
+      },
+      {
+        "type": "빈칸채우기",
+        "question": "_____의 새 노래가 나왔어요.",
+        "answer": "ENHYPEN",
+        "explanation": "정답: ENHYPEN\n이 단어는 문장에서 핵심 정보를 나타냅니다.",
+        "points": 3,
+        "source_sentence": "ENHYPEN의 새 노래가 나왔어요."
+      },
+      {
+        "type": "참거짓",
+        "question": "NCT는 2019년에 데뷔했어요.",
+        "answer": true,
+        "explanation": "제시된 문장은 원문과 동일한 내용입니다.",
+        "points": 3,
+        "source_sentence": "NCT는 2019년에 데뷔했어요."
+      },
+      {
+        "type": "참거짓",
+        "question": "Stray Kids 콘서트에 가고 싶어요.",
+        "answer": false,
+        "explanation": "원문: TWICE 콘서트에 가고 싶어요.\n변경된 부분을 확인하세요.",
+        "points": 3,
+        "source_sentence": "TWICE 콘서트에 가고 싶어요."
+      }
+    ],
+    "rejected_questions": [],
+    "suggestions": [
+      "문제 품질이 양호하나 개선 여지가 있습니다."
+    ],
+    "overall_score": 0.798,
+    "metadata": {
+      "age_group": "20대",
+      "total_evaluated": 10,
+      "approved_count": 10,
+      "rejected_count": 0,
+      "evaluation_time": "2025-09-16T20:22:28.848512"
+    },
+    "regeneration_reason": "최대 시도 횟수 도달",
+    "needs_regeneration": false
+  },
+  "pdf_path": "",
+  "metadata": {
+    "interest": "kpop",
+    "age_group": "20대",
+    "difficulty": "beginner",
+    "generated_at": "2025-09-16T20:22:28.849980",
+    "total_regeneration_attempts": 2
+  }
+}
