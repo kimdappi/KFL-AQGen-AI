@@ -1,0 +1,1 @@
+See critic prompt template in agents/critic_agent.py
