@@ -1,0 +1,802 @@
+[
+  {
+    "grammar": "-기에는",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-을 만하다",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-기 위해서",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-는 편이다",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-었던 모양이다",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-거든(요)",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-어/아 보이다",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-는다면",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-어서 그런지",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "피동",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-어/아 있다",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-을지",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "골지",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-어 놓다",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-는군요",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "아무",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-었더니",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-잖아요",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-군",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-고나서",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-는 모양이다",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-는데도",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-기(가) 쉽다",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-다니요?",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-을지도 모르다",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-었더라면",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-을 것이다",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-나 보다",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-는다고 생각하다",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-는 대신에",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-게 하다",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-고서",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-을 뻔하다",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "사동",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-으니까",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-는다는 것이",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-고 말다",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-거든요",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-을까 봐",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-는다고 하던데",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-는 대로",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-기는 하지만",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-는 셈이다",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-을 만하다",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-을 뿐만 아니라",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-이며",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-다면서요",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "안 -어도 되다",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-는 김에",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-는군요",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-다니",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-느라고",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-는 법이다",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-다니요?",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "어디가",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-는 걸 보니",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-기만 하면 되다",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-곤 하다",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-는 탓에",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-는 바람에",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-는 체하다",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-지 그래요?",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-는 척하다",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-을 겸",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-도록 하다",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-지",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-을 테니(까)",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-느라",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-은 채로",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-는다면",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-을 수도 있다",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-을 가지고",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-었었-",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "이나",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-을수록",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-어 버리다",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-는 모양이다",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-었을 텐데(요)",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "만 하다",
+    "grade": 3,
+    "level": "B"
+  },
+  {
+    "grammar": "-다/-라/-자(고) 보니(까)",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-도록",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-지만",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "어찌나 -(으)ㄴ/는지",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-도록",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-을 뿐 아니라",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-기에는",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-었던 것 같다",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-더니",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-는다고 해서",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-처럼",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-는 탓에",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-고 보니(까)",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-을 텐데",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-는걸요?",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-는 김에",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-는걸요",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-게요?",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-었/았어야 하다",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-다기보다(는)",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "까지",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-(으)라고요",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-는 탓에",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-는지",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-도록",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-만 해도",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-길래",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-더군요",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-는다고",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-라는",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-는 수밖에 없다",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-는 바람에",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-어/아 봤자",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "에 비해서",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-을 수가 있어야지요",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "에 따르면",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-는다고 보다",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "만 아니면",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-는 듯이",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-는 법이다",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-는다고 할 수 있다",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-는다는 둥",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-다가는",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-더니만",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-었다 하면",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-다고 해도",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-을 줄 그었다",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-는 김에",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-는 것치고",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-는 통에",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-다 해도",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-는다는 게",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-으려다(가)",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-는다고들",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-었더라면",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "에 관한",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-는다는 반응이다",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-는가 하면",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-는다는",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-는다는지(요)?",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-던데",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-게요?",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-었을 텐데",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-도록 하다",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-었을 텐데",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-는 듯하다",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-다는",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-는 셈 치고",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-기로",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-는가 하면",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-으나 마나",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-도록",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-는다며",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-을 따름이다",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "과연 -을까요?",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-어 가면서",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "이야",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-으라고",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-게",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-으라",
+    "grade": 4,
+    "level": "B"
+  },
+  {
+    "grammar": "-아라",
+    "grade": 4,
+    "level": "B"
+  }
+]
