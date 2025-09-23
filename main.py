@@ -10,7 +10,11 @@ from grammar_retriever import GrammarRetriever
 from graph import KoreanLearningGraph
 from config import TOPIK_PATHS, GRAMMAR_PATHS
 import uuid
+from dotenv import load_dotenv
+import os
 
+# .env 파일의 내용을 로드
+load_dotenv()
 
 def main():
     """메인 실행 함수"""
