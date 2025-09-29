@@ -66,7 +66,7 @@ class GrammarRetriever:
             if documents:
                 vectorstore = FAISS.from_documents(documents, embeddings)
                 vector_retriever = vectorstore.as_retriever(
-                    search_kwargs={"k": 10}
+                    search_kwargs={"k": 10} 
                 )
                 self.retrievers[level] = vector_retriever
     
@@ -76,5 +76,5 @@ class GrammarRetriever:
             docs = self.retrievers[level].get_relevant_documents(query)
             # grade 순으로 재정렬
             docs.sort(key=lambda x: x.metadata.get('grade', 999))
-            return docs[:10]
+            return docs[:1]
         return []

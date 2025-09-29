@@ -1,0 +1,15 @@
+{
+  "level": 1,
+  "target_grammar": "-는 게 어때요?",
+  "critique_summary": [
+    {
+      "sentence": "주말에 한글 공부를 하는 게 어때요?"
+    },
+    {
+      "sentence": "생활 속에서 문화를 배우는 게 어때요?"
+    },
+    {
+      "sentence": "힘을 내서 주말에 운동하는 게 어때요?"
+    }
+  ]
+}

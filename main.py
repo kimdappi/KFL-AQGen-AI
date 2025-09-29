@@ -40,7 +40,7 @@ def main():
     # 테스트 질문들
     test_queries = [
         "Create basic level Korean practice questions about daily life",
-        "중급 수준의 비즈니스 한국어 연습 문제를 만들어주세요",
+        "중급 수준의 식당에서 사용할 수 있는 한국어 연습 문제를 만들어주세요",
         "Generate advanced Korean grammar exercises"
     ]
     
