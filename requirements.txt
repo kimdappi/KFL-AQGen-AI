@@ -1,8 +1,12 @@
 rank_bm25
 faiss-cpu
+pandas
+python-dotenv
+pydantic<3
+openai>=1.30
+tiktoken>=0.5
 langchain-core>=0.2,<0.3
 langchain>=0.2,<0.3
 langchain-community>=0.2,<0.3
-pydantic<3
-openai
-pandas
+langchain-openai>=0.1,<0.2
+langgraph>=0.2,<0.3
