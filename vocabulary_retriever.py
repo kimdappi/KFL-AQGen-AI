@@ -7,10 +7,10 @@ TOPIK 단어 Retriever
 import pandas as pd
 from typing import List, Dict
 from langchain.schema import Document
-from langchain.vectorstores import FAISS
-from langchain.embeddings import OpenAIEmbeddings
-from langchain.retrievers import EnsembleRetriever, BM25Retriever
-
+from langchain_community.vectorstores import FAISS
+from langchain_openai import OpenAIEmbeddings
+from langchain.retrievers.ensemble import EnsembleRetriever
+from langchain_community.retrievers import BM25Retriever
 
 class TOPIKVocabularyRetriever:
     """TOPIK 단어 CSV 파일 기반 Retriever"""

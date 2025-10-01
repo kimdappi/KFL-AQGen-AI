@@ -15,6 +15,7 @@ class GraphState(TypedDict):
     difficulty_level: Annotated[str, "난이도 (basic/intermediate/advanced)"]
     vocabulary_docs: Annotated[List[Document], "검색된 단어 문서"]
     grammar_docs: Annotated[List[Document], "검색된 문법 문서"]
+    kpop_docs: Annotated[List[Document], "검색된 K-pop 문장"]   # ✅ 추가
     generated_sentences: Annotated[List[str], "생성된 예문"]
     final_output: Annotated[str, "최종 출력"]
     messages: Annotated[list, add_messages]  # 메시지 히스토리

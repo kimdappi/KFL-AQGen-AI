@@ -18,9 +18,10 @@ from utils import (
 class KoreanLearningNodes:
     """한국어 학습 노드 클래스"""
     
-    def __init__(self, vocabulary_retriever, grammar_retriever, llm=None):
+    def __init__(self, vocabulary_retriever, grammar_retriever, kpop_retriever, llm=None):
         self.vocabulary_retriever = vocabulary_retriever
         self.grammar_retriever = grammar_retriever
+        self.kpop_retriever = kpop_retriever   # ✅ 추가
         self.llm = llm or OpenAI(temperature=0.7)
     
     def detect_difficulty(self, state: GraphState) -> GraphState:
@@ -44,6 +45,14 @@ class KoreanLearningNodes:
         grammar_docs = self.grammar_retriever.invoke(query, level)
         return {"grammar_docs": grammar_docs}
     
+    def retrieve_kpop(self, state: GraphState) -> GraphState:
+        """K-pop 문장 검색 노드"""
+        level = state['difficulty_level']
+        query = state['input_text']
+
+        kpop_docs = self.kpop_retriever.invoke(query, level)
+        return {"kpop_docs": kpop_docs}
+    
     def generate_sentences(self, state: GraphState) -> GraphState:
         """검색된 단어와 문법을 활용한 문장 생성"""
         words_info = extract_words_from_docs(state['vocabulary_docs'])
@@ -55,7 +64,7 @@ class KoreanLearningNodes:
             words_formatted.append(f"{word}({wordclass})")
         
         prompt = f"""
-        다음 단어와 문법을 사용하여 한국어 학습용 예문을 3개 생성해주세요.
+        다음 단어와 문법, K-pop 문장을 참고하여 한국어 학습용 예문을 3개 생성해주세요.
         
         난이도: {state['difficulty_level']}
         단어 (품사): {', '.join(words_formatted)}

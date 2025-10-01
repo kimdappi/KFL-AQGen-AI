@@ -7,16 +7,23 @@
 
 # 파일 경로 설정
 TOPIK_PATHS = {
-    'basic': ['data\words\TOPIK1.csv', 'data\words\TOPIK2.csv'],
-    'intermediate': ['data\words\TOPIK3.csv', 'data\words\TOPIK4.csv'],
-    'advanced': ['data\words\TOPIK5.csv', 'data\words\TOPIK6.csv']
+    'basic': ['data/words/TOPIK1.csv', 'data/words/TOPIK2.csv'],
+    'intermediate': ['data/words/TOPIK3.csv', 'data/words/TOPIK4.csv'],
+    'advanced': ['data/words/TOPIK5.csv', 'data/words/TOPIK6.csv']
 }
 
 GRAMMAR_PATHS = {
-    'basic': 'data\grammar\grammar_list_A.json',
-    'intermediate': 'data\grammar\grammar_list_B.json',
-    'advanced': 'data\grammar\grammar_list_C.json'
+    'basic': 'data/grammar/grammar_list_A.json',
+    'intermediate': 'data/grammar/grammar_list_B.json',
+    'advanced': 'data/grammar/grammar_list_C.json'
 }
+KPOP_PATHS = {
+    'basic': ['data/kpop/kpop_basic.csv'],
+    'intermediate': ['data/kpop/kpop_intermediate.csv'],
+    'advanced': ['data/kpop/kpop_advanced.csv']
+}
+
+
 
 # Retriever 설정
 RETRIEVER_CONFIG = {

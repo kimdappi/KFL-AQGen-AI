@@ -6,10 +6,11 @@
 """
 import json
 from typing import List, Dict
-from langchain.schema import Document
-from langchain.vectorstores import FAISS
-from langchain.embeddings import OpenAIEmbeddings
-
+from langchain_core.documents import Document
+from langchain_community.vectorstores import FAISS
+from langchain_openai import OpenAIEmbeddings
+from langchain.retrievers.ensemble import EnsembleRetriever
+from langchain_community.retrievers import BM25Retriever
 
 class GrammarRetriever:
     """문법 JSON 파일 기반 Retriever"""

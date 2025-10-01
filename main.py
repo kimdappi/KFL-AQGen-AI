@@ -7,6 +7,8 @@
 from langchain_core.runnables import RunnableConfig
 from vocabulary_retriever import TOPIKVocabularyRetriever
 from grammar_retriever import GrammarRetriever
+from kpop_retriever import KpopSentenceRetriever
+from config import KPOP_PATHS
 from graph import KoreanLearningGraph
 from config import TOPIK_PATHS, GRAMMAR_PATHS
 import uuid
@@ -23,10 +25,11 @@ def main():
     print("Initializing retrievers...")
     topik_retriever = TOPIKVocabularyRetriever(TOPIK_PATHS)
     grammar_retriever = GrammarRetriever(GRAMMAR_PATHS)
+    kpop_retriever = KpopSentenceRetriever(KPOP_PATHS)
     
     # Graph 생성
     print("Building graph...")
-    graph = KoreanLearningGraph(topik_retriever, grammar_retriever)
+    graph = KoreanLearningGraph(topik_retriever, grammar_retriever, kpop_retriever)
     
     # Config 설정
     config = RunnableConfig(
@@ -39,10 +42,10 @@ def main():
     
     # 테스트 질문들
     test_queries = [
-        "Create basic level Korean practice questions about daily life",
-        "중급 수준의 비즈니스 한국어 연습 문제를 만들어주세요",
-        "Generate advanced Korean grammar exercises"
-    ]
+    "Create basic level Korean practice questions about K-pop songs and idols",
+    "중급 수준의 한국어 연습 문제를 만들어주세요, 반드시 K-pop 그룹과 관련된 문장을 포함하세요",
+    "Generate advanced Korean grammar exercises using contexts from K-pop lyrics, wiki, and news"
+]
     
     for query in test_queries:
         print(f"\n입력: {query}")
