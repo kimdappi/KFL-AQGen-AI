@@ -1,0 +1,63 @@
+{
+  "level": 3,
+  "target_grammar": "-잖아요",
+  "critique_summary": [
+    {
+      "sentence": "{"
+    },
+    {
+      "sentence": "\"sentences\": ["
+    },
+    {
+      "sentence": "{"
+    },
+    {
+      "sentence": "\"sentence\": \"한국말은 재미있잖아요.\","
+    },
+    {
+      "sentence": "\"role\": \"기본 모델\","
+    },
+    {
+      "sentence": "\"pedagogical_rationale\": \"목표 문법 '-잖아요'의 기본 의미와 형태를 간단하게 보여줍니다. 학습자가 문법의 기초를 이해하는 데 도움이 됩니다.\""
+    },
+    {
+      "sentence": "},"
+    },
+    {
+      "sentence": "{"
+    },
+    {
+      "sentence": "\"sentence\": \"식당가에 가면 맛있는 음식이 많잖아요.\","
+    },
+    {
+      "sentence": "\"role\": \"확장 모델\","
+    },
+    {
+      "sentence": "\"pedagogical_rationale\": \"실제 상황에서 사용할 수 있는 문장으로, 다양한 문법 요소가 결합되어 있습니다. 이를 통해 학습자는 문법을 보다 폭넓게 활용할 수 있게 됩니다.\""
+    },
+    {
+      "sentence": "},"
+    },
+    {
+      "sentence": "{"
+    },
+    {
+      "sentence": "\"sentence\": \"발음을 잘해야 한국말을 잘할 수 있잖아요.\","
+    },
+    {
+      "sentence": "\"role\": \"오류 예방 모델\","
+    },
+    {
+      "sentence": "\"pedagogical_rationale\": \"이 문장은 일본인 학습자가 자주 범하는 '1-1. 격조사 선택 오류'를 예방하기 위해 설계되었습니다. '발음을 잘해야'라는 표현을 통해 '을/를'과 '이/가'의 올바른 사용을 명확히 제시합니다.\""
+    },
+    {
+      "sentence": "}"
+    },
+    {
+      "sentence": "]"
+    },
+    {
+      "sentence": "}"
+    }
+  ]
+}

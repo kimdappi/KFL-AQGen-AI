@@ -1,0 +1,63 @@
+{
+  "level": 3,
+  "target_grammar": "-잖아요",
+  "critique_summary": [
+    {
+      "sentence": "{"
+    },
+    {
+      "sentence": "\"sentences\": ["
+    },
+    {
+      "sentence": "{"
+    },
+    {
+      "sentence": "\"sentence\": \"한국어는 정말 재미있잖아요.\","
+    },
+    {
+      "sentence": "\"role\": \"기본 모델\","
+    },
+    {
+      "sentence": "\"pedagogical_rationale\": \"목표 문법 '-잖아요'의 기본 의미를 간단하게 전달합니다. 학습자가 문법의 형태와 의미를 명확히 이해할 수 있도록 도와줍니다.\""
+    },
+    {
+      "sentence": "},"
+    },
+    {
+      "sentence": "{"
+    },
+    {
+      "sentence": "\"sentence\": \"식당가에 가면 맛있는 음식을 먹을 수 있잖아요.\","
+    },
+    {
+      "sentence": "\"role\": \"확장 모델\","
+    },
+    {
+      "sentence": "\"pedagogical_rationale\": \"실제 대화에서 자주 사용되는 문장을 통해 '-잖아요'의 활용을 보여줍니다. 문법을 다른 요소와 결합하여 학습자의 응용력을 강화합니다.\""
+    },
+    {
+      "sentence": "},"
+    },
+    {
+      "sentence": "{"
+    },
+    {
+      "sentence": "\"sentence\": \"한국말을 잘하는 사람들은 한국어를 열심히 공부했잖아요.\","
+    },
+    {
+      "sentence": "\"role\": \"오류 예방 모델\","
+    },
+    {
+      "sentence": "\"pedagogical_rationale\": \"이 문장은 일본인 학습자가 자주 범하는 '1-1. 격조사 선택 오류'를 예방하기 위해 설계되었습니다. '한국어를'이라는 목적격 조사를 명확히 사용하여 올바른 형태를 강조합니다.\""
+    },
+    {
+      "sentence": "}"
+    },
+    {
+      "sentence": "]"
+    },
+    {
+      "sentence": "}"
+    }
+  ]
+}
