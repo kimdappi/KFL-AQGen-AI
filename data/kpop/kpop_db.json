@@ -1,0 +1,12 @@
+{
+  "group": "BLACKPINK",
+  "members": [
+    {"name": "Jisoo", "role": "vocal", "debut": "2016-08-08"},
+    {"name": "Jennie", "role": "rapper", "debut": "2016-08-08"},
+    {"name": "Rosé", "role": "vocal", "debut": "2016-08-08"},
+    {"name": "Lisa", "role": "rapper", "debut": "2016-08-08"}
+  ],
+  "agency": "YG Entertainment",
+  "fandom": "BLINK",
+  "concepts": ["girl crush", "hip-hop", "confidence"]
+}
