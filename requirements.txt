@@ -1,0 +1,12 @@
+langchain>=0.3,<0.4
+langchain-core>=0.3,<0.4
+langchain-community>=0.3,<0.4
+langchain-openai>=0.2
+numpy>=2.0
+langgraph>=0.6
+python-dotenv
+pandas
+openai
+pydantic<3
+rank_bm25
+#faiss 설치는 추가로 해줘야 할것임
