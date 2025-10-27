@@ -1,0 +1,87 @@
+{
+  "level": 1,
+  "target_grammar": "-을까요?",
+  "kpop_references": [
+    {
+      "sentence": "많은 사람들이 블랙핑크를 좋아한다",
+      "song": "How You Like That",
+      "group": "BLACKPINK",
+      "context": "NamuWiki",
+      "source": "database"
+    },
+    {
+      "sentence": "무대 위에서 팬들이 블랙핑크를 응원했다",
+      "song": "Pink Venom",
+      "group": "BLACKPINK",
+      "context": "News Article",
+      "source": "database"
+    },
+    {
+      "sentence": "아이콘은 데뷔 후 빠르게 성장했다",
+      "song": "Rhythm Ta",
+      "group": "iKON",
+      "context": "NamuWiki",
+      "source": "database"
+    },
+    {
+      "sentence": "EXO는 전 세계에서 인기가 많다",
+      "song": "Love Shot",
+      "group": "EXO",
+      "context": "NamuWiki",
+      "source": "database"
+    },
+    {
+      "sentence": "EXO의 무대는 화려한 조명으로 빛났다",
+      "song": "Growl",
+      "group": "EXO",
+      "context": "News Article",
+      "source": "database"
+    },
+    {
+      "sentence": "BTS의 'Dynamite'는 전 세계적으로 큰 인기를 얻었습니다",
+      "song": "Dynamite",
+      "group": "BTS",
+      "context": "",
+      "source": "web_search"
+    },
+    {
+      "sentence": "BLACKPINK의 '뚜두뚜두'는 강렬한 비트가 인상적인 곡입니다",
+      "song": "뚜두뚜두",
+      "group": "BLACKPINK",
+      "context": "",
+      "source": "web_search"
+    },
+    {
+      "sentence": "NewJeans의 'Hype Boy'는 Y2K 감성을 담은 노래입니다",
+      "song": "Hype Boy",
+      "group": "NewJeans",
+      "context": "",
+      "source": "web_search"
+    },
+    {
+      "sentence": "아이브의 'LOVE DIVE'는 중독성 있는 멜로디로 유명합니다",
+      "song": "LOVE DIVE",
+      "group": "아이브",
+      "context": "",
+      "source": "web_search"
+    },
+    {
+      "sentence": "세븐틴의 'HOT'은 여름에 어울리는 상쾌한 곡입니다",
+      "song": "HOT",
+      "group": "세븐틴",
+      "context": "",
+      "source": "web_search"
+    }
+  ],
+  "critique_summary": [
+    {
+      "sentence": "흰색 떡국을 먹으면서 중앙에서 놀까요?"
+    },
+    {
+      "sentence": "BTS의 노래를 들으면서 중간에 춤을 출까요?"
+    },
+    {
+      "sentence": "우리 집 중앙에 흰색 꽃을 놓을까요?"
+    }
+  ]
+}

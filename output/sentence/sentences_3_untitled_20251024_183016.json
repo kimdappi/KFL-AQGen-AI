@@ -1,0 +1,52 @@
+{
+  "level": 3,
+  "target_grammar": "-는 김에",
+  "kpop_references": [
+    {
+      "sentence": "블랙핑크는 케이팝 역사에서 중요한 전환점을 만들었다",
+      "song": "Pink Venom",
+      "group": "BLACKPINK",
+      "context": "NamuWiki",
+      "source": "database"
+    },
+    {
+      "sentence": "언론은 블랙핑크의 글로벌 영향력을 크게 보도했다",
+      "song": "How You Like That",
+      "group": "BLACKPINK",
+      "context": "News Article",
+      "source": "database"
+    },
+    {
+      "sentence": "방탄소년단의 곡 봄날은 따뜻한 봄날의 기억을 담고 있다",
+      "song": "Spring Day",
+      "group": "BTS",
+      "context": "NamuWiki",
+      "source": "database"
+    },
+    {
+      "sentence": "최근 기사에 따르면, EXO는 아시아 전역에서 성장하고 있다",
+      "song": "Love Shot",
+      "group": "EXO",
+      "context": "News Article",
+      "source": "database"
+    },
+    {
+      "sentence": "아이콘의 팬덤은 활발한 온라인 활동으로 유명하다",
+      "song": "Rhythm Ta",
+      "group": "iKON",
+      "context": "News Article",
+      "source": "database"
+    }
+  ],
+  "critique_summary": [
+    {
+      "sentence": "BLACKPINK의 중반 무대를 보면서 춤을 연습하는 김에 가죽 재킷을 입어 보았어요."
+    },
+    {
+      "sentence": "BTS의 '봄날'을 듣는 김에 중급 한국어 공부도 함께 하려고 해요."
+    },
+    {
+      "sentence": "EXO의 음악을 듣는 김에 각종 중소기업에 대한 기사도 찾아보았어요."
+    }
+  ]
+}

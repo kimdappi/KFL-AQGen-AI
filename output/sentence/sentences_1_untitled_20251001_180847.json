@@ -1,0 +1,15 @@
+{
+  "level": 1,
+  "target_grammar": "-을까요?",
+  "critique_summary": [
+    {
+      "sentence": "우리의 생활은 한글을 배우는 데 힘이 될까요?"
+    },
+    {
+      "sentence": "주말에 외국 친구와 한글 공부를 할까요?"
+    },
+    {
+      "sentence": "한글을 잘 배우면 외국에서도 힘이 될까요?"
+    }
+  ]
+}

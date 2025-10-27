@@ -1,0 +1,52 @@
+{
+  "level": 1,
+  "target_grammar": "그",
+  "kpop_references": [
+    {
+      "sentence": "아이콘은 데뷔 후 빠르게 성장했다",
+      "song": "Rhythm Ta",
+      "group": "iKON",
+      "context": "NamuWiki",
+      "source": "database"
+    },
+    {
+      "sentence": "EXO는 전 세계에서 인기가 많다",
+      "song": "Love Shot",
+      "group": "EXO",
+      "context": "NamuWiki",
+      "source": "database"
+    },
+    {
+      "sentence": "마음은 시간을 달려가네",
+      "song": "Spring Day",
+      "group": "BTS",
+      "context": "Lyrics",
+      "source": "database"
+    },
+    {
+      "sentence": "많은 사람들이 블랙핑크를 좋아한다",
+      "song": "How You Like That",
+      "group": "BLACKPINK",
+      "context": "NamuWiki",
+      "source": "database"
+    },
+    {
+      "sentence": "무대 위에서 팬들이 블랙핑크를 응원했다",
+      "song": "Pink Venom",
+      "group": "BLACKPINK",
+      "context": "News Article",
+      "source": "database"
+    }
+  ],
+  "critique_summary": [
+    {
+      "sentence": "많은 사람들이 BTS의 흰색 옷을 좋아해요."
+    },
+    {
+      "sentence": "EXO의 노래는 보통 힘이 있어요."
+    },
+    {
+      "sentence": "BLACKPINK처럼 간단히 춤추고 싶어요."
+    }
+  ]
+}

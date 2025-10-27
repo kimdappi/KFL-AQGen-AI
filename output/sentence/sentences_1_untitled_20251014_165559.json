@@ -1,0 +1,9 @@
+{
+  "level": 1,
+  "target_grammar": "-입니까?",
+  "critique_summary": [
+    {
+      "sentence": "한글은 흰색 숙제입니다. 공부는 힘이 필요합니까? 많은 사람들이 흰색 공부를 좋아합니까?"
+    }
+  ]
+}

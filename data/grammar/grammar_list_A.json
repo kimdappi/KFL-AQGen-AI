@@ -1,0 +1,682 @@
+[
+  {
+    "grammar": "-은",
+    "grade": 1,
+    "level": "A"
+  },
+  {
+    "grammar": "-는",
+    "grade": 1,
+    "level": "A"
+  },
+  {
+    "grammar": "-입니다",
+    "grade": 1,
+    "level": "A"
+  },
+  {
+    "grammar": "-입니까?",
+    "grade": 1,
+    "level": "A"
+  },
+  {
+    "grammar": "이",
+    "grade": 1,
+    "level": "A"
+  },
+  {
+    "grammar": "가",
+    "grade": 1,
+    "level": "A"
+  },
+  {
+    "grammar": "-이/가 아니다",
+    "grade": 1,
+    "level": "A"
+  },
+  {
+    "grammar": "그",
+    "grade": 1,
+    "level": "A"
+  },
+  {
+    "grammar": "저",
+    "grade": 1,
+    "level": "A"
+  },
+  {
+    "grammar": "-에 있습니다",
+    "grade": 1,
+    "level": "A"
+  },
+  {
+    "grammar": "-에 없습니다",
+    "grade": 1,
+    "level": "A"
+  },
+  {
+    "grammar": "-을",
+    "grade": 1,
+    "level": "A"
+  },
+  {
+    "grammar": "-를",
+    "grade": 1,
+    "level": "A"
+  },
+  {
+    "grammar": "-과",
+    "grade": 1,
+    "level": "A"
+  },
+  {
+    "grammar": "-와",
+    "grade": 1,
+    "level": "A"
+  },
+  {
+    "grammar": "-에 가다",
+    "grade": 1,
+    "level": "A"
+  },
+  {
+    "grammar": "-고 싶다",
+    "grade": 1,
+    "level": "A"
+  },
+  {
+    "grammar": "-지 않다",
+    "grade": 1,
+    "level": "A"
+  },
+  {
+    "grammar": "-아/어/여요",
+    "grade": 1,
+    "level": "A"
+  },
+  {
+    "grammar": "-(으)ㅂ시다",
+    "grade": 1,
+    "level": "A"
+  },
+  {
+    "grammar": "에",
+    "grade": 1,
+    "level": "A"
+  },
+  {
+    "grammar": "부터",
+    "grade": 1,
+    "level": "A"
+  },
+  {
+    "grammar": "까지",
+    "grade": 1,
+    "level": "A"
+  },
+  {
+    "grammar": "무슨",
+    "grade": 1,
+    "level": "A"
+  },
+  {
+    "grammar": "-을까요?",
+    "grade": 1,
+    "level": "A"
+  },
+  {
+    "grammar": "-네요",
+    "grade": 1,
+    "level": "A"
+  },
+  {
+    "grammar": "-군요",
+    "grade": 1,
+    "level": "A"
+  },
+  {
+    "grammar": "-고",
+    "grade": 1,
+    "level": "A"
+  },
+  {
+    "grammar": "-(으)러",
+    "grade": 1,
+    "level": "A"
+  },
+  {
+    "grammar": "-지만",
+    "grade": 1,
+    "level": "A"
+  },
+  {
+    "grammar": "-을 거예요",
+    "grade": 1,
+    "level": "A"
+  },
+  {
+    "grammar": "-ㅂ니다",
+    "grade": 1,
+    "level": "A"
+  },
+  {
+    "grammar": "-습니다",
+    "grade": 1,
+    "level": "A"
+  },
+  {
+    "grammar": "-았/었/였어요",
+    "grade": 1,
+    "level": "A"
+  },
+  {
+    "grammar": "안",
+    "grade": 1,
+    "level": "A"
+  },
+  {
+    "grammar": "-지 못하다",
+    "grade": 1,
+    "level": "A"
+  },
+  {
+    "grammar": "-아/어/여서",
+    "grade": 1,
+    "level": "A"
+  },
+  {
+    "grammar": "-은 후에",
+    "grade": 1,
+    "level": "A"
+  },
+  {
+    "grammar": "-(으)니까",
+    "grade": 1,
+    "level": "A"
+  },
+  {
+    "grammar": "-(으)시-",
+    "grade": 1,
+    "level": "A"
+  },
+  {
+    "grammar": "-(으)세요",
+    "grade": 1,
+    "level": "A"
+  },
+  {
+    "grammar": "-(으)로",
+    "grade": 1,
+    "level": "A"
+  },
+  {
+    "grammar": "에게",
+    "grade": 1,
+    "level": "A"
+  },
+  {
+    "grammar": "께",
+    "grade": 1,
+    "level": "A"
+  },
+  {
+    "grammar": "-보다",
+    "grade": 1,
+    "level": "A"
+  },
+  {
+    "grammar": "-는 것",
+    "grade": 1,
+    "level": "A"
+  },
+  {
+    "grammar": "-(으)ㄹ",
+    "grade": 1,
+    "level": "A"
+  },
+  {
+    "grammar": "-어/아 주다",
+    "grade": 1,
+    "level": "A"
+  },
+  {
+    "grammar": "에게서",
+    "grade": 1,
+    "level": "A"
+  },
+  {
+    "grammar": "-(으)ㄴ/는 것 같다",
+    "grade": 1,
+    "level": "A"
+  },
+  {
+    "grammar": "-는군요",
+    "grade": 1,
+    "level": "A"
+  },
+  {
+    "grammar": "-(으)려고 하다",
+    "grade": 1,
+    "level": "A"
+  },
+  {
+    "grammar": "-는 게 어때요?",
+    "grade": 1,
+    "level": "A"
+  },
+  {
+    "grammar": "-고 있다",
+    "grade": 1,
+    "level": "A"
+  },
+  {
+    "grammar": "못",
+    "grade": 1,
+    "level": "A"
+  },
+  {
+    "grammar": "-기 전에",
+    "grade": 1,
+    "level": "A"
+  },
+  {
+    "grammar": "-겠-",
+    "grade": 1,
+    "level": "A"
+  },
+  {
+    "grammar": "-지 않아요?",
+    "grade": 1,
+    "level": "A"
+  },
+  {
+    "grammar": "-고요",
+    "grade": 1,
+    "level": "A"
+  },
+  {
+    "grammar": "-어/아/여지다",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-을지",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-을려고",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-네요",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-다니요",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-을 때",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-(으)니까",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-어/아/여 보다",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-(으)면",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-기 때문에",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-(으)면 좋겠다",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-어/아/여서",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-는 중이다",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-지요?",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-(으)ㄹ 테니",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-은 적이 있다(없다)",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-(으)ㄹ 만하다",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-(으)ㄹ까요?",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-(으)ㄹ게요",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-는군요",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-어/아/여 하다",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-어도 되다",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-으면 안 되다",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-(으)면서",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-어/아/여서 그런지",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-(으)ㄹ래요?",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-(으)ㄹ까 하다",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-어 가지고",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-지 마",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-는다, -니?",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-을게요",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-어라, -자",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-게 되다",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-을래요?",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-았다가",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-습니다만",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-는지 알다(모르다)",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-(으)로",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-(으)려면",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-으러/으로 해서",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-으면 되다",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-기 위해서",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-는데요",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-(으)나",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-거나",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "부터",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-는 동안",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-기 시작하다",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-을 테니까",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-을 건가요?",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-는다고 하다",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-냐고 하다",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-자고 하다",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-으라고 하다",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-으려고 하다",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-어 달라고 (주라고) 하다",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-이라서",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "치고는",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-(으)ㄹ걸요",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "아무리 -어도",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-을 줄 알다(모르다)",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-지 않으면 안 되다",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-기 마련이다",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "만큼",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-어도",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-만 못하다",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-은/는 편이다",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-이지",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "미처",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-을 줄 알았다",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-을 뻔했다",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-이나",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-은 뒤에",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-기로 하다",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-자마자",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-는다고 하니까",
+    "grade": 2,
+    "level": "A"
+  },
+  {
+    "grammar": "-지 말고",
+    "grade": 2,
+    "level": "A"
+  }
+]

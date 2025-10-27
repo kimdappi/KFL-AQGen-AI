@@ -1,0 +1,437 @@
+[
+  {
+    "grammar": "-는다고?",
+    "grade": 5,
+    "level": "C"
+  },
+  {
+    "grammar": "-느니?",
+    "grade": 5,
+    "level": "C"
+  },
+  {
+    "grammar": "-는다는",
+    "grade": 5,
+    "level": "C"
+  },
+  {
+    "grammar": "-은/는",
+    "grade": 5,
+    "level": "C"
+  },
+  {
+    "grammar": "-어/아도",
+    "grade": 5,
+    "level": "C"
+  },
+  {
+    "grammar": "-을수록",
+    "grade": 5,
+    "level": "C"
+  },
+  {
+    "grammar": "-는/(으)ㄴ 나머지",
+    "grade": 5,
+    "level": "C"
+  },
+  {
+    "grammar": "-고도",
+    "grade": 5,
+    "level": "C"
+  },
+  {
+    "grammar": "-을 바에야",
+    "grade": 5,
+    "level": "C"
+  },
+  {
+    "grammar": "-의외로",
+    "grade": 5,
+    "level": "C"
+  },
+  {
+    "grammar": "-는 반면에",
+    "grade": 5,
+    "level": "C"
+  },
+  {
+    "grammar": "-다기보다는",
+    "grade": 5,
+    "level": "C"
+  },
+  {
+    "grammar": "-니 하고",
+    "grade": 5,
+    "level": "C"
+  },
+  {
+    "grammar": "-기 마련이다",
+    "grade": 5,
+    "level": "C"
+  },
+  {
+    "grammar": "-과 달리",
+    "grade": 5,
+    "level": "C"
+  },
+  {
+    "grammar": "-은/는",
+    "grade": 5,
+    "level": "C"
+  },
+  {
+    "grammar": "-고서는",
+    "grade": 5,
+    "level": "C"
+  },
+  {
+    "grammar": "-에도 불구하고",
+    "grade": 5,
+    "level": "C"
+  },
+  {
+    "grammar": "-거든",
+    "grade": 5,
+    "level": "C"
+  },
+  {
+    "grammar": "-고 말고요",
+    "grade": 5,
+    "level": "C"
+  },
+  {
+    "grammar": "-다마다",
+    "grade": 5,
+    "level": "C"
+  },
+  {
+    "grammar": "-다 못해",
+    "grade": 5,
+    "level": "C"
+  },
+  {
+    "grammar": "-음으로써",
+    "grade": 5,
+    "level": "C"
+  },
+  {
+    "grammar": "-는 한편",
+    "grade": 5,
+    "level": "C"
+  },
+  {
+    "grammar": "-다 가도",
+    "grade": 5,
+    "level": "C"
+  },
+  {
+    "grammar": "같다면",
+    "grade": 5,
+    "level": "C"
+  },
+  {
+    "grammar": "-으리라고",
+    "grade": 5,
+    "level": "C"
+  },
+  {
+    "grammar": "-었더라면",
+    "grade": 5,
+    "level": "C"
+  },
+  {
+    "grammar": "-는 이상",
+    "grade": 5,
+    "level": "C"
+  },
+  {
+    "grammar": "-을 통해",
+    "grade": 5,
+    "level": "C"
+  },
+  {
+    "grammar": "-게 생기다",
+    "grade": 5,
+    "level": "C"
+  },
+  {
+    "grammar": "-자니",
+    "grade": 5,
+    "level": "C"
+  },
+  {
+    "grammar": "-는 셈 치고",
+    "grade": 5,
+    "level": "C"
+  },
+  {
+    "grammar": "-고도",
+    "grade": 5,
+    "level": "C"
+  },
+  {
+    "grammar": "-는 듯이",
+    "grade": 5,
+    "level": "C"
+  },
+  {
+    "grammar": "-어 주십사 하고",
+    "grade": 5,
+    "level": "C"
+  },
+  {
+    "grammar": "-다니 하다",
+    "grade": 5,
+    "level": "C"
+  },
+  {
+    "grammar": "-나 싶다",
+    "grade": 5,
+    "level": "C"
+  },
+  {
+    "grammar": "-으려던 참이다",
+    "grade": 5,
+    "level": "C"
+  },
+  {
+    "grammar": "-는 한",
+    "grade": 5,
+    "level": "C"
+  },
+  {
+    "grammar": "-어서는",
+    "grade": 5,
+    "level": "C"
+  },
+  {
+    "grammar": "-는 듯하다",
+    "grade": 5,
+    "level": "C"
+  },
+  {
+    "grammar": "-으니만큼",
+    "grade": 5,
+    "level": "C"
+  },
+  {
+    "grammar": "-은 결과",
+    "grade": 5,
+    "level": "C"
+  },
+  {
+    "grammar": "으로는",
+    "grade": 5,
+    "level": "C"
+  },
+  {
+    "grammar": "-더라도",
+    "grade": 5,
+    "level": "C"
+  },
+  {
+    "grammar": "-을뿐더러",
+    "grade": 5,
+    "level": "C"
+  },
+  {
+    "grammar": "-거나",
+    "grade": 6,
+    "level": "C"
+  },
+  {
+    "grammar": "-는다는 것이다",
+    "grade": 6,
+    "level": "C"
+  },
+  {
+    "grammar": "-는 바",
+    "grade": 6,
+    "level": "C"
+  },
+  {
+    "grammar": "-은/는 나머지",
+    "grade": 6,
+    "level": "C"
+  },
+  {
+    "grammar": "-는커녕",
+    "grade": 6,
+    "level": "C"
+  },
+  {
+    "grammar": "조사",
+    "grade": 6,
+    "level": "C"
+  },
+  {
+    "grammar": "-(으)랴마는",
+    "grade": 6,
+    "level": "C"
+  },
+  {
+    "grammar": "-지",
+    "grade": 6,
+    "level": "C"
+  },
+  {
+    "grammar": "마련",
+    "grade": 6,
+    "level": "C"
+  },
+  {
+    "grammar": "-는 한이 있더라도",
+    "grade": 6,
+    "level": "C"
+  },
+  {
+    "grammar": "에 비추어 볼 때",
+    "grade": 6,
+    "level": "C"
+  },
+  {
+    "grammar": "-어 나가다",
+    "grade": 6,
+    "level": "C"
+  },
+  {
+    "grammar": "-는다는 점에서",
+    "grade": 6,
+    "level": "C"
+  },
+  {
+    "grammar": "-는 가운데",
+    "grade": 6,
+    "level": "C"
+  },
+  {
+    "grammar": "-어 봤자",
+    "grade": 6,
+    "level": "C"
+  },
+  {
+    "grammar": "매달려 있다",
+    "grade": 6,
+    "level": "C"
+  },
+  {
+    "grammar": "-기에 앞서서",
+    "grade": 6,
+    "level": "C"
+  },
+  {
+    "grammar": "-오나마",
+    "grade": 6,
+    "level": "C"
+  },
+  {
+    "grammar": "-은 채",
+    "grade": 6,
+    "level": "C"
+  },
+  {
+    "grammar": "-건만",
+    "grade": 6,
+    "level": "C"
+  },
+  {
+    "grammar": "-더니",
+    "grade": 6,
+    "level": "C"
+  },
+  {
+    "grammar": "-음으로써",
+    "grade": 6,
+    "level": "C"
+  },
+  {
+    "grammar": "-는 까닭에",
+    "grade": 6,
+    "level": "C"
+  },
+  {
+    "grammar": "-(으)랴",
+    "grade": 6,
+    "level": "C"
+  },
+  {
+    "grammar": "-는 탓에",
+    "grade": 6,
+    "level": "C"
+  },
+  {
+    "grammar": "이중부정",
+    "grade": 6,
+    "level": "C"
+  },
+  {
+    "grammar": "-거니와",
+    "grade": 6,
+    "level": "C"
+  },
+  {
+    "grammar": "-을/를 비롯하여",
+    "grade": 6,
+    "level": "C"
+  },
+  {
+    "grammar": "이자",
+    "grade": 6,
+    "level": "C"
+  },
+  {
+    "grammar": "따위로",
+    "grade": 6,
+    "level": "C"
+  },
+  {
+    "grammar": "-기 일쑤이다",
+    "grade": 6,
+    "level": "C"
+  },
+  {
+    "grammar": "-으련만",
+    "grade": 6,
+    "level": "C"
+  },
+  {
+    "grammar": "-었더라면",
+    "grade": 6,
+    "level": "C"
+  },
+  {
+    "grammar": "-는답시고",
+    "grade": 6,
+    "level": "C"
+  },
+  {
+    "grammar": "하마터면",
+    "grade": 6,
+    "level": "C"
+  },
+  {
+    "grammar": "-는 듯이",
+    "grade": 6,
+    "level": "C"
+  },
+  {
+    "grammar": "-는 듯싶다",
+    "grade": 6,
+    "level": "C"
+  },
+  {
+    "grammar": "-은 이래",
+    "grade": 6,
+    "level": "C"
+  },
+  {
+    "grammar": "-는다고 치다",
+    "grade": 6,
+    "level": "C"
+  },
+  {
+    "grammar": "-을 법하다",
+    "grade": 6,
+    "level": "C"
+  }
+]

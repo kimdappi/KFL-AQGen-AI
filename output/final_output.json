@@ -1,0 +1,56 @@
+[
+  {
+    "schema_id": "Q_generated_1",
+    "format": "fill_in_blank",
+    "input": {
+      "instruction": "<보기>와 같이 괄호 안의 단어를 사용하여 문장을 완성하십시오.",
+      "example": {
+        "stem": "공부가 힘들면 한글 숙제를 ___ 됩니까? (쉬다)",
+        "answer": "쉬어도"
+      },
+      "stem_with_blank": "매일매일이 숙제로 가득 차면 힘들지만, 블랙핑크 노래를 ___ 공부하면 재미있습니다. ({hint})",
+      "hint": "듣다"
+    },
+    "answer": {
+      "completed_sentence": "매일매일이 숙제로 가득 차면 힘들지만, 블랙핑크 노래를 들으면서 공부하면 재미있습니다."
+    },
+    "rationale": "두 가지 행동을 동시에 함을 나타내는 '-으면서'가 자연스럽습니다. '듣다'는 불규칙 동사이므로 '들으면서'로 활용됩니다."
+  },
+  {
+    "schema_id": "Q_generated_1",
+    "format": "dialogue_completion",
+    "input": {
+      "dialogue_with_missing_turns": [
+        {
+          "speaker": "A",
+          "text": "한국어를 더 잘 배우고 싶어서 새로운 교재를 찾고 있어요."
+        },
+        {
+          "speaker": "B",
+          "text": "___"
+        },
+        {
+          "speaker": "A",
+          "text": "좋은 생각이에요. 전문가에게 도움을 요청하십사 하고 그런 교재를 찾으면 좋겠네요."
+        }
+      ]
+    },
+    "answer": {
+      "completed_dialogue": [
+        {
+          "speaker": "A",
+          "text": "한국어를 더 잘 배우고 싶어서 새로운 교재를 찾고 있어요."
+        },
+        {
+          "speaker": "B",
+          "text": "그렇다면 한국적 요소가 가득한 교재를 추천해 주십사 하고 서점에 가보는 건 어때요?"
+        },
+        {
+          "speaker": "A",
+          "text": "좋은 생각이에요. 전문가에게 도움을 요청하십사 하고 그런 교재를 찾으면 좋겠네요."
+        }
+      ]
+    },
+    "rationale": "B의 발화에서 '추천해 주십사 하고'라는 표현을 사용하여 A의 요청에 대한 제안을 자연스럽게 연결합니다."
+  }
+]

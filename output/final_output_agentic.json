@@ -1,0 +1,24 @@
+[
+  {
+    "schema_id": "Q_generated_2",
+    "format": "sentence_creation",
+    "input": {
+      "instruction": "<보기>와 같이 주어진 표현을 사용하여 '-(으)면서' 문법으로 문장을 완성하십시오.",
+      "example": {
+        "cues": [
+          "무대를 보다",
+          "춤추다"
+        ],
+        "answer": "무대를 보면서 춤춥니다."
+      },
+      "cues": [
+        "음악을 듣다",
+        "자료를 찾다"
+      ]
+    },
+    "answer": {
+      "created_sentence": "음악을 들으면서 자료를 찾습니다."
+    },
+    "rationale": "핵심 표현들을 '-으면서' 문법을 사용하여 자연스러운 문장으로 만들 수 있습니다."
+  }
+]
