@@ -13,6 +13,7 @@ from utils import (
     extract_grammars_from_docs,
     format_docs
 )
+from kpop_evaluator import KpopSentenceEvaluator
 
 
 class KoreanLearningNodes:
@@ -21,8 +22,10 @@ class KoreanLearningNodes:
     def __init__(self, vocabulary_retriever, grammar_retriever, kpop_context, llm=None):
         self.vocabulary_retriever = vocabulary_retriever
         self.grammar_retriever = grammar_retriever
-        self.kpop_context = kpop_context  # ✅ 변경됨
+        self.kpop_context = kpop_context  # 변경됨
         self.llm = llm or OpenAI(temperature=0.7)
+        self.evaluator = KpopSentenceEvaluator()  #  추가
+
 
     def detect_difficulty(self, state: GraphState) -> GraphState:
         """입력 텍스트에서 난이도 감지"""
@@ -127,3 +130,34 @@ class KoreanLearningNodes:
             output += f"- {cleaned}\n"
 
         return {"final_output": output}
+    
+    def evaluate_sentences(self, state):
+        """
+        LLM이 생성한 문장을 평가
+        grammar, vocab은 Document 객체의 metadata에서 추출
+        """
+        grammar = ""
+        vocab = ""
+
+        # ✅ grammar_docs에서 문법 제목 추출
+        if state.get("grammar_docs"):
+            first_doc = state["grammar_docs"][0]
+            grammar = getattr(first_doc, "metadata", {}).get("title", "")
+
+        # ✅ vocabulary_docs에서 어휘 단어 추출
+        if state.get("vocabulary_docs"):
+            first_doc = state["vocabulary_docs"][0]
+            vocab = getattr(first_doc, "metadata", {}).get("word", "")
+
+        results = []
+        for sentence in state["generated_sentences"]:
+            eval_result = self.evaluator.evaluate(sentence, grammar=grammar, vocab=vocab)
+            results.append({
+                "sentence": sentence,
+                "grammar": grammar,
+                "vocab": vocab,
+                **eval_result
+            })
+
+        state["evaluations"] = results
+        return state

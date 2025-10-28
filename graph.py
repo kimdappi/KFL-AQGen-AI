@@ -35,14 +35,16 @@ class KoreanLearningGraph:
         workflow.add_node("retrieve_vocabulary", self.nodes.retrieve_vocabulary)
         workflow.add_node("retrieve_grammar", self.nodes.retrieve_grammar)
         workflow.add_node("generate_sentences", self.nodes.generate_sentences)
+        workflow.add_node("evaluate_sentences", self.nodes.evaluate_sentences)  # ✅ 추가
         workflow.add_node("format_output", self.nodes.format_output)
-        
+
         # 엣지 연결
         workflow.set_entry_point("detect_difficulty")
         workflow.add_edge("detect_difficulty", "retrieve_vocabulary")
         workflow.add_edge("retrieve_vocabulary", "retrieve_grammar")
         workflow.add_edge("retrieve_grammar", "generate_sentences")
-        workflow.add_edge("generate_sentences", "format_output")
+        workflow.add_edge("generate_sentences", "evaluate_sentences")  # ✅ 추가
+        workflow.add_edge("evaluate_sentences", "format_output")       # ✅ 추가
         workflow.add_edge("format_output", END)
         
         # 체크포인터 설정
