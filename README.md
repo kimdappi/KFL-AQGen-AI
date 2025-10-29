@@ -1,5 +1,74 @@
 # KFL-AQGen-AI
 
+한국어 학습용 RAG (Retrieval-Augmented Generation) 데모 프로젝트입니다. TOPIK 단어 CSV와 문법 JSON을 기반으로 검색(retrieval)한 정보를 사용해 LLM이 학습용 예문/문제들을 생성합니다.
+
+간단한 목적
+- 학습 난이도(basic/intermediate/advanced)에 맞는 단어와 문법을 검색
+- 검색된 자료를 바탕으로 LLM(OpenAI)을 이용해 예문/문제 생성
+- LangGraph 기반의 workflow(node)로 처리 파이프라인을 구성
+
+주요 파일
+- `main.py` — 진입점. retriever 초기화, 그래프 구성 후 예제 쿼리 실행
+- `config.py` — 데이터 경로, retriever 및 LLM 기본 설정
+- `graph.py` — LangGraph 워크플로우 정의 (노드 연결 순서 및 엔트리 포인트)
+- `nodes.py` — 각 워크플로우 노드 구현 (난이도 감지, 단어/문법 검색, 문장 생성, 출력 포맷)
+- `vocabulary_retriever.py` — TOPIK CSV를 로드, FAISS + BM25 기반 retriever(Ensemble)를 생성
+- `grammar_retriever.py` — 문법 JSON을 로드, FAISS 기반 retriever를 생성
+- `utils.py` — 난이도 감지, 문서 포맷팅, 데이터 추출 유틸
+- `schema.py` — `GraphState` 타입 정의 (워크플로우 상태)
+- `data/` — 실제 자료 폴더
+  - `data/words/TOPIK*.csv` — 단어 데이터 (CSV)
+  - `data/grammar/grammar_list_*.json` — 문법 데이터 (JSON)
+
+설치 및 실행 (Windows PowerShell)
+1. 가상환경(권장) 생성 및 활성화
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+```
+2. 의존성 설치
+```powershell
+pip install -r requirements.txt
+```
+3. 환경변수 (OpenAI API 키) 설정 — 세션 단위
+```powershell
+#$env:OPENAI_API_KEY = "sk-..."
+```
+또는 프로젝트 루트에 `.env` 파일을 만들어 `OPENAI_API_KEY=sk-...` 형태로 둡니다. `main.py`는 `python-dotenv`로 `.env`를 로드합니다.
+
+4. 실행
+```powershell
+python main.py
+```
+
+핵심 개념 및 운영 방식
+- 난이도는 `basic`, `intermediate`, `advanced` 세 단계로 고정됩니다. (선택/감지 후 해당 레벨의 retriever 사용)
+- `vocabulary_retriever.py`는 CSV에서 `langchain.schema.Document` 객체를 만들고, FAISS 벡터 스토어와 BM25를 만들어 `EnsembleRetriever`로 결합합니다.
+- `grammar_retriever.py`는 JSON 배열을 읽어 `Document`로 변환하고 FAISS 기반 retriever를 만듭니다. 문법은 `grade` 값으로 정렬됩니다.
+- `graph.py`의 LangGraph는 순차적 노드 체인을 사용합니다: detect_difficulty -> retrieve_vocabulary -> retrieve_grammar -> generate_sentences -> format_output
+- 생성 노드(`nodes.py`)는 `langchain.llms.OpenAI`를 사용해 프롬프트로 예문을 생성합니다. 프롬프트는 선택된 단어(품사 포함)와 문법을 전달합니다.
+
+데이터 추가/갱신 팁
+- 단어 CSV를 추가하려면 `data/words`에 CSV를 넣고 `config.py`의 `TOPIK_PATHS`에 경로를 추가합니다.
+- 문법 JSON을 추가하려면 `data/grammar`에 파일을 넣고 `config.py`의 `GRAMMAR_PATHS`를 갱신하세요.
+- CSV/JSON 컬럼/키 구조는 현재 `vocabulary_retriever.py`와 `grammar_retriever.py`에서 읽는 형식과 일치해야 합니다.
+
+주의 및 트러블슈팅
+- Windows 경로 구분자: `config.py`에 백슬래시(`\\`)가 사용되어 있습니다. 경로 이슈가 발생하면 파이썬에서 원시 문자열(r"path") 또는 슬래시(`/`)로 바꿔보세요.
+- FAISS 관련: `faiss-cpu` 설치가 필요합니다. 설치 환경에 따라 빌드/설치 실패가 날 수 있으니 오류 메시지를 확인하세요.
+- OpenAI 키 부족/쿼터: LLM 호출 시 키 문제 또는 쿼터 초과로 실패할 수 있습니다. `.env`와 환경변수를 확실히 확인하세요.
+
+개발자 참고 (빠른 훑어보기)
+- retriever를 수정할 때는 `invoke(query, level)` 시그니처를 유지하세요. 그래프 노드가 해당 시그니처에 의존합니다.
+- 문서의 `metadata` 필드에 단어, 품사, 설명(guide), TOPIK 레벨 등이 포함되어 있어 downstream 포맷/프롬프트 작성에 사용됩니다.
+
+기여 및 피드백
+원하시는 추가 내용(예: 더 자세한 예제, 테스트 스크립트, CI 설정)을 알려주시면 README에 반영하겠습니다.
+
+---
+간단한 업데이트입니다. 내용에 빠진 부분이나 현 프로젝트와 다른 점이 있으면 알려주세요.
+# KFL-AQGen-AI
+
 > **한국어 학습용 문항/예문 자동 생성 시스템**  
 > 단순화된 라우터 기반 Agentic RAG 시스템으로 TOPIK 어휘, 문법, K-pop 문맥을 결합해 난이도별 한국어 학습 자료를 생성합니다.
 

@@ -15,7 +15,7 @@ from datetime import datetime
 from typing import Any
 from datetime import datetime
 from langchain.chat_models import ChatOpenAI
-from Ragsystem.schema import GraphState #디렉토리 구조 정리
+from .schema import GraphState #디렉토리 구조 정리
 from utils import (#사용하는 함수만 선언해도 됨
     detect_difficulty_from_text,
     extract_words_from_docs,
@@ -23,7 +23,7 @@ from utils import (#사용하는 함수만 선언해도 됨
     #extract_grammars_from_docs, format_docs # 현재 안쓰는 함수
 )
 from config import LLM_CONFIG,SENTENCE_SAVE_DIR #문장 저장경로 변경
-from agents import QueryAnalysisAgent, QualityCheckAgent
+from agents import QueryAnalysisAgent  # QualityCheckAgent는 agents.py에 없음 (ProblemImprovementAgent만 존재)
 
 INVALID_CHARS = r'[<>:"/\\|?*\x00-\x1F]'
 
@@ -330,7 +330,7 @@ class AgenticKoreanLearningNodes(KoreanLearningNodes):
         
         # Agentic 에이전트 추가
         self.query_agent = QueryAnalysisAgent(llm)
-        self.quality_agent = QualityCheckAgent(llm)
+        # self.quality_agent = QualityCheckAgent(llm)  # QualityCheckAgent는 agents.py에 없음 (SimplifiedRouterNodes에서 오버라이드됨)
     
     def analyze_query_agent(self, state: GraphState) -> GraphState:
         """쿼리 분석 에이전트 노드"""
@@ -636,4 +636,34 @@ class AgenticKoreanLearningNodes(KoreanLearningNodes):
         
         output += "\n" + "=" * 80 + "\n"
         
-        return {"final_output": output}
+        return {"final_output": output}    
+    def _save_to_json(self, sentence_data: Dict[str, Any]) -> str:
+        """
+        생성된 예문 데이터를 JSON 파일로 저장
+        
+        Args:
+            sentence_data: 저장할 문장 데이터
+            
+        Returns:
+            저장된 파일 경로
+        """
+        # 파일명 생성 (타임스탬프 + target_grammar)
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        grammar = sentence_data.get('target_grammar', 'unknown')
+        safe_grammar = sanitize_filename(grammar)
+        filename = f"{timestamp}_{safe_grammar}.json"
+        
+        # 저장 디렉토리 생성
+        save_dir = Path(SENTENCE_SAVE_DIR)
+        save_dir.mkdir(parents=True, exist_ok=True)
+        
+        # 파일 경로
+        filepath = save_dir / filename
+        
+        # JSON 저장
+        with open(filepath, 'w', encoding='utf-8') as f:
+            json.dump(sentence_data, f, ensure_ascii=False, indent=2)
+        
+        print(f"   💾 파일 저장: {filepath}")
+        
+        return str(filepath)

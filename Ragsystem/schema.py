@@ -38,6 +38,7 @@ class GraphState(TypedDict):
     query_analysis: Optional[Dict]  # 쿼리 분석 결과
     quality_check: Optional[Dict]  # 품질 체크 결과
     routing_decision: Optional[object]  # 라우팅 결정 객체
+    search_params: Optional[Dict]  # 검색 파라미터 (vocabulary, grammar, kpop)
     search_strategies: Optional[List[Dict]]  # 검색 전략 (딕셔너리 리스트)
     rerank_count: Optional[int]  # 재검색 시도 카운터
     rerank_decision: Optional[object]  # 재검색 결정 객체

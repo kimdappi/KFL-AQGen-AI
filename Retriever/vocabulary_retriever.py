@@ -4,6 +4,8 @@
 """
 TOPIK 단어 Retriever
 """
+import os
+from pydoc import doc
 import pandas as pd
 from typing import List, Dict
 from langchain.schema import Document
@@ -21,6 +23,7 @@ class TOPIKVocabularyRetriever:
         self.retrievers = {}
         self._load_vocabulary()
         self._create_retrievers()
+    
     
     def _load_vocabulary(self):
         """CSV 파일들을 레벨별로 로드"""
@@ -90,3 +93,27 @@ class TOPIKVocabularyRetriever:
         return []
 
 
+def _load_vocabulary(self):
+    """CSV 파일들을 레벨별로 로드"""
+    for level, paths in self.csv_paths.items():
+        level_documents = []
+        print(f"📖 [{level}] 어휘 로딩 중...")
+        
+        for path in paths:
+            try:
+                if not os.path.exists(path):
+                    print(f"   ❌ 파일 없음: {path}")
+                    continue
+                    
+                df = pd.read_csv(path, encoding='utf-8')
+                print(f"   ✅ {path}: {len(df)}개 단어")
+                
+                for _, row in df.iterrows():
+                    # ... (기존 코드)
+                    level_documents.append(doc)
+                    
+            except Exception as e:
+                print(f"   ❌ 오류 ({path}): {e}")
+        
+        print(f"   총 {len(level_documents)}개 문서 생성")
+        self.vocabulary_data[level] = level_documents

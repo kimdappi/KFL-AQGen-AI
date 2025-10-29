@@ -1,4 +1,4 @@
-# test_maker.py
+# test_maker.py - 품질 체크 및 개선 기능 추가 버전
 
 import os
 import json
@@ -291,8 +291,6 @@ def select_best_schema(payload: dict) -> dict:
 # 2. [2단계] 문제 생성기
 # ==============================================================================
 
-# test_maker.py 파일 안에 있는 이 함수를 통째로 교체하세요.
-
 def generate_question_item(agent_decision: dict, payload: dict) -> dict:
     """AI 에이전트의 결정을 바탕으로 실제 문제를 '생성'하는 함수"""
     chosen_format = agent_decision.get("chosen_format")
@@ -305,28 +303,20 @@ def generate_question_item(agent_decision: dict, payload: dict) -> dict:
         
     valid_sentences = [item["sentence"] for item in payload.get("critique_summary", [])]
     
-    # --- START: 수정 및 디버깅 코드 추가 ---
     try:
-        # format에 전달할 기본 인자들을 딕셔너리로 정의합니다.
         format_args = {
             "sentences_bullets": bullets(valid_sentences),
             "target_grammar": payload.get("target_grammar", "N/A"),
             "level": payload.get("level", "N/A"),
-            "schema_id": "Q_generated_1"  # ✅ 항상 추가
+            "schema_id": "Q_generated_1"
         }
         
-        # 디버깅을 위해 어떤 인자들이 사용되는지 출력합니다.
-        print(f"DEBUG: Formatting template '{chosen_format}' with keys: {list(format_args.keys())}")
-
-        # 정의된 인자들을 사용하여 프롬프트 포맷팅
         prompt = template.format(**format_args)
 
     except KeyError as e:
         print(f"❌ CRITICAL ERROR: Formatting failed with KeyError.")
-        print(f"   템플릿 '{chosen_format}'에 필요한 키가 format_args에 없는지 확인하세요.")
         print(f"   오류 메시지: {e}")
         return {"error": "Template formatting failed.", "details": str(e)}
-    # --- END: 수정 및 디버깅 코드 추가 ---
     
     print("✍️ 생성 LLM을 호출하여 문제 구성 중입니다...")
     raw_json_output = call_llm(prompt)
@@ -337,25 +327,161 @@ def generate_question_item(agent_decision: dict, payload: dict) -> dict:
         return generated_question
     except json.JSONDecodeError:
         return {"error": "문제 생성 LLM의 응답이 유효한 JSON이 아닙니다."}
+
 # ==============================================================================
-# 3. 전체 파이프라인 실행 함수 (main.py에서 호출할 함수)
+# 3. 전체 파이프라인 실행 함수 - 품질 체크 및 개선 기능 추가
 # ==============================================================================
 
 def create_korean_test_from_payload(payload: dict) -> dict:
     """
     입력받은 payload로 한국어 연습 문제를 생성하는 전체 파이프라인을 실행합니다.
     payload는 'level', 'target_grammar', 'critique_summary' 키를 포함해야 합니다.
+    
+    품질 체크 및 재생성 기능 포함:
+    - 생성된 문제의 품질을 자동으로 검증
+    - 품질이 낮으면 ProblemImprovementAgent로 개선 후 재생성
+    - 최대 3회 시도
     """
     if not all(k in payload for k in ['level', 'target_grammar', 'critique_summary']):
         return {"error": "Payload must contain 'level', 'target_grammar', and 'critique_summary' keys."}
-        
-    # --- 1단계 실행 ---
+    
+    # 품질 체크 및 개선 에이전트 초기화
+    from agents import QueryAnalysisAgent, ProblemImprovementAgent
+    from langchain_openai import ChatOpenAI
+    
+    quality_checker = QueryAnalysisAgent(llm=ChatOpenAI(model="gpt-4o-mini", temperature=0))
+    improver = ProblemImprovementAgent(llm=ChatOpenAI(model="gpt-4o-mini", temperature=0.3))
+    
+    # --- 1단계: 문제 유형 선택 ---
+    print("\n" + "="*70)
+    print("📋 [Step 1] 문제 유형 선택")
+    print("="*70)
     agent_decision = select_best_schema(payload)
     
-    # --- 2단계 실행 ---
-    if "error" not in agent_decision:
-        final_question = generate_question_item(agent_decision, payload)
-        return final_question
-    else:
-        print("에이전트 결정 단계에서 오류가 발생하여 문제 생성을 진행하지 않습니다.")
+    if "error" in agent_decision:
+        print("❌ 에이전트 결정 단계에서 오류가 발생하여 문제 생성을 진행하지 않습니다.")
         return {"error": "Agent decision failed.", "details": agent_decision}
+    
+    print(f"✅ 선택된 유형: {agent_decision.get('chosen_format', 'unknown')}")
+    
+    # --- 2단계: 문제 생성 with 품질 체크 루프 ---
+    print("\n" + "="*70)
+    print("🔄 [Step 2] 문제 생성 및 품질 검증 (최대 3회 시도)")
+    print("="*70)
+    
+    max_attempts = 3
+    final_question = None
+    
+    # 어휘 추출 (품질 체크용)
+    target_vocab = [item["sentence"] for item in payload.get("critique_summary", [])]
+    
+    for attempt in range(1, max_attempts + 1):
+        print(f"\n🔹 시도 {attempt}/{max_attempts}")
+        print("-" * 70)
+        
+        # 첫 시도: 새로 생성, 이후: 개선된 문제 사용
+        if attempt == 1:
+            print("   ✏️ 문제 생성 중...")
+            final_question = generate_question_item(agent_decision, payload)
+            
+            if "error" in final_question:
+                print(f"   ❌ 생성 실패: {final_question.get('error')}")
+                continue
+        else:
+            # 이전 시도에서 개선된 문제 사용
+            print("   ♻️ 개선된 문제 사용...")
+        
+        # 품질 체크
+        print("   🔍 품질 검증 중...")
+        try:
+            quality_result = quality_checker.check_problem_quality(
+                generated_problem=final_question,
+                target_level=str(payload.get('level', 'basic')),
+                learning_goals=None,
+                target_grammar=payload.get('target_grammar'),
+                target_vocab=target_vocab
+            )
+            
+            score = quality_result.get('overall_quality_score', 0)
+            recommendation = quality_result.get('recommendation', 'unknown')
+            
+            print(f"   📊 품질 점수: {score}/100")
+            print(f"   📌 권장사항: {recommendation}")
+            
+            # 상세 점수 출력
+            criteria_scores = quality_result.get('criteria_scores', {})
+            print(f"      - 학습자 적합성: {criteria_scores.get('appropriateness_for_learners', 0)}/100")
+            print(f"      - 교육적 가치: {criteria_scores.get('educational_value', 0)}/100")
+            print(f"      - 문제 설계: {criteria_scores.get('problem_design', 0)}/100")
+            print(f"      - 목표 정렬: {criteria_scores.get('goal_alignment', 0)}/100")
+            print(f"      - 참여도: {criteria_scores.get('engagement', 0)}/100")
+            
+            # 품질 기준: 70점 이상 또는 'accept' 권장
+            if score >= 70 or recommendation == "accept":
+                print(f"   ✅ 품질 기준 충족! (점수: {score}/100)")
+                print(f"   🎉 최종 문제 확정")
+                
+                # 품질 정보 추가
+                final_question['quality_assessment'] = {
+                    'score': score,
+                    'recommendation': recommendation,
+                    'attempts': attempt,
+                    'criteria_scores': criteria_scores
+                }
+                
+                return final_question
+            
+            # 마지막 시도가 아니면 개선
+            if attempt < max_attempts:
+                print(f"   ⚠️ 품질 기준 미달 (점수: {score}/100)")
+                print(f"   🔧 문제 개선 중...")
+                
+                # 약점 출력
+                weaknesses = quality_result.get('weaknesses', [])
+                if weaknesses:
+                    print(f"      약점:")
+                    for i, weakness in enumerate(weaknesses[:3], 1):
+                        print(f"         {i}. {weakness}")
+                
+                # 문제 개선
+                improvement_result = improver.improve_problem(
+                    original_problem=final_question,
+                    evaluation=quality_result,
+                    target_level=str(payload.get('level', 'basic'))
+                )
+                
+                # 개선된 문제 추출
+                improved_question = improvement_result.get('improved_problem')
+                changes_made = improvement_result.get('changes_made', [])
+                
+                if improved_question and changes_made:
+                    print(f"      개선 완료:")
+                    for i, change in enumerate(changes_made[:3], 1):
+                        print(f"         {i}. {change}")
+                    
+                    final_question = improved_question
+                else:
+                    print(f"      ⚠️ 개선 실패, 원본 문제 유지")
+            else:
+                # 마지막 시도 - 현재 문제 반환
+                print(f"   ⚠️ 최대 시도 횟수 도달 (점수: {score}/100)")
+                print(f"   📝 현재 문제로 확정")
+                
+                # 품질 정보 추가
+                final_question['quality_assessment'] = {
+                    'score': score,
+                    'recommendation': recommendation,
+                    'attempts': attempt,
+                    'criteria_scores': criteria_scores,
+                    'note': '최대 시도 횟수 도달'
+                }
+        
+        except Exception as e:
+            print(f"   ❌ 품질 체크 중 오류: {e}")
+            # 오류 발생시 현재 문제 반환
+            if attempt == max_attempts:
+                print(f"   📝 품질 체크 실패로 현재 문제 반환")
+                return final_question
+    
+    print("\n" + "="*70)
+    return final_question

@@ -5,12 +5,12 @@ Simplified Router-Integrated Nodes
 
 from typing import Any, Dict
 from Ragsystem.schema import GraphState
-from Ragsystem.nodes import AgenticKoreanLearningNodes
-from router import SimplifiedRouter
-from agents import QueryAnalysisAgent, ProblemImprovementAgent
+from Ragsystem.nodes import AgenticKoreanLearningNodes  # Agentic 노드 클래스 사용
+from .router import SimplifiedRouter
+from agents import QueryAnalysisAgent  # ProblemImprovementAgent는 test_maker.py에서만 사용
 
 
-class SimplifiedRouterNodes(AgenticKoreanLearningNodes):
+class SimplifiedRouterNodes(AgenticKoreanLearningNodes):  # Agentic 기능 상속
     """
     단순화된 라우터 통합 노드
     - 문법 문제여도 어휘 필수 포함
@@ -22,7 +22,7 @@ class SimplifiedRouterNodes(AgenticKoreanLearningNodes):
         
         # 단순화된 컴포넌트
         self.query_agent = QueryAnalysisAgent(llm=llm)
-        self.quality_agent = ProblemImprovementAgent(llm=llm) 
+        # self.quality_agent 불필요 (check_quality_agent에서 직접 로직 구현)
         self.router = SimplifiedRouter(llm=llm)
         
         print("✅ Simplified Router initialized - Always includes vocabulary")

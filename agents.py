@@ -6,7 +6,9 @@ KFL-AQGen-AI Agentic RAG 에이전트
 
 from typing import Dict, Any, List, Optional
 from langchain_openai import ChatOpenAI
+from langchain_core.messages import HumanMessage
 import json
+import re
 
 
 class QueryAnalysisAgent:
@@ -16,7 +18,8 @@ class QueryAnalysisAgent:
     """
     
     def __init__(self, llm=None):
-        self.llm = llm 
+        # 기본 LLM 설정 추가
+        self.llm = llm or ChatOpenAI(model="gpt-4o-mini", temperature=0.3)
     
     def analyze(self, query: str) -> Dict[str, Any]:
         """
@@ -37,20 +40,51 @@ class QueryAnalysisAgent:
 4. 관심 요소: K-pop 관련 그룹/가수/세계관/콘셉트 등 구체 관심사 확인 후 삽입
 5. 학습 목표: 어휘/문법/표현 학습 의도
 
-JSON 형식으로 반환:
-{
-  "difficulty": "",
-  "topic": "",
-  "needs_kpop": true/false,
-  "user_interests": [],
-  "learning_goals": [],
-  "query_intent": ""
-}
+**중요: 반드시 아래 JSON 형식으로만 응답하세요. 다른 설명은 포함하지 마세요.**
+
+JSON 형식:
+{{
+  "difficulty": "초급/중급/고급 중 하나",
+  "topic": "주제",
+  "needs_kpop": true,
+  "user_interests": ["관심사1", "관심사2"],
+  "learning_goals": ["목표1", "목표2"],
+  "query_intent": "사용자 의도 요약"
+}}
 """
         
-        response = self.llm.predict(prompt)
+        # invoke() 메서드 사용 (predict() deprecated)
+        response = self.llm.invoke(prompt)
         
-        return json.loads(response)
+        # AIMessage 객체에서 content 추출
+        response_text = response.content if hasattr(response, 'content') else str(response)
+        
+        # JSON 파싱 시도
+        try:
+            # 응답에서 JSON 부분만 추출 (마크다운 코드블록 제거)
+            json_match = re.search(r'```json\s*(.*?)\s*```', response_text, re.DOTALL)
+            if json_match:
+                response_text = json_match.group(1)
+            
+            # 중괄호로 시작하는 부분 찾기
+            json_start = response_text.find('{')
+            json_end = response_text.rfind('}') + 1
+            if json_start != -1 and json_end > json_start:
+                response_text = response_text[json_start:json_end]
+            
+            return json.loads(response_text)
+            
+        except json.JSONDecodeError as e:
+            print(f"JSON 파싱 실패. 원본 응답: {response_text}")
+            # 기본값 반환
+            return {
+                "difficulty": "중급",
+                "topic": "일반",
+                "needs_kpop": False,
+                "user_interests": [],
+                "learning_goals": ["한국어 학습"],
+                "query_intent": query
+            }
 
     
     def check_problem_quality(
@@ -86,51 +120,50 @@ Target Vocabulary: {target_vocab}
 
 Evaluate based on these criteria:
 
-1. **Appropriateness for Foreign Learners** (외국인 학습자 적합성):
-- 난이도가 사용자가 원하는 난이도인가?
-- 외국인이 문제를 풀기에 가독성이 좋은 문제인가?
-- 문제, 정답, 예문 모두 오로지 **한국어 교육** 에 적합한가?
+1. **Appropriateness for Foreign Learners** (외국인 학습자 적합성)
+2. **Educational Value** (교육적 가치)
+3. **Problem Design Quality** (문제 설계 품질)
+4. **Learning Goal Alignment** (학습 목표 정렬)
+5. **Engagement and Relevance** (참여도와 관련성)
 
-2. **Educational Value** (교육적 가치):
-- 효과적으로 타겟 문법을 배울 수 있는 문제로 생성되었나?
-- 데이터베이스에서 가져온 해당 난이도에 알맞는 단어를 사용해서 문제를 만들었나?
-- 한국어를 배우는 목표에 맞는 문제인가?
+**중요: 반드시 아래 JSON 형식으로만 응답하세요.**
 
-3. **Problem Design Quality** (문제 설계 품질):
-- 해당 문제가 주어진 문제 형식에 적합하게 만들어졌나?
-
-4. **Learning Goal Alignment** (학습 목표 정렬):
-- 학습해야 하는 목표에 알맞는 문제가 생성이 되었는가?
-
-5. **Engagement and Relevance** (참여도와 관련성):
-- 생성된 문제와 예상 답안이 모두 번역체가 아닌 자연스러운 한국어로 구성되어 있나?
-
-Json 포멧으로 각 항목에 대해 점수를 반환하세요:
-{{
-  "overall_quality_score": 0-100,
-  "is_appropriate": true/false,
-  "criteria_scores": {{
-    "appropriateness_for_learners": 0-100,
-    "educational_value": 0-100,
-    "problem_design": 0-100,
-    "goal_alignment": 0-100,
-    "engagement": 0-100
-  }},
-  "strengths": ["list of strengths"],
-  "weaknesses": ["list of weaknesses"],
-  "improvement_suggestions": ["specific suggestions"],
-  "recommendation": "accept/revise/reject",
-  "detailed_feedback": "comprehensive feedback message"
-}}
+{{{{
+  "overall_quality_score": 80,
+  "is_appropriate": true,
+  "criteria_scores": {{{{
+    "appropriateness_for_learners": 80,
+    "educational_value": 80,
+    "problem_design": 80,
+    "goal_alignment": 80,
+    "engagement": 80
+  }}}},
+  "strengths": ["강점1", "강점2"],
+  "weaknesses": ["약점1"],
+  "improvement_suggestions": ["제안1"],
+  "recommendation": "accept",
+  "detailed_feedback": "종합 피드백"
+}}}}
 """
         
-        response = self.llm.predict(prompt)
+        response = self.llm.invoke(prompt)
+        response_text = response.content if hasattr(response, 'content') else str(response)
         
         try:
-            evaluation = json.loads(response)
+            # JSON 추출
+            json_match = re.search(r'```json\s*(.*?)\s*```', response_text, re.DOTALL)
+            if json_match:
+                response_text = json_match.group(1)
+            
+            json_start = response_text.find('{')
+            json_end = response_text.rfind('}') + 1
+            if json_start != -1 and json_end > json_start:
+                response_text = response_text[json_start:json_end]
+            
+            evaluation = json.loads(response_text)
             
             # 종합 판단
-            if evaluation["overall_quality_score"] >= 70:
+            if evaluation.get("overall_quality_score", 0) >= 70:
                 evaluation["final_verdict"] = "한국어 학습에 적합한 문제"
             else:
                 evaluation["final_verdict"] = "문제 재생성 필요"
@@ -185,36 +218,40 @@ class ProblemImprovementAgent:
             개선된 문제 또는 개선 제안
         """
         
-        if evaluation["recommendation"] == "accept":
+        if evaluation.get("recommendation") == "accept":
             return original_problem
         
-        prompt = f""" 아래 원문 문제를 분석하고, 평가 내용을 반영하여 한국어 교육에 더 적합한 문제로 재구성하세요.
+        prompt = f"""아래 원문 문제를 분석하고, 평가 내용을 반영하여 한국어 교육에 더 적합한 문제로 재구성하세요.
 
 원문 문제: {json.dumps(original_problem, ensure_ascii=False)}
 평가 결과: {json.dumps(evaluation, ensure_ascii=False)}
 목표 난이도: {target_level}
 
-개선 시 중점 사항:
-1. 평가에서 드러난 약점 보완
-2. 제시된 개선 의견 반영
-3. 한국어 학습자를 위한 문제 및 학습 목표에 맞춘 문제
-4. {target_level} 수준에 맞는 난이도 조정
+**중요: 반드시 아래 JSON 형식으로만 응답하세요.**
 
-출력 형식(JSON):
-{
-  "improved_problem": { ... },  
-  "changes_made": ["구체적으로 어떤 부분을 어떻게 바꿨는지"],
-  "rationale": "왜 그렇게 수정했는지 (교육적 이유)"
-}
-
-반드시 JSON만 출력하고, 설명은 JSON 내부 'changes_made'와 'rationale'에 포함하세요.
-
+{{{{
+  "improved_problem": {{}},
+  "changes_made": ["변경사항1", "변경사항2"],
+  "rationale": "개선 이유"
+}}}}
 """
         
-        response = self.llm.predict(prompt)
+        response = self.llm.invoke(prompt)
+        response_text = response.content if hasattr(response, 'content') else str(response)
         
         try:
-            return json.loads(response)
+            # JSON 추출
+            json_match = re.search(r'```json\s*(.*?)\s*```', response_text, re.DOTALL)
+            if json_match:
+                response_text = json_match.group(1)
+            
+            json_start = response_text.find('{')
+            json_end = response_text.rfind('}') + 1
+            if json_start != -1 and json_end > json_start:
+                response_text = response_text[json_start:json_end]
+            
+            return json.loads(response_text)
+            
         except json.JSONDecodeError:
             return {
                 "improved_problem": original_problem,

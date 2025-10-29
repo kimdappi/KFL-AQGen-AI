@@ -1,24 +1,31 @@
 [
   {
     "schema_id": "Q_generated_1",
-    "format": "sentence_creation",
+    "format": "fill_in_blank",
     "input": {
-      "instruction": "<보기>와 같이 주어진 표현을 사용하여 '-(으)면서' 문법으로 문장을 완성하십시오.",
+      "instruction": "<보기>와 같이 괄호 안의 단어를 사용하여 문장을 완성하십시오.",
       "example": {
-        "cues": [
-          "음악을 듣다",
-          "기사 읽다"
-        ],
-        "answer": "음악을 들으면서 기사를 읽습니다."
+        "stem": "내일은 날씨가 좋으니까 ___ 가요. (공원)",
+        "answer": "공원에"
       },
-      "cues": [
-        "팬 활동을 하다",
-        "목표를 세우다"
-      ]
+      "stem_with_blank": "저는 한국 음식을 좋아해요, 특히 ___ 맛있어요. ({hint})",
+      "hint": "김치찌개"
     },
     "answer": {
-      "created_sentence": "팬 활동을 하면서 목표를 세워보는 것도 좋겠어요."
+      "completed_sentence": "저는 한국 음식을 좋아해요, 특히 김치찌개가 맛있어요."
     },
-    "rationale": "핵심 표현들을 '-으면서' 문법을 사용하여 자연스러운 문장으로 만들 수 있습니다."
+    "rationale": "빈칸에는 특정 음식을 나타내는 명사가 들어가며, '김치찌개가 맛있어요'라는 문장이 자연스럽습니다.",
+    "quality_assessment": {
+      "score": 80,
+      "recommendation": "accept",
+      "attempts": 1,
+      "criteria_scores": {
+        "appropriateness_for_learners": 80,
+        "educational_value": 80,
+        "problem_design": 80,
+        "goal_alignment": 80,
+        "engagement": 80
+      }
+    }
   }
 ]

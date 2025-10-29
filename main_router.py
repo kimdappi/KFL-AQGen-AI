@@ -15,7 +15,7 @@ from Retriever.vocabulary_retriever import TOPIKVocabularyRetriever
 from Retriever.grammar_retriever import GrammarRetriever
 from Retriever.kpop_retriever import KpopSentenceRetriever
 
-from Ragsystem.graph_agentic_router import RouterAgenticGraph
+from Ragsystem.graph_agentic_router import SimplifiedRouterGraph  # 올바른 클래스명
 from config import TOPIK_PATHS, GRAMMAR_PATHS, KPOP_PATHS , SENTENCE_SAVE_DIR
 from test_maker import create_korean_test_from_payload
 
@@ -55,7 +55,7 @@ def main():
     
     # 라우터 통합 Agentic RAG 그래프 구축
     print("\n🔧 지능형 라우터 기반 Agentic RAG 그래프 구축 중...")
-    graph = RouterAgenticGraph(
+    graph = SimplifiedRouterGraph(
         topik_retriever,
         grammar_retriever,
         kpop_retriever
