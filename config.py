@@ -32,11 +32,8 @@ LLM_CONFIG = {
 }
 
 # Kpop 데이터 설정
-KPOP_PATHS = {
-    'basic': [r'data\kpop\kpop_basic.csv'],
-    'intermediate': [r'data\kpop\kpop_intermediate.csv'],
-    'advanced': [r'data\kpop\kpop_advanced.csv']
-}
+# 변경됨
+KPOP_JSON_PATH = r'data\kpop\kpop_db.json'
 
 # 생성문장 위치(nodes.py에서 사용)
 SENTENCE_SAVE_DIR = "output/sentence"

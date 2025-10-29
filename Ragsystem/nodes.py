@@ -398,60 +398,98 @@ class AgenticKoreanLearningNodes(KoreanLearningNodes):
     Updated generate_sentences_with_kpop method for nodes.py
     Replace the existing method in AgenticKoreanLearningNodes class
     """
-
-    def generate_sentences_with_kpop(self, state: GraphState) -> GraphState:
+    
+    def generate_sentences_with_kpop(self, state):
         """
-        K-pop 정보를 활용한 한국어 학습 문장 생성 (조건부)
-        K-pop 검색 결과가 있을 때만 K-pop 맥락 포함
+        K-pop 메타데이터를 활용한 한국어 학습 문장 생성
+        쿼리에 명시된 그룹만 사용 (필터링 적용)
         """
-        print("\n✏️ [Agent] 한국어 학습 문장 생성")
+        print("\n✏️ [Agent] 한국어 학습 문장 생성 (K-pop 그룹 필터링)")
+        
+        from utils import extract_words_from_docs, extract_grammar_with_grade
         
         words_info = extract_words_from_docs(state['vocabulary_docs'])
         grammar_info = extract_grammar_with_grade(state['grammar_docs'])
         
-        # K-pop 정보 통합 (있을 때만)
-        kpop_references = []
-        kpop_context_text = ""
-        has_kpop = False
-        kpop_groups = []  # K-pop 그룹 리스트
-        kpop_songs = []   # K-pop 노래 리스트
-        
-        # DB에서 가져온 K-pop 문장들
-        kpop_db_docs = state.get('kpop_docs', [])
-        if kpop_db_docs:
-            has_kpop = True
-            for doc in kpop_db_docs[:5]:
-                sentence = doc.metadata.get('sentence', '')
-                song = doc.metadata.get('song', '')
-                group = doc.metadata.get('group', '')
-                context = doc.metadata.get('context', '')
-                
-                if sentence:
-                    kpop_references.append({
-                        "sentence": sentence,
-                        "song": song,
-                        "group": group,
-                        "context": context,
-                        "source": "database"
-                    })
-                    kpop_context_text += f'- "{sentence}" ({song} - {group})\n'
-                    
-                    # 그룹명과 노래 제목 수집
-                    if group and group not in kpop_groups:
-                        kpop_groups.append(group)
-                    if song and song not in kpop_songs:
-                        kpop_songs.append(song)
-        
-        # needs_kpop 확인 (쿼리에 K-pop 키워드가 있는지)
+        # 쿼리 분석에서 언급된 K-pop 그룹 추출
         query_analysis = state.get('query_analysis', {})
         needs_kpop = query_analysis.get('needs_kpop', False)
+        specified_groups = query_analysis.get('kpop_groups', [])  # ← NEW!
+        
+        print(f"   쿼리 분석: needs_kpop={needs_kpop}, 지정된 그룹={specified_groups}")
+        
+        # K-pop 메타데이터 통합 (필터링 적용)
+        kpop_metadata = []
+        kpop_context_text = ""
+        has_kpop = False
+        kpop_groups = []
+        
+        # DB에서 가져온 K-pop 메타데이터
+        kpop_db_docs = state.get('kpop_docs', [])
+        
+        if kpop_db_docs:
+            # ✅ 필터링 로직 추가
+            filtered_docs = []
+            
+            if specified_groups:
+                # 쿼리에 특정 그룹이 명시된 경우: 해당 그룹만 사용
+                for doc in kpop_db_docs:
+                    group = doc.metadata.get('group', '')
+                    # 대소문자 무시하고 비교
+                    if any(g.upper() == group.upper() for g in specified_groups):
+                        filtered_docs.append(doc)
+                
+                if filtered_docs:
+                    print(f"   ✅ 필터링 완료: {len(kpop_db_docs)}개 → {len(filtered_docs)}개 (지정된 그룹만)")
+                else:
+                    print(f"   ⚠️ 지정된 그룹({specified_groups})을 찾을 수 없어 필터링 없이 사용")
+                    filtered_docs = kpop_db_docs[:3]
+            else:
+                # 쿼리에 특정 그룹이 없는 경우: 모든 검색 결과 사용
+                filtered_docs = kpop_db_docs[:3]
+                print(f"   ℹ️ 특정 그룹 지정 없음, 검색 결과 상위 {len(filtered_docs)}개 사용")
+            
+            # 필터링된 문서 처리
+            if filtered_docs:
+                has_kpop = True
+                for doc in filtered_docs:
+                    group = doc.metadata.get('group', '')
+                    agency = doc.metadata.get('agency', '')
+                    fandom = doc.metadata.get('fandom', '')
+                    concepts = doc.metadata.get('concepts', [])
+                    members = doc.metadata.get('members', [])
+                    
+                    if group:
+                        kpop_groups.append(group)
+                        
+                        # 메타데이터 저장
+                        kpop_metadata.append({
+                            "group": group,
+                            "agency": agency,
+                            "fandom": fandom,
+                            "concepts": concepts,
+                            "members": [m.get("name", "") for m in members[:4]]
+                        })
+                        
+                        # 컨텍스트 텍스트 구성
+                        kpop_context_text += f"【{group}】\n"
+                        if agency:
+                            kpop_context_text += f"  소속사: {agency}\n"
+                        if fandom:
+                            kpop_context_text += f"  팬덤: {fandom}\n"
+                        if concepts:
+                            kpop_context_text += f"  컨셉: {', '.join(concepts)}\n"
+                        if members:
+                            member_names = [m.get("name", "") for m in members[:4]]
+                            kpop_context_text += f"  멤버: {', '.join(member_names)}\n"
+                        kpop_context_text += "\n"
         
         if has_kpop:
-            print(f"   K-pop 참조 문장: {len(kpop_references)}개 (DB)")
+            print(f"   K-pop 그룹 정보: {len(kpop_metadata)}개 - {kpop_groups}")
             if needs_kpop:
                 print(f"   ⚠️ K-pop 쿼리 감지: K-pop 내용 필수 포함")
         else:
-            print(f"   K-pop 참조 문장: 없음 (일반 예문 생성)")
+            print(f"   K-pop 그룹 정보: 없음 (일반 예문 생성)")
         
         # 어휘 포맷팅
         words_formatted = []
@@ -479,37 +517,41 @@ class AgenticKoreanLearningNodes(KoreanLearningNodes):
         
         # K-pop 유무에 따른 프롬프트 생성
         if has_kpop and needs_kpop:
-            # K-pop 쿼리이고 참조가 있을 때 - K-pop 내용 필수
-            kpop_groups_text = ', '.join(kpop_groups[:3]) if kpop_groups else ""
-            kpop_songs_text = ', '.join(kpop_songs[:3]) if kpop_songs else ""
+            # K-pop 쿼리이고 메타데이터가 있을 때
+            # ✅ 지정된 그룹만 사용하도록 명시
+            groups_text = ', '.join(kpop_groups)
             
             kpop_instruction = f"""
-    【K-pop 참조 자료 ({len(kpop_references)}개)】
+    【K-pop 그룹 정보 ({len(kpop_metadata)}개)】
     {kpop_context_text}
-    
-    🎵 K-pop 그룹: {kpop_groups_text}
-    🎵 노래 제목: {kpop_songs_text}
 
     **⚠️ K-pop 필수 포함 규칙**:
-    - 위에 제시된 K-pop 그룹명(예: {kpop_groups[0] if kpop_groups else 'BTS'})을 **반드시** 3개 문장 모두에 포함해야 합니다
-    - K-pop 참조 문장의 내용을 자연스럽게 활용하세요
-    - 예시: "{kpop_groups[0] if kpop_groups else 'BLACKPINK'}처럼 춤추고 싶어요"
-    - K-pop 관련 내용이 모든 문장에 포함되어야 합니다.
+    - **오직 위에 제시된 그룹({groups_text})만 사용**하세요
+    - 다른 K-pop 그룹은 절대 언급하지 마세요
+    - 영어 그룹명/멤버명은 **한국어 표기로 자연스럽게 변환**하세요
+    예: "BLACKPINK" → "블랙핑크", "Jennie" → "제니", "BTS" → "방탄소년단"
+    - K-pop 관련 내용이 3개 문장 모두에 포함되어야 합니다
+    - 예시: "저는 블랙핑크의 노래를 좋아해요", "제니처럼 춤추고 싶어요"
     """
-            kpop_requirement = f"**필수**: K-pop 관련 내용(그룹명, 노래 등)이 3개 문장 모두에 포함되어야 합니다."
+            kpop_requirement = f"**필수**: {groups_text} 관련 내용만 사용하여 3개 문장 모두에 포함"
+            
         elif has_kpop and not needs_kpop:
-            # K-pop 참조는 있지만 필수는 아닐 때
+            # K-pop 메타데이터는 있지만 필수는 아닐 때
+            groups_text = ', '.join(kpop_groups)
+            
             kpop_instruction = f"""
-    【K-pop 참조 문장 ({len(kpop_references)}개)】
+    【K-pop 그룹 정보 ({len(kpop_metadata)}개) - 선택 사항】
     {kpop_context_text}
 
     **K-pop 활용 규칙**:
-    - 위의 K-pop 참조 문장 내용을 자연스럽게 활용할 수 있습니다
-    - K-pop 아티스트, 노래, 문화를 언급하면 학습자에게 더 흥미로울 수 있습니다
+    - 위 정보({groups_text})를 자연스럽게 활용할 수 있습니다
+    - 영어 이름은 한국어로 표기하세요 (예: "Jennie" → "제니")
+    - K-pop 내용을 포함하면 학습자에게 더 흥미로울 수 있습니다
     """
-            kpop_requirement = "K-pop 관련 내용이 자연스럽게 포함되면 좋지만 필수는 아닙니다"
+            kpop_requirement = f"{groups_text} 관련 내용을 포함하면 좋지만 필수는 아닙니다"
+            
         else:
-            # K-pop 참조가 없을 때
+            # K-pop 메타데이터가 없을 때
             kpop_instruction = ""
             kpop_requirement = ""
         
@@ -528,8 +570,8 @@ class AgenticKoreanLearningNodes(KoreanLearningNodes):
     1. **필수**: 제시된 어휘 중 최소 3개 이상 포함
     2. **필수**: 목표 문법 '{target_grammar}' 반드시 사용
     3. 문법 등급 {target_grade}에 적합한 난이도
-    4. 외국인이 한국어를 사용시 실제로 사용 가능한 표현
-    5. 자연스러운 한국어 
+    4. 외국인이 한국어 사용 시 실제로 사용 가능한 표현
+    5. **완전한 한국어 문장** (영어 고유명사는 한국어 표기 사용)
     6. 한국 문화적으로 적절해야 한다
     {f'7. ✅ {kpop_requirement}' if kpop_requirement else ''}
 
@@ -543,15 +585,18 @@ class AgenticKoreanLearningNodes(KoreanLearningNodes):
         
         response = self.llm.predict(prompt)
         sentences = response.strip().split('\n')
-        sentences = [s.strip() for s in sentences if s.strip()][:3]  # 정확히 3개
+        sentences = [s.strip() for s in sentences if s.strip()][:3]
         
         print(f"   생성 완료: {len(sentences)}개 문장")
+        for i, s in enumerate(sentences, 1):
+            print(f"      {i}. {s}")
         
         # JSON 저장 데이터
         save_data = {
             "level": target_grade,
             "target_grammar": target_grammar,
-            "kpop_references": kpop_references,  # 있을 때만 포함
+            "kpop_references": kpop_metadata if kpop_metadata else [],
+            "specified_groups": specified_groups,  # ← NEW! 쿼리에 지정된 그룹
             "critique_summary": [{"sentence": s} for s in sentences]
         }
         
@@ -566,7 +611,6 @@ class AgenticKoreanLearningNodes(KoreanLearningNodes):
             "sentence_data": save_data,
             "target_grade": target_grade
         }
-
 
     def format_output_agentic(self, state: GraphState) -> GraphState:
         """출력 포맷팅 (Agentic 버전 - 한국어 교육 중심)"""

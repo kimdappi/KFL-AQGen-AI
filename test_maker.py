@@ -30,7 +30,7 @@ FILL_IN_BLANK_TMPL = """\
 
 MATCH_AND_CONNECT_TMPL = """\
 [ROLE] 너는 '외국어로서의 한국어' 교재 편집자다. 반드시 JSON만 출력한다.
-[GOAL] 입력된 문장들을 분해하고 재조합하여, 문장 연결하기 문제를 생성한다.
+[GOAL] 입력된 문장들을 분해하고 재조합하여, 문장 연결하기 문제를 생성한다. 반드시 입력된 문장들만 사용한다.
 [INPUT_SENTENCES]
 {sentences_bullets}
 [INSTRUCTIONS]
@@ -49,6 +49,7 @@ SENTENCE_CONNECTION_TMPL = """\
 - 입력된 문장 하나를 두 개의 절로 분해하여 문장 연결 문제를 생성한다.
 
 [INPUT_SENTENCES]
+- 아래 정확히 3개의 예문 중에서만 사용한다. 
 {sentences_bullets}
 
 [INSTRUCTIONS]
@@ -76,7 +77,7 @@ SENTENCE_CREATION_TMPL = """\
 [ROLE] 한국어 문장 생성 문제 출제자. JSON만 출력.
 
 [GOAL]
-- 입력된 문장에서 핵심 표현을 추출하여 문장 생성 문제를 만든다.
+- 입력된 문장에서 핵심 표현을 추출하여 문장 생성 문제를 만든다. 
 
 [INPUT_SENTENCES]
 {sentences_bullets}

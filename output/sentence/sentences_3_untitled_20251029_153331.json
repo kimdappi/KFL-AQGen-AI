@@ -1,0 +1,36 @@
+{
+  "level": 3,
+  "target_grammar": "-는 김에",
+  "kpop_references": [
+    {
+      "group": "BLACKPINK",
+      "agency": "YG Entertainment",
+      "fandom": "BLINK",
+      "concepts": [
+        "girl crush",
+        "hip-hop",
+        "confidence"
+      ],
+      "members": [
+        "Jisoo",
+        "Jennie",
+        "Rosé",
+        "Lisa"
+      ]
+    }
+  ],
+  "specified_groups": [
+    "BLACKPINK"
+  ],
+  "critique_summary": [
+    {
+      "sentence": "블랙핑크의 무대를 보면서 중급 한국어를 가꾸는 김에 더 열심히 공부해야겠어요."
+    },
+    {
+      "sentence": "힘차게 노래하는 로제를 보니까 저도 중소기업에서 일하는 꿈을 이루고 싶어졌어요."
+    },
+    {
+      "sentence": "제니처럼 자신감 있게 중반 무대에 서는 김에 저도 노래 연습을 더 해야겠어요."
+    }
+  ]
+}

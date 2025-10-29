@@ -16,7 +16,7 @@ from Retriever.grammar_retriever import GrammarRetriever
 from Retriever.kpop_retriever import KpopSentenceRetriever
 
 from Ragsystem.graph_agentic_router import RouterAgenticGraph
-from config import TOPIK_PATHS, GRAMMAR_PATHS, KPOP_PATHS , SENTENCE_SAVE_DIR
+from config import TOPIK_PATHS, GRAMMAR_PATHS, KPOP_JSON_PATH , SENTENCE_SAVE_DIR
 from test_maker import create_korean_test_from_payload
 
 load_dotenv()
@@ -50,7 +50,7 @@ def main():
     print("   ├─ 문법 패턴 데이터베이스")
     grammar_retriever = GrammarRetriever(GRAMMAR_PATHS)
     print("   └─ K-pop 학습 자료 데이터베이스")
-    kpop_retriever = KpopSentenceRetriever(KPOP_PATHS)
+    kpop_retriever = KpopSentenceRetriever(KPOP_JSON_PATH)
     print("   ✅ 모든 데이터베이스 초기화 완료")
     
     # 라우터 통합 Agentic RAG 그래프 구축
