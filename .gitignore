@@ -29,3 +29,4 @@ Thumbs.db
 
 # === Git 관련 ===
 .git/
+.env/

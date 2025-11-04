@@ -10,3 +10,5 @@ openai
 pydantic<3
 rank_bm25
 #faiss 설치는 추가로 해줘야 할것임
+#env 파일 만들어서 api key 복사한거 넣어주셈
+faiss-cpu>=1.8.0

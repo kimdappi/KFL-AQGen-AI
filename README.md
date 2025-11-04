@@ -44,9 +44,14 @@ KFL-AQGen-AI/
 │   ├── graph.py                      # 기본 그래프
 │   └── graph_agentic_router.py       # 🆕 라우터 통합 그래프
 │
+├── 📂 Evaluator/                     # 평가 스크립트
+│   └── kpop_evaluator.py
+│
 ├── 📂 output/                        # 출력 결과
 │   ├── 📂 sentence/                  # 생성된 예문 (JSON)
-│   └── final_v.1.json                # 최종 문제
+│   ├── final_output_agentic.json     # 최종 문제 (agentic)
+│   ├── final_output.json             # 최종 문제
+│   └── final_v.1.json                # 이전 버전 결과
 │
 ├── 🐍 agents.py                      # AI 에이전트
 ├── ⚙️ config.py                      # 설정 파일
@@ -63,7 +68,7 @@ KFL-AQGen-AI/
 
 #### 1. 🚀 실행 파일
 - **`main_router.py`**: 지능형 라우터 통합 메인 실행 파일 (권장)
-- **`main.py`**: 기본 Agentic RAG 실행 파일
+ 
 
 #### 2. 🕸️ 그래프 워크플로우
 - **`graph_agentic_router.py`**: 지능형 라우터 통합 LangGraph 워크플로우 (최신)
@@ -88,7 +93,7 @@ KFL-AQGen-AI/
 ### 데이터 소스
 - **어휘**: `data/words/TOPIK{1..6}.csv` (TOPIK 1-6급 어휘)
 - **문법**: `data/grammar/grammar_list_{A|B|C}.json` (기초/중급/고급)
-- **K-pop**: `data/kpop/kpop_{basic|intermediate|advanced}.csv`
+- **K-pop**: `data/kpop/kpop_db.json`
 
 ## 🔄 처리 흐름 (지능형 라우터 통합 Agentic RAG)
 
@@ -173,10 +178,10 @@ pip install -r requirements.txt
 ```
 
 #### 추가 설치 (FAISS)
+요구사항에 포함되어 자동 설치됩니다. GPU 환경만 별도 설치를 고려하세요:
 ```bash
-pip install faiss-cpu  # CPU 버전
-# 또는
-pip install faiss-gpu  # GPU 버전 (CUDA 지원 시)
+# (선택) CUDA 환경에서 GPU 버전 사용 시
+pip install --upgrade --force-reinstall faiss-gpu
 ```
 
 ### 2. 환경변수 설정
@@ -196,7 +201,7 @@ OPENAI_API_KEY=your_openai_api_key_here
 data/
 ├── words/          # TOPIK1.csv ~ TOPIK6.csv
 ├── grammar/        # grammar_list_A.json, B.json, C.json
-└── kpop/          # kpop_basic.csv, intermediate.csv, advanced.csv
+└── kpop/          # kpop_db.json
 ```
 
 경로는 `config.py`의 `TOPIK_PATHS`, `GRAMMAR_PATHS`, `KPOP_PATHS`에서 관리됩니다.
@@ -209,9 +214,7 @@ python main_router.py
 ```
 
 #### 기본 실행 방법
-```bash
-python main.py
-```
+(해당 없음)
 
 ### 5. 실행 결과
 
@@ -222,7 +225,7 @@ python main.py
 
 **파일 생성:**
 - `sentence/` 폴더에 최신 예문 JSON이 저장됩니다
-- `final_output_agentic.json`에 최종 연습문제가 저장됩니다
+- `final_output_agentic.json`, `final_output.json`, `final_v.1.json`에 결과가 저장됩니다
 - 지능형 라우터를 통해 검색 효율성이 향상됩니다
 
 ## 🧭 지능형 라우터 기능
@@ -392,7 +395,7 @@ pandas
 openai
 pydantic<3
 rank_bm25
-faiss-cpu  # 또는 faiss-gpu
+faiss-cpu>=1.8.0  # 또는 faiss-gpu
 ```
 
 ## 💡 팁
