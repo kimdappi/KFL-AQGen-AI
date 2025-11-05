@@ -1,0 +1,72 @@
+{
+  "level": 5,
+  "target_grammar": "-다기보다는",
+  "kpop_references": [
+    {
+      "group": "EXO",
+      "agency": "SM Entertainment",
+      "fandom": "EXO-L",
+      "concepts": [
+        "power/superpower lore",
+        "performance",
+        "vocal-centered"
+      ],
+      "members": [
+        "Xiumin",
+        "Suho",
+        "Baekhyun",
+        "Chen"
+      ]
+    },
+    {
+      "group": "BTS",
+      "agency": "BIGHIT MUSIC",
+      "fandom": "ARMY",
+      "concepts": [
+        "self-love",
+        "youth",
+        "storytelling"
+      ],
+      "members": [
+        "RM",
+        "Jin",
+        "Suga",
+        "J-Hope"
+      ]
+    },
+    {
+      "group": "SEVENTEEN",
+      "agency": "Pledis Entertainment",
+      "fandom": "CARAT",
+      "concepts": [
+        "self-producing",
+        "performance",
+        "youth"
+      ],
+      "members": [
+        "S.Coups",
+        "Jeonghan",
+        "Joshua",
+        "Jun"
+      ]
+    }
+  ],
+  "specified_groups": [],
+  "critique_summary": [
+    {
+      "sentence": "1. EXO의 음악은 힘차다기보다는 그들의 뛰어난 퍼포먼스와 보컬에 더 중점을 둔다고 할 수 있다. 대중문화 속에서 EXO의 존재는 강력하게 자리 잡고 있다.",
+      "grammar_ok": true,
+      "vocab_ok": true
+    },
+    {
+      "sentence": "2. BTS는 자아 사랑을 주제로 한 곡들이 많지만, 단순히 그 메시지에 그치기보다는 그들의 이야기를 통해 청소년들에게 힘을 주고 향상할 수 있는 기회를 제공한다.",
+      "grammar_ok": true,
+      "vocab_ok": true
+    },
+    {
+      "sentence": "3. SEVENTEEN은 자가 제작 그룹으로 잘 알려져 있지만, 그들의 음악이 단순히 자작곡이라는 점에 국한되기보다는 공연을 통해 팬들과의 소통을 강화하는 데 더 중점을 둔다.",
+      "grammar_ok": true,
+      "vocab_ok": true
+    }
+  ]
+}

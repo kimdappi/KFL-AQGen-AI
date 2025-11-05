@@ -1,12 +1,152 @@
-{
-  "group": "BLACKPINK",
-  "members": [
-    {"name": "Jisoo", "role": "vocal", "debut": "2016-08-08"},
-    {"name": "Jennie", "role": "rapper", "debut": "2016-08-08"},
-    {"name": "Rosé", "role": "vocal", "debut": "2016-08-08"},
-    {"name": "Lisa", "role": "rapper", "debut": "2016-08-08"}
-  ],
-  "agency": "YG Entertainment",
-  "fandom": "BLINK",
-  "concepts": ["girl crush", "hip-hop", "confidence"]
-}
+[
+  {
+    "group": "BLACKPINK",
+    "members": [
+      {"name": "Jisoo", "role": "vocal", "debut": "2016-08-08"},
+      {"name": "Jennie", "role": "rapper", "debut": "2016-08-08"},
+      {"name": "Rosé", "role": "vocal", "debut": "2016-08-08"},
+      {"name": "Lisa", "role": "rapper", "debut": "2016-08-08"}
+    ],
+    "agency": "YG Entertainment",
+    "fandom": "BLINK",
+    "concepts": ["girl crush", "hip-hop", "confidence"]
+  },
+  {
+    "group": "BTS",
+    "members": [
+      {"name": "RM", "role": "rapper", "debut": "2013-06-13"},
+      {"name": "Jin", "role": "vocal", "debut": "2013-06-13"},
+      {"name": "Suga", "role": "rapper", "debut": "2013-06-13"},
+      {"name": "J-Hope", "role": "rapper", "debut": "2013-06-13"},
+      {"name": "Jimin", "role": "vocal", "debut": "2013-06-13"},
+      {"name": "V", "role": "vocal", "debut": "2013-06-13"},
+      {"name": "Jungkook", "role": "vocal", "debut": "2013-06-13"}
+    ],
+    "agency": "BIGHIT MUSIC",
+    "fandom": "ARMY",
+    "concepts": ["self-love", "youth", "storytelling"]
+  },
+  {
+    "group": "TWICE",
+    "members": [
+      {"name": "Nayeon", "role": "vocal", "debut": "2015-10-20"},
+      {"name": "Jeongyeon", "role": "vocal", "debut": "2015-10-20"},
+      {"name": "Momo", "role": "dance", "debut": "2015-10-20"},
+      {"name": "Sana", "role": "vocal", "debut": "2015-10-20"},
+      {"name": "Jihyo", "role": "vocal", "debut": "2015-10-20"},
+      {"name": "Mina", "role": "vocal", "debut": "2015-10-20"},
+      {"name": "Dahyun", "role": "rapper", "debut": "2015-10-20"},
+      {"name": "Chaeyoung", "role": "rapper", "debut": "2015-10-20"},
+      {"name": "Tzuyu", "role": "vocal", "debut": "2015-10-20"}
+    ],
+    "agency": "JYP Entertainment",
+    "fandom": "ONCE",
+    "concepts": ["bright", "cute", "energetic"]
+  },
+  {
+    "group": "Red Velvet",
+    "members": [
+      {"name": "Irene", "role": "vocal", "debut": "2014-08-01"},
+      {"name": "Seulgi", "role": "vocal", "debut": "2014-08-01"},
+      {"name": "Wendy", "role": "vocal", "debut": "2014-08-01"},
+      {"name": "Joy", "role": "vocal", "debut": "2014-08-01"},
+      {"name": "Yeri", "role": "vocal", "debut": "2015-03-18"}
+    ],
+    "agency": "SM Entertainment",
+    "fandom": "ReVeluv",
+    "concepts": ["duality", "red & velvet", "art-pop"]
+  },
+  {
+    "group": "IVE",
+    "members": [
+      {"name": "Yujin", "role": "vocal", "debut": "2021-12-01"},
+      {"name": "Gaeul", "role": "rapper", "debut": "2021-12-01"},
+      {"name": "Rei", "role": "rapper", "debut": "2021-12-01"},
+      {"name": "Wonyoung", "role": "vocal", "debut": "2021-12-01"},
+      {"name": "Liz", "role": "vocal", "debut": "2021-12-01"},
+      {"name": "Leeseo", "role": "vocal", "debut": "2021-12-01"}
+    ],
+    "agency": "Starship Entertainment",
+    "fandom": "DIVE",
+    "concepts": ["elegance", "self-love", "girl crush"]
+  },
+  {
+    "group": "NewJeans",
+    "members": [
+      {"name": "Minji", "role": "vocal", "debut": "2022-07-22"},
+      {"name": "Hanni", "role": "vocal", "debut": "2022-07-22"},
+      {"name": "Danielle", "role": "vocal", "debut": "2022-07-22"},
+      {"name": "Haerin", "role": "vocal", "debut": "2022-07-22"},
+      {"name": "Hyein", "role": "vocal", "debut": "2022-07-22"}
+    ],
+    "agency": "ADOR",
+    "fandom": "Bunnies",
+    "concepts": ["y2k", "minimal pop", "natural"]
+  },
+  {
+    "group": "SEVENTEEN",
+    "members": [
+      {"name": "S.Coups", "role": "rapper", "debut": "2015-05-26"},
+      {"name": "Jeonghan", "role": "vocal", "debut": "2015-05-26"},
+      {"name": "Joshua", "role": "vocal", "debut": "2015-05-26"},
+      {"name": "Jun", "role": "vocal", "debut": "2015-05-26"},
+      {"name": "Hoshi", "role": "dance", "debut": "2015-05-26"},
+      {"name": "Wonwoo", "role": "rapper", "debut": "2015-05-26"},
+      {"name": "Woozi", "role": "vocal", "debut": "2015-05-26"},
+      {"name": "DK", "role": "vocal", "debut": "2015-05-26"},
+      {"name": "Mingyu", "role": "rapper", "debut": "2015-05-26"},
+      {"name": "The8", "role": "dance", "debut": "2015-05-26"},
+      {"name": "Seungkwan", "role": "vocal", "debut": "2015-05-26"},
+      {"name": "Vernon", "role": "rapper", "debut": "2015-05-26"},
+      {"name": "Dino", "role": "dance", "debut": "2015-05-26"}
+    ],
+    "agency": "Pledis Entertainment",
+    "fandom": "CARAT",
+    "concepts": ["self-producing", "performance", "youth"]
+  },
+  {
+    "group": "Stray Kids",
+    "members": [
+      {"name": "Bang Chan", "role": "vocal", "debut": "2018-03-25"},
+      {"name": "Lee Know", "role": "dance", "debut": "2018-03-25"},
+      {"name": "Changbin", "role": "rapper", "debut": "2018-03-25"},
+      {"name": "Hyunjin", "role": "rapper", "debut": "2018-03-25"},
+      {"name": "Han", "role": "rapper", "debut": "2018-03-25"},
+      {"name": "Felix", "role": "dance", "debut": "2018-03-25"},
+      {"name": "Seungmin", "role": "vocal", "debut": "2018-03-25"},
+      {"name": "I.N", "role": "vocal", "debut": "2018-03-25"}
+    ],
+    "agency": "JYP Entertainment",
+    "fandom": "STAY",
+    "concepts": ["self-production", "hip-hop", "raw energy"]
+  },
+  {
+    "group": "LE SSERAFIM",
+    "members": [
+      {"name": "Chaewon", "role": "vocal", "debut": "2022-05-02"},
+      {"name": "Sakura", "role": "vocal", "debut": "2022-05-02"},
+      {"name": "Yunjin", "role": "vocal", "debut": "2022-05-02"},
+      {"name": "Kazuha", "role": "vocal", "debut": "2022-05-02"},
+      {"name": "Eunchae", "role": "vocal", "debut": "2022-05-02"}
+    ],
+    "agency": "SOURCE MUSIC",
+    "fandom": "FEARNOT",
+    "concepts": ["fearless", "performance", "confidence"]
+  },
+  {
+    "group": "EXO",
+    "members": [
+      {"name": "Xiumin", "role": "vocal", "debut": "2012-04-08"},
+      {"name": "Suho", "role": "vocal", "debut": "2012-04-08"},
+      {"name": "Baekhyun", "role": "vocal", "debut": "2012-04-08"},
+      {"name": "Chen", "role": "vocal", "debut": "2012-04-08"},
+      {"name": "Chanyeol", "role": "rapper", "debut": "2012-04-08"},
+      {"name": "D.O.", "role": "vocal", "debut": "2012-04-08"},
+      {"name": "Kai", "role": "dance", "debut": "2012-04-08"},
+      {"name": "Sehun", "role": "rapper", "debut": "2012-04-08"}
+    ],
+    "agency": "SM Entertainment",
+    "fandom": "EXO-L",
+    "concepts": ["power/superpower lore", "performance", "vocal-centered"]
+  }
+]

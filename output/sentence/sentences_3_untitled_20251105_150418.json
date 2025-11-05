@@ -1,0 +1,42 @@
+{
+  "level": 3,
+  "target_grammar": "-는 김에",
+  "kpop_references": [
+    {
+      "group": "BTS",
+      "agency": "BIGHIT MUSIC",
+      "fandom": "ARMY",
+      "concepts": [
+        "self-love",
+        "youth",
+        "storytelling"
+      ],
+      "members": [
+        "RM",
+        "Jin",
+        "Suga",
+        "J-Hope"
+      ]
+    }
+  ],
+  "specified_groups": [
+    "BTS"
+  ],
+  "critique_summary": [
+    {
+      "sentence": "문장1: BTS의 음악을 듣는 김에 중반에 있는 노래들을 집중적으로 들어보세요.",
+      "grammar_ok": true,
+      "vocab_ok": true
+    },
+    {
+      "sentence": "문장2: BTS의 공연을 보러 가는 김에 힘차게 응원해 주면 좋겠어요.",
+      "grammar_ok": true,
+      "vocab_ok": false
+    },
+    {
+      "sentence": "문장3: BTS의 팬이 되는 김에 중급 한국어를 배우는 것도 추천합니다.",
+      "grammar_ok": true,
+      "vocab_ok": true
+    }
+  ]
+}

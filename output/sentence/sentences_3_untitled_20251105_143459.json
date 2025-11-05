@@ -1,0 +1,42 @@
+{
+  "level": 3,
+  "target_grammar": "-는 김에",
+  "kpop_references": [
+    {
+      "group": "TWICE",
+      "agency": "JYP Entertainment",
+      "fandom": "ONCE",
+      "concepts": [
+        "bright",
+        "cute",
+        "energetic"
+      ],
+      "members": [
+        "Nayeon",
+        "Jeongyeon",
+        "Momo",
+        "Sana"
+      ]
+    }
+  ],
+  "specified_groups": [
+    "TWICE"
+  ],
+  "critique_summary": [
+    {
+      "sentence": "1. 중반에 열리는 TWICE의 콘서트를 보러 가는 김에 친구들에게도 자랑하고 싶어요.",
+      "grammar_ok": true,
+      "vocab_ok": false
+    },
+    {
+      "sentence": "2. 힘차게 노래하는 TWICE의 모습을 보면서 힘없이 지내던 일상에서 벗어나고 싶습니다.",
+      "grammar_ok": false,
+      "vocab_ok": true
+    },
+    {
+      "sentence": "3. 중소기업에서 일하는 저는 TWICE의 팬이 되어 힘차게 하루를 시작하는 김에 새로운 목표를 세워야겠어요.",
+      "grammar_ok": true,
+      "vocab_ok": true
+    }
+  ]
+}

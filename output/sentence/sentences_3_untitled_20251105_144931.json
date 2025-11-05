@@ -1,0 +1,42 @@
+{
+  "level": 3,
+  "target_grammar": "-는 김에",
+  "kpop_references": [
+    {
+      "group": "BLACKPINK",
+      "agency": "YG Entertainment",
+      "fandom": "BLINK",
+      "concepts": [
+        "girl crush",
+        "hip-hop",
+        "confidence"
+      ],
+      "members": [
+        "Jisoo",
+        "Jennie",
+        "Rosé",
+        "Lisa"
+      ]
+    }
+  ],
+  "specified_groups": [
+    "BLACKPINK"
+  ],
+  "critique_summary": [
+    {
+      "sentence": "중반에 있는 연습을 더 잘하기 위해서, BLACKPINK의 춤 영상을 보면서 따라 해보는 김에 나도 같이 연습해 보았다.",
+      "grammar_ok": true,
+      "vocab_ok": false
+    },
+    {
+      "sentence": "힘차게 노래하는 BLACKPINK의 모습을 보면서, 나도 힘없이 노래하는 것보다는 자신 있게 부르는 김에 연습을 시작했다.",
+      "grammar_ok": true,
+      "vocab_ok": true
+    },
+    {
+      "sentence": "중소기업에서 일하는 친구를 만나게 된 김에, 그에게 BLACKPINK의 음악이 어떻게 인기를 끌고 있는지 물어보았다.",
+      "grammar_ok": true,
+      "vocab_ok": true
+    }
+  ]
+}

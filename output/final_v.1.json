@@ -1,24 +1,46 @@
 [
   {
-    "schema_id": "Q_generated_1",
+    "schema_id": "Q_3_sentence_creation",
+    "format": "sentence_creation",
+    "input": {
+      "instruction": "<보기>와 같이 주어진 표현을 사용하여 '-는 김에' 문법으로 문장을 완성하십시오.",
+      "example": {
+        "cues": [
+          "연습하다",
+          "무대를 보여주다"
+        ],
+        "answer": "힘차게 연습하는 김에 친구들에게도 무대를 보여주고 싶어요."
+      },
+      "cues": [
+        "중소기업에 취직하다",
+        "경험을 쌓다"
+      ]
+    },
+    "answer": {
+      "created_sentence": "중소기업에 취직하는 김에 다양한 경험을 쌓고 싶습니다."
+    },
+    "rationale": "핵심 표현들을 '-는 김에' 문법을 사용하여 자연스러운 문장으로 만들 수 있습니다."
+  },
+  {
+    "schema_id": "Q_5_sentence_creation",
     "format": "sentence_creation",
     "input": {
       "instruction": "<보기>와 같이 주어진 표현을 사용하여 문장을 완성하십시오.",
       "example": {
         "cues": [
-          "앨범을 듣다",
-          "춤을 추다"
+          "BLACKPINK의 공연",
+          "강한 에너지를 전달하다"
         ],
-        "answer": "블랙핑크의 새로운 앨범을 듣는 김에 힘차게 춤도 춰볼 거야."
+        "answer": "BLACKPINK의 공연은 강한 에너지를 전달합니다."
       },
       "cues": [
-        "콘서트에 가다",
-        "상품을 구경하다"
+        "BLACKPINK",
+        "음악과 스타일로 새로운 트렌드를 만들다"
       ]
     },
     "answer": {
-      "created_sentence": "블랙핑크의 콘서트에 가는 김에 중소기업의 상품도 구경해 보려고 해."
+      "created_sentence": "BLACKPINK는 음악과 스타일로 새로운 트렌드를 만들어가고 있다."
     },
-    "rationale": "주어진 표현들을 사용하여 원본 문장을 재구성할 수 있습니다."
+    "rationale": "주어진 표현을 활용하여 BLACKPINK의 특징을 강조하는 문장을 만들 수 있습니다."
   }
 ]

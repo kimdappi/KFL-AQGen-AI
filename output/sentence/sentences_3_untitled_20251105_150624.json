@@ -1,0 +1,72 @@
+{
+  "level": 3,
+  "target_grammar": "-는 김에",
+  "kpop_references": [
+    {
+      "group": "IVE",
+      "agency": "Starship Entertainment",
+      "fandom": "DIVE",
+      "concepts": [
+        "elegance",
+        "self-love",
+        "girl crush"
+      ],
+      "members": [
+        "Yujin",
+        "Gaeul",
+        "Rei",
+        "Wonyoung"
+      ]
+    },
+    {
+      "group": "BTS",
+      "agency": "BIGHIT MUSIC",
+      "fandom": "ARMY",
+      "concepts": [
+        "self-love",
+        "youth",
+        "storytelling"
+      ],
+      "members": [
+        "RM",
+        "Jin",
+        "Suga",
+        "J-Hope"
+      ]
+    },
+    {
+      "group": "NewJeans",
+      "agency": "ADOR",
+      "fandom": "Bunnies",
+      "concepts": [
+        "y2k",
+        "minimal pop",
+        "natural"
+      ],
+      "members": [
+        "Minji",
+        "Hanni",
+        "Danielle",
+        "Haerin"
+      ]
+    }
+  ],
+  "specified_groups": [],
+  "critique_summary": [
+    {
+      "sentence": "중반에 도착하는 김에 카페에서 커피도 한 잔 마시고 가세요.",
+      "grammar_ok": true,
+      "vocab_ok": true
+    },
+    {
+      "sentence": "힘차게 연습하는 김에 친구들에게도 무대를 보여주고 싶어요.",
+      "grammar_ok": true,
+      "vocab_ok": true
+    },
+    {
+      "sentence": "중소기업에 취직하는 김에 다양한 경험을 쌓고 싶습니다.",
+      "grammar_ok": true,
+      "vocab_ok": true
+    }
+  ]
+}

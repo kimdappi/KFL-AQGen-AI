@@ -74,84 +74,87 @@ def main():
     
     all_generated_questions = []
     
-    # 테스트 쿼리
-    test_queries = [
-        "Create **middle** level Korean grammar practice questions about blackpink",
-    ]
     
-    for idx, query in enumerate(test_queries, 1):
+    # 사용자 입력 받기
+    print("\n💬 한국어 학습 문제를 생성할 쿼리를 입력하세요.")
+    print("   예시: 'Create intermediate level Korean grammar practice questions about BLACKPINK'")
+    print("   종료하려면 'quit' 또는 'exit'를 입력하세요.\n")
+    
+    while True:
+        query = input("📝 쿼리 입력: ").strip()
+        
+        if query.lower() in ['quit', 'exit', '종료', '그만']:
+            print("\n👋 프로그램을 종료합니다.")
+            break
+        
+        if not query:
+            print("   ⚠️ 쿼리를 입력해주세요.\n")
+            continue
+        
         print(f"\n{'='*80}")
-        print(f"🔹 쿼리 {idx}/{len(test_queries)}")
+        print(f"🔹 처리 중...")
         print(f"   입력: {query}")
         print('='*80)
-        
-        try:
-            # 1. 라우터 기반 Agentic RAG 실행
-            rag_output_string = graph.invoke(query, config)
-            
-            print("\n" + "="*80)
-            print("📊 RAG 시스템 최종 출력")
-            print("="*80)
-            print(rag_output_string)
-            print("="*80)
 
-            # 2. 최신 JSON 파일 찾기
-            latest_payload_file = find_latest_sentence_file()
-            
-            if latest_payload_file:
-                print(f"\n📄 생성된 예문 파일: {latest_payload_file}")
-                
-                with open(latest_payload_file, 'r', encoding='utf-8') as f:
-                    sentence_payload = json.load(f)
-                
-                # Payload 검증
-                print("\n" + "="*70)
-                print("📋 생성된 학습 자료 정보")
-                print("="*70)
-                print(f"   학습자 수준 (등급): {sentence_payload.get('level')}")
-                print(f"   목표 문법: {sentence_payload.get('target_grammar')}")
-                print(f"   생성된 예문: {len(sentence_payload.get('critique_summary', []))}개")
-                
-                # 생성된 문장 출력
-                for i, item in enumerate(sentence_payload.get('critique_summary', []), 1):
-                    print(f"      {i}. {item.get('sentence', 'N/A')}")
-                
-                # K-pop 정보 확인
-                if 'kpop_references' in sentence_payload:
-                    kpop_refs = sentence_payload['kpop_references']
-                    db_count = len(kpop_refs)  # 모두 DB에서
-                    
-                    print(f"\n   ✨ K-pop 참조 자료: 총 {len(kpop_refs)}개")
-                    print(f"      - 데이터베이스: {db_count}개")
-                    
-                    for i, ref in enumerate(kpop_refs[:5], 1):
-                        print(f"      {i}. [DB] {ref.get('group', 'N/A')} - {ref.get('song', 'N/A')}")
-                
-                print("="*70)
-                
-                # 3. 문제 생성
-                print("\n🎯 한국어 학습 문제 생성 파이프라인 시작...")
-                final_question = create_korean_test_from_payload(sentence_payload)
-                
-                if final_question and "error" not in final_question:
-                    print("\n" + "="*70)
-                    print("✅ 생성된 한국어 학습 문제")
-                    print("="*70)
-                    print(json.dumps(final_question, indent=2, ensure_ascii=False))
-                    print("="*70)
-                    
-                    all_generated_questions.append(final_question)
-                else:
-                    print(f"\n❌ 문제 생성 실패: {final_question}")
-                
-            else:
-                print("\n⚠️ 'sentence' 폴더에서 JSON 파일을 찾을 수 없습니다.")
-        
+        # 1. 라우터 기반 Agentic RAG 실행
+        try:
+            rag_output_string = graph.invoke(query, config)
+            print("\n" + "="*80)
         except Exception as e:
-            print(f"\n❌ 오류 발생: {e}")
-            import traceback
-            traceback.print_exc()
-        
+            print(f"❌ 오류가 발생했습니다: {e}")
+            continue
+
+        # 2. 최신 JSON 파일 찾기
+        latest_payload_file = find_latest_sentence_file()
+
+        if latest_payload_file:
+            print(f"\n📄 생성된 예문 파일: {latest_payload_file}")
+            
+            with open(latest_payload_file, 'r', encoding='utf-8') as f:
+                sentence_payload = json.load(f)
+            
+            # Payload 검증
+            print("\n" + "="*70)
+            print("📋 생성된 학습 자료 정보")
+            print("="*70)
+            print(f"   학습자 수준 (등급): {sentence_payload.get('level')}")
+            print(f"   목표 문법: {sentence_payload.get('target_grammar')}")
+            print(f"   생성된 예문: {len(sentence_payload.get('critique_summary', []))}개")
+            
+            # 생성된 문장 출력
+            for i, item in enumerate(sentence_payload.get('critique_summary', []), 1):
+                print(f"      {i}. {item.get('sentence', 'N/A')}")
+            
+            # K-pop 정보 확인
+            if 'kpop_references' in sentence_payload:
+                kpop_refs = sentence_payload['kpop_references']
+                db_count = len(kpop_refs)  # 모두 DB에서
+                
+                print(f"\n   ✨ K-pop 참조 자료: 총 {len(kpop_refs)}개")
+                print(f"      - 데이터베이스: {db_count}개")
+                
+                for i, ref in enumerate(kpop_refs[:5], 1):
+                    print(f"      {i}. [DB] {ref.get('group', 'N/A')} - {ref.get('song', 'N/A')}")
+            
+            print("="*70)
+            
+            # 3. 문제 생성
+            print("\n🎯 한국어 학습 문제 생성 파이프라인 시작...")
+            final_question = create_korean_test_from_payload(sentence_payload)
+            
+            if final_question and "error" not in final_question:
+                print("\n" + "="*70)
+                print("✅ 생성된 한국어 학습 문제")
+                print("="*70)
+                print(json.dumps(final_question, indent=2, ensure_ascii=False))
+                print("="*70)
+                
+                all_generated_questions.append(final_question)
+            else:
+                print(f"\n❌ 문제 생성 실패: {final_question}")
+        else:
+            print("\n⚠️ 'sentence' 폴더에서 JSON 파일을 찾을 수 없습니다.")
+
         print("\n" + "="*80)
     
     # 최종 출력 저장
@@ -161,14 +164,14 @@ def main():
     print(f"{'='*80}")
     print(f"   생성된 문제 수: {len(all_generated_questions)}개")
     print(f"   저장 파일명: {output_filename}")
-    
+
     try:
         with open(output_filename, 'w', encoding='utf-8') as f:
             json.dump(all_generated_questions, f, ensure_ascii=False, indent=2)
         print(f"   ✅ '{output_filename}' 저장 완료")
     except Exception as e:
         print(f"   ❌ 파일 저장 실패: {e}")
-    
+
     print("\n" + "="*80)
     print("🎉 모든 작업 완료!")
     print("   외국인을 위한 한국어 학습 문제가 성공적으로 생성되었습니다.")

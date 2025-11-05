@@ -1,9 +1,11 @@
 # =====================================
-# nodes.py (Updated) - Evaluator 통합 버전
-# 수정 완료
+# nodes.py (개선 버전) - Evaluator 기반 최적화
 # =====================================
 """
-LangGraph 노드 정의 (문장 저장 기능 및 평가 기능 포함)
+LangGraph 노드 정의 (개선된 재생성 로직)
+- 3회 시도 후 가장 좋은 결과 자동 선택
+- 점진적 프롬프트 강화
+- 명확한 어휘 할당
 """
 import json
 import os
@@ -22,7 +24,7 @@ from utils import (
 from config import LLM_CONFIG, SENTENCE_SAVE_DIR
 from agents import QueryAnalysisAgent, QualityCheckAgent
 
-# Evaluator 임포트 (optional)
+# Evaluator 임포트
 try:
     from Evaluator.kpop_evaluator import KpopSentenceEvaluator
     EVALUATOR_ENABLED = True
@@ -64,7 +66,6 @@ class KoreanLearningNodes:
                 print(f"   ℹ️ 평가기 초기화 실패: {e}")
                 self.evaluator = None
         
-        # sentence 폴더 생성
         self.output_dir = "sentence"
         if not os.path.exists(self.output_dir):
             os.makedirs(self.output_dir)
@@ -121,27 +122,21 @@ class KoreanLearningNodes:
         
         print(f"[참조] K-pop 참조 개수: {len(kpop_references)}")
         
-        # 문법과 grade 정보 추출
         grammar_info = extract_grammar_with_grade(state['grammar_docs'])
         
         # 어휘 포맷팅
         words_formatted = []
-        vocab_list = []  # 평가용
+        vocab_list = []
         for word, wordclass in words_info[:5]:
             words_formatted.append(f"{word}({wordclass})")
             vocab_list.append(word)
         
-        if grammar_info:
-            random_grammar_item = random.choice(grammar_info)
-            target_grammar = random_grammar_item['grammar']
-            target_grade = random_grammar_item['grade']
-            print("grammar : ", target_grammar)
-            print("grade : ", target_grade)
-        else:
-            target_grammar = "기본 문법"
-            target_grade = 1
+        target_grammar = grammar_info[0]['grammar'] if grammar_info else "기본 문법"
+        target_grade = grammar_info[0]['grade'] if grammar_info else 1
         
-        # 난이도별 프롬프트 생성
+        print("grammar : ", target_grammar)
+        print("grade : ", target_grade)
+        
         difficulty = state['difficulty_level']
         difficulty_guide = {
             "basic": "초급 학습자 (TOPIK 1-2급): 짧고 간단한 문장, 기본 시제 사용",
@@ -163,7 +158,7 @@ class KoreanLearningNodes:
         sentences = response.strip().split('\n')
         sentences = [s.strip() for s in sentences if s.strip()][:3]
         
-        # 평가 수행 (있을 경우)
+        # 평가 수행
         critique_summary = self._evaluate_sentences(
             sentences, 
             target_grammar, 
@@ -192,7 +187,7 @@ class KoreanLearningNodes:
     
     def _build_generation_prompt(self, difficulty, target_grade, words_formatted, 
                                 target_grammar, kpop_context_text, difficulty_guide):
-        """프롬프트 템플릿 생성 (난이도별)"""
+        """프롬프트 템플릿 생성"""
         prompt_templates = {
             "basic": """
 [ROLE]
@@ -206,9 +201,8 @@ class KoreanLearningNodes:
 
 [SENTENCE RULES]
 1. 짧고 간단한 문장 (10-15 단어)
-2. 기본 시제만 사용
-3. 문법 패턴 {target_grammar} 필수 포함
-4. 제시된 단어 최소 3개 포함
+2. 문법 패턴 {target_grammar} 필수 포함
+3. 제시된 단어 문장 하나당 최소 1개씩 겹치지 않게 필수 포함
 
 형식: 번호 없이 문장 3개만
 """,
@@ -223,10 +217,9 @@ class KoreanLearningNodes:
 - K-pop 참고: {kpop_context_text}
 
 [REQUIREMENTS]
-1. 자연스러운 대화체
-2. 문법 {target_grammar} 활용
-3. 제시된 어휘 3-4개 포함
-4. 실생활 상황 반영
+1. 중급 수준의 문장 생성
+2. 문법 {target_grammar} 필수 포함
+3. 제시된 어휘 문장당 최소 1개씩 겹치지 않게 필수 포함
 
 출력: 예문 3개만 (번호 없이)
 """,
@@ -242,9 +235,8 @@ class KoreanLearningNodes:
 
 [REQUIREMENTS]
 1. 복잡한 문장 구조
-2. 문법 {target_grammar} 심화 활용
-3. 고급 어휘 사용
-4. 문어체 또는 격식체
+2. 문법 {target_grammar} 필수 포함해서 심화 활용
+3. 제시된 어휘 중 문장당 최소 1개 겹치지 않게 필수 포함
 
 출력: 예문 3개만
 """
@@ -270,7 +262,6 @@ class KoreanLearningNodes:
                     vocab=vocab_list
                 )
                 
-                # 평가 결과를 critique_summary에 포함
                 critique_summary = []
                 for sent, eval_res in zip(sentences, evaluation_results):
                     critique_summary.append({
@@ -284,7 +275,6 @@ class KoreanLearningNodes:
             except Exception as e:
                 print(f"   ⚠️ 평가 중 오류: {e}")
         
-        # 평가 없이 기본 형식
         return [{"sentence": s} for s in sentences]
     
     def format_output(self, state: GraphState) -> GraphState:
@@ -299,7 +289,6 @@ class KoreanLearningNodes:
         for i, sentence in enumerate(state['generated_sentences'], 1):
             output += f"{i}. {sentence}\n"
         
-        # JSON 파일 저장
         if 'sentence_data' in state and state['sentence_data']:
             saved_file = self._save_to_json(state['sentence_data'])
             output += f"\n예문이 저장되었습니다: {saved_file}\n"
@@ -325,16 +314,14 @@ class KoreanLearningNodes:
         return str(filepath)
 
 
-# Agentic RAG 구현
+# =====================================
+# Agentic RAG 구현 (개선 버전)
+# =====================================
 class AgenticKoreanLearningNodes(KoreanLearningNodes):
-    """
-    Agentic RAG 노드 (KoreanLearningNodes 상속)
-    """
+    """Agentic RAG 노드 - 재생성 로직 최적화"""
     
     def __init__(self, vocabulary_retriever, grammar_retriever, kpop_retriever, llm=None):
         super().__init__(vocabulary_retriever, grammar_retriever, kpop_retriever, llm)
-        
-        # Agentic 에이전트 추가
         self.query_agent = QueryAnalysisAgent(llm)
         self.quality_agent = QualityCheckAgent(llm)
     
@@ -354,8 +341,8 @@ class AgenticKoreanLearningNodes(KoreanLearningNodes):
         }
     
     def retrieve_kpop_mixed(self, state: GraphState) -> GraphState:
-        """K-pop 검색 노드 (DB 전용)"""
-        print("\n🎵 [Agent] K-pop Retrieval (DB Only)")
+        """K-pop 검색 노드"""
+        print("\n🎵 [Agent] K-pop Retrieval")
         
         level = state['difficulty_level']
         query = state['input_text']
@@ -389,10 +376,11 @@ class AgenticKoreanLearningNodes(KoreanLearningNodes):
     
     def generate_sentences_with_kpop(self, state):
         """
-        K-pop 메타데이터를 활용한 한국어 학습 문장 생성
-        3개 생성 → 평가 수행
+        개선된 문장 생성 로직
+        - 3회 시도 후 가장 좋은 결과 선택
+        - 점진적 프롬프트 강화
         """
-        print("\n✏️ [Agent] 한국어 학습 문장 생성 (K-pop 통합)")
+        print("\n✏️ [Agent] 한국어 학습 문장 생성 (최적화)")
         
         from utils import extract_words_from_docs, extract_grammar_with_grade
         
@@ -412,57 +400,71 @@ class AgenticKoreanLearningNodes(KoreanLearningNodes):
             specified_groups
         )
         
-        has_kpop = len(kpop_metadata) > 0
-        
-        if has_kpop:
-            print(f"   K-pop 정보: {len(kpop_metadata)}개 - {kpop_groups}")
-        else:
-            print(f"   K-pop 정보: 없음")
+        print(f"   K-pop 정보: {len(kpop_metadata)}개 - {kpop_groups}" if kpop_metadata else "   K-pop 정보: 없음")
         
         # 어휘/문법 준비
-        words_formatted = []
-        vocab_list = []  # 평가용
-        for word, wordclass in words_info[:5]:
-            words_formatted.append(f"{word}({wordclass})")
-            vocab_list.append(word)
-        
-        if grammar_info:
-            random_grammar_item = random.choice(grammar_info)
-            target_grammar = random_grammar_item['grammar']
-            target_grade = random_grammar_item['grade']
-        else:
-            target_grammar = "기본 문법"
-            target_grade = 1
-        
+        vocab_list = [word for word, _ in words_info[:5]]
+        target_grammar = grammar_info[0]['grammar'] if grammar_info else "기본 문법"
+        target_grade = grammar_info[0]['grade'] if grammar_info else 1
         difficulty = state['difficulty_level']
         
-        # 프롬프트 생성
-        prompt = self._build_kpop_prompt(
-            difficulty,
-            target_grade,
-            target_grammar,
-            words_formatted,
-            has_kpop,
-            needs_kpop,
-            kpop_context_text,
-            kpop_groups
-        )
+        print(f"\n   🎯 타겟: 문법 '{target_grammar}' + 어휘 {vocab_list}")
         
-        print(f"\n   🎯 타겟: 문법 '{target_grammar}' + 어휘 {len(words_formatted)}개")
+        # ===================================
+        # 3회 시도, 가장 좋은 결과 선택
+        # ===================================
+        max_attempts = 3
+        all_attempts = []
         
-        # 문장 생성 (3개)
-        response = self.llm.predict(prompt)
-        sentences = response.strip().split('\n')
-        sentences = [s.strip() for s in sentences if s.strip()][:3]
+        for attempt in range(max_attempts):
+            print(f"\n   📝 시도 {attempt + 1}/{max_attempts}")
+            
+            # 점진적으로 강화된 프롬프트 생성
+            prompt = self._build_progressive_prompt(
+                attempt,
+                difficulty,
+                target_grade,
+                target_grammar,
+                vocab_list,
+                kpop_groups,
+                kpop_context_text,
+                needs_kpop,
+                all_attempts  # 이전 실패 정보
+            )
+            
+            # 문장 생성
+            response = self.llm.predict(prompt)
+            sentences = [s.strip() for s in response.strip().split('\n') if s.strip()][:3]
+            
+            # 평가 수행
+            critique = self._evaluate_sentences(sentences, target_grammar, vocab_list)
+            
+            # K-pop 포함 체크
+            kpop_ok = self._check_kpop_inclusion(sentences, kpop_groups) if needs_kpop else True
+            
+            # 점수 계산
+            score = self._calculate_score(critique, kpop_ok)
+            
+            all_attempts.append({
+                'sentences': sentences,
+                'critique': critique,
+                'score': score,
+                'kpop_ok': kpop_ok
+            })
+            
+            print(f"      점수: {score}/3 (문법+어휘+K-pop)")
+            
+            # 완벽한 결과면 즉시 종료
+            if score == 3:
+                print(f"   ✅ 완벽한 문장 생성!")
+                break
         
-        print(f"   ✅ {len(sentences)}개 문장 생성 완료")
+        # 가장 좋은 결과 선택
+        best_attempt = max(all_attempts, key=lambda x: x['score'])
+        final_sentences = best_attempt['sentences']
+        critique_summary = best_attempt['critique']
         
-        # 평가 수행
-        critique_summary = self._evaluate_sentences(
-            sentences,
-            target_grammar,
-            vocab_list
-        )
+        print(f"\n   🏆 최종 선택: 점수 {best_attempt['score']}/3")
         
         # JSON 저장 데이터
         save_data = {
@@ -475,15 +477,147 @@ class AgenticKoreanLearningNodes(KoreanLearningNodes):
         
         messages = [
             ("user", state['input_text']),
-            ("assistant", "\n".join(sentences))
+            ("assistant", "\n".join(final_sentences))
         ]
         
         return {
-            "generated_sentences": sentences,
+            "generated_sentences": final_sentences,
             "messages": messages,
             "sentence_data": save_data,
             "target_grade": target_grade
         }
+    
+    def _calculate_score(self, critique, kpop_ok):
+        """
+        문장 품질 점수 계산
+        - 문법 충족: +1점
+        - 어휘 충족: +1점
+        - K-pop 포함 (필요시): +1점
+        """
+        grammar_pass = sum(1 for c in critique if c.get('grammar_ok', False))
+        vocab_pass = sum(1 for c in critique if c.get('vocab_ok', False))
+        
+        score = 0
+        if grammar_pass == 3:  # 3개 문장 모두 문법 충족
+            score += 1
+        if vocab_pass == 3:    # 3개 문장 모두 어휘 충족
+            score += 1
+        if kpop_ok:             # K-pop 조건 충족
+            score += 1
+        
+        return score
+    
+    def _build_progressive_prompt(self, attempt, difficulty, target_grade, 
+                                  target_grammar, vocab_list, kpop_groups,
+                                  kpop_context_text, needs_kpop, previous_attempts):
+        """
+        점진적으로 강화되는 프롬프트 생성
+        - attempt 0: 기본 프롬프트
+        - attempt 1: 강화된 프롬프트 + 이전 실패 정보
+        - attempt 2: 최대 강화 + 구체적인 어휘 할당
+        """
+        difficulty_guide = {
+            "basic": "초급 (TOPIK 1-2급)",
+            "intermediate": "중급 (TOPIK 3-4급)",
+            "advanced": "고급 (TOPIK 5-6급)"
+        }
+        
+        # 기본 정보
+        base_info = f"""【학습 정보】
+수준: {difficulty_guide.get(difficulty)}
+문법: {target_grammar} (Grade {target_grade})
+어휘: {', '.join(vocab_list)}
+"""
+        
+        # K-pop 정보
+        kpop_info = ""
+        if kpop_groups and needs_kpop:
+            kpop_info = f"""
+【K-pop 정보】
+{kpop_context_text}
+그룹: {', '.join(kpop_groups)}
+"""
+        
+        # 시도별 프롬프트
+        if attempt == 0:
+            # 첫 시도: 기본 프롬프트
+            prompt = f"""한국어 학습용 예문을 정확히 3개 생성하세요.
+
+{base_info}{kpop_info}
+【생성 규칙】
+1. 문법 '{target_grammar}' 3개 문장 모두에 필수 사용
+2. 제시 어휘 중 각 문장마다 최소 1개 이상 포함 (겹치지 않게)
+3. 자연스러운 한국어 문장
+4. 번호 없이 문장 3개만
+
+예문:
+"""
+        
+        elif attempt == 1:
+            # 두 번째 시도: 강화 + 이전 실패 분석
+            prev = previous_attempts[0]
+            failed_items = []
+            
+            if prev['score'] < 3:
+                critique = prev['critique']
+                grammar_fail = sum(1 for c in critique if not c.get('grammar_ok', False))
+                vocab_fail = sum(1 for c in critique if not c.get('vocab_ok', False))
+                
+                if grammar_fail > 0:
+                    failed_items.append(f"- 문법 '{target_grammar}' 미포함: {grammar_fail}개 문장")
+                if vocab_fail > 0:
+                    failed_items.append(f"- 어휘 미포함: {vocab_fail}개 문장")
+                if not prev['kpop_ok'] and needs_kpop:
+                    failed_items.append(f"- K-pop 정보 미포함")
+            
+            fail_text = "\n".join(failed_items) if failed_items else "일부 조건 미충족"
+            
+            prompt = f"""⚠️ 이전 시도 실패 - 반드시 모든 조건을 충족하세요!
+
+{base_info}{kpop_info}
+【이전 실패 원인】
+{fail_text}
+
+【필수 조건】
+✅ 문법 '{target_grammar}' - 3개 문장 모두 반드시 포함!
+✅ 어휘 {', '.join(vocab_list)} - 각 문장마다 최소 1개 겹치지 않게 포함!
+{f"✅ K-pop '{', '.join(kpop_groups)}' - 3개 문장 모두 포함!" if needs_kpop and kpop_groups else ""}
+
+【생성 규칙】
+1. 문법 패턴을 명확하게 사용
+2. 각 문장마다 다른 어휘 사용
+3. 자연스럽고 실용적인 문장
+
+예문:
+"""
+        
+        else:  # attempt == 2
+            # 세 번째 시도: 최대 강화 + 명확한 어휘 할당
+            vocab_assignment = ""
+            for i, word in enumerate(vocab_list[:3], 1):
+                vocab_assignment += f"   문장{i}: '{word}' 반드시 포함\n"
+            
+            prompt = f"""🚨 최종 시도 - 아래 지시사항을 정확히 따르세요!
+
+{base_info}{kpop_info}
+【명확한 어휘 할당】
+{vocab_assignment}
+
+【절대 규칙】
+1. 문법 '{target_grammar}' - 3개 문장 모두 명확하게 사용
+2. 위 어휘 할당표대로 각 문장에 지정된 어휘 반드시 포함
+3. 자연스럽고 문법적으로 완벽한 문장
+{f"4. K-pop 그룹 '{', '.join(kpop_groups)}' 반드시 포함 (영어→한글)" if needs_kpop and kpop_groups else ""}
+
+【예시 형식】
+문장1: [어휘1 + 문법 + K-pop]
+문장2: [어휘2 + 문법 + K-pop]
+문장3: [어휘3 + 문법 + K-pop]
+
+예문:
+"""
+        
+        return prompt
     
     def _process_kpop_docs(self, kpop_docs, specified_groups):
         """K-pop 문서 처리 및 필터링"""
@@ -495,17 +629,16 @@ class AgenticKoreanLearningNodes(KoreanLearningNodes):
             return kpop_metadata, kpop_context_text, kpop_groups
         
         # 필터링
-        filtered_docs = []
+        filtered_docs = kpop_docs[:3]
         if specified_groups:
+            filtered = []
             for doc in kpop_docs:
                 group = doc.metadata.get('group', '')
                 if any(g.upper() == group.upper() for g in specified_groups):
-                    filtered_docs.append(doc)
+                    filtered.append(doc)
             
-            if not filtered_docs:
-                filtered_docs = kpop_docs[:3]
-        else:
-            filtered_docs = kpop_docs[:3]
+            if filtered:
+                filtered_docs = filtered[:3]
         
         # 메타데이터 추출
         for doc in filtered_docs:
@@ -536,58 +669,38 @@ class AgenticKoreanLearningNodes(KoreanLearningNodes):
         
         return kpop_metadata, kpop_context_text, kpop_groups
     
-    def _build_kpop_prompt(self, difficulty, target_grade, target_grammar, 
-                          words_formatted, has_kpop, needs_kpop, 
-                          kpop_context_text, kpop_groups):
-        """K-pop 통합 프롬프트 생성"""
-        difficulty_guide = {
-            "basic": "초급 (TOPIK 1-2급): 짧고 간단한 문장",
-            "intermediate": "중급 (TOPIK 3-4급): 자연스러운 일상 표현",
-            "advanced": "고급 (TOPIK 5-6급): 복잡한 문장 구조"
+    def _check_kpop_inclusion(self, sentences, kpop_groups):
+        """K-pop 그룹명 포함 여부 체크"""
+        if not kpop_groups:
+            return True
+        
+        # 영어 그룹명의 한글 변환 매핑
+        korean_names = {
+            "BLACKPINK": "블랙핑크",
+            "BTS": "방탄소년단",
+            "TWICE": "트와이스",
+            "NewJeans": "뉴진스",
+            "EXO": "엑소",
+            "Stray Kids": "스트레이키즈",
+            "aespa": "에스파",
+            "SEVENTEEN": "세븐틴"
         }
         
-        # K-pop 지시사항
-        kpop_instruction = ""
-        kpop_requirement = ""
-        
-        if has_kpop and needs_kpop:
-            groups_text = ', '.join(kpop_groups)
-            kpop_instruction = f"""
-【K-pop 그룹 정보】
-{kpop_context_text}
-
-⚠️ K-pop 필수 규칙:
-- 위 그룹({groups_text})만 사용
-- 영어는 한국어로: "BLACKPINK"→"블랙핑크"
-- 3개 문장 모두 K-pop 포함
-"""
-            kpop_requirement = f"필수: {groups_text} 내용 포함"
+        # 모든 문장에서 K-pop 정보 포함 확인
+        for sentence in sentences:
+            has_kpop = False
+            for group in kpop_groups:
+                # 영어명 또는 한글명 체크
+                if (group.lower() in sentence.lower() or 
+                    korean_names.get(group, "").lower() in sentence.lower()):
+                    has_kpop = True
+                    break
             
-        elif has_kpop:
-            groups_text = ', '.join(kpop_groups)
-            kpop_instruction = f"""
-【K-pop 정보 (선택)】
-{kpop_context_text}
-"""
-            kpop_requirement = f"선택: {groups_text} 활용 가능"
+            if not has_kpop:
+                return False
         
-        prompt = f"""한국어 학습용 예문을 정확히 3개 생성하세요.
+        return True
 
-【학습 정보】
-- 수준: {difficulty_guide.get(difficulty)}
-- 문법: {target_grammar} (Grade {target_grade})
-- 어휘: {', '.join(words_formatted)}
-{kpop_instruction}
-【생성 규칙】
-1. 문법 '{target_grammar}' 필수 사용
-2. 제시 어휘 중 3개 이상 포함
-3. 문장 3개만, 번호 없이
-{f'4. {kpop_requirement}' if kpop_requirement else ''}
-
-예문:
-"""
-        return prompt
-    
     def format_output_agentic(self, state: GraphState) -> GraphState:
         """Agentic RAG 출력 포맷팅"""
         print("\n📄 [Agent] 최종 출력")

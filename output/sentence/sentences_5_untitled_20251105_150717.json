@@ -1,0 +1,42 @@
+{
+  "level": 5,
+  "target_grammar": "-다기보다는",
+  "kpop_references": [
+    {
+      "group": "BLACKPINK",
+      "agency": "YG Entertainment",
+      "fandom": "BLINK",
+      "concepts": [
+        "girl crush",
+        "hip-hop",
+        "confidence"
+      ],
+      "members": [
+        "Jisoo",
+        "Jennie",
+        "Rosé",
+        "Lisa"
+      ]
+    }
+  ],
+  "specified_groups": [
+    "BLACKPINK"
+  ],
+  "critique_summary": [
+    {
+      "sentence": "문장1: BLACKPINK는 대중문화에서 중요한 위치를 차지하고 있다기보다는 그들의 음악과 스타일로 새로운 트렌드를 만들어가고 있다.",
+      "grammar_ok": true,
+      "vocab_ok": true
+    },
+    {
+      "sentence": "문장2: BLACKPINK의 공연은 힘차다기보다는 관객들에게 강한 에너지를 전달하는 데 초점을 맞추고 있다.",
+      "grammar_ok": true,
+      "vocab_ok": true
+    },
+    {
+      "sentence": "문장3: 이 그룹은 팬들과의 소통을 통해 그들의 이미지를 더욱 강화하겠다기보다는 진정한 자신을 보여주려는 노력을 하고 있다.",
+      "grammar_ok": true,
+      "vocab_ok": true
+    }
+  ]
+}

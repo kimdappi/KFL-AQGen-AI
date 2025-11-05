@@ -17,7 +17,7 @@ client = OpenAI()
 FILL_IN_BLANK_TMPL = """\
 [ROLE] 너는 '외국어로서의 한국어' 교재 편집자다. 반드시 JSON만 출력한다.
 [GOAL] [INPUT_SENTENCES]에 주어진 문장 중 하나를 활용하여 **주관식 빈칸 채우기** 문제 1개를 만든다.
-[INPUT_SENTENCES]
+{kpop_info}[INPUT_SENTENCES]
 {sentences_bullets}
 [INSTRUCTIONS]
 - `instruction`: "<보기>와 같이 괄호 안의 단어를 사용하여 문장을 완성하십시오." 와 같은 명확한 지시문을 작성한다.
@@ -31,7 +31,7 @@ FILL_IN_BLANK_TMPL = """\
 MATCH_AND_CONNECT_TMPL = """\
 [ROLE] 너는 '외국어로서의 한국어' 교재 편집자다. 반드시 JSON만 출력한다.
 [GOAL] 입력된 문장들을 분해하고 재조합하여, 문장 연결하기 문제를 생성한다. 반드시 입력된 문장들만 사용한다.
-[INPUT_SENTENCES]
+{kpop_info}[INPUT_SENTENCES]
 {sentences_bullets}
 [INSTRUCTIONS]
 - `instruction`: "다음 문장을 연결하여 <보기>와 같이 하나의 문장을 만드십시오." 와 같은 지시문을 작성한다.
@@ -47,8 +47,7 @@ SENTENCE_CONNECTION_TMPL = """\
 
 [GOAL]
 - 입력된 문장 하나를 두 개의 절로 분해하여 문장 연결 문제를 생성한다.
-
-[INPUT_SENTENCES]
+{kpop_info}[INPUT_SENTENCES]
 - 아래 정확히 3개의 예문 중에서만 사용한다. 
 {sentences_bullets}
 
@@ -78,8 +77,7 @@ SENTENCE_CREATION_TMPL = """\
 
 [GOAL]
 - 입력된 문장에서 핵심 표현을 추출하여 문장 생성 문제를 만든다. 
-
-[INPUT_SENTENCES]
+{kpop_info}[INPUT_SENTENCES]
 {sentences_bullets}
 
 [INSTRUCTIONS]
@@ -144,7 +142,7 @@ CHOICE_COMPLETION_TMPL = """\
 }
 ---
 
-[INPUT_SENTENCES]
+{kpop_info}[INPUT_SENTENCES]
 {sentences_bullets}
 
 [OUTPUT_JSON]
@@ -158,8 +156,7 @@ DIALOGUE_COMPLETION_TMPL = """\
 - 목표 문법: {target_grammar}
 - 레벨: {level}
 - 대화(turn 3개 내외)에서 1곳을 빈칸으로 두고 자연스럽게 채우게 한다.
-
-[INPUT_SENTENCES]
+{kpop_info}[INPUT_SENTENCES]
 {sentences_bullets}
 
 [INSTRUCTIONS]
@@ -306,6 +303,33 @@ def generate_question_item(agent_decision: dict, payload: dict) -> dict:
         
     valid_sentences = [item["sentence"] for item in payload.get("critique_summary", [])]
     
+    # K-pop 정보 포맷팅 (nodes.py에서 생성된 kpop_references 활용)
+    kpop_info_text = ""
+    if "kpop_references" in payload and payload["kpop_references"]:
+        kpop_info_lines = []
+        for ref in payload["kpop_references"]:
+            group = ref.get('group', '')
+            agency = ref.get('agency', '')
+            fandom = ref.get('fandom', '')
+            concepts = ref.get('concepts', [])
+            members = ref.get('members', [])
+            
+            info_parts = [f"그룹: {group}"]
+            if agency:
+                info_parts.append(f"소속사: {agency}")
+            if fandom:
+                info_parts.append(f"팬덤: {fandom}")
+            if concepts:
+                info_parts.append(f"컨셉: {', '.join(concepts)}")
+            if members:
+                info_parts.append(f"멤버: {', '.join(members[:4])}")
+            
+            kpop_info_lines.append("  - " + " | ".join(info_parts))
+        
+        if kpop_info_lines:
+            kpop_info_text = "\n[K-pop 참고 정보]\n" + "\n".join(kpop_info_lines) + "\n"
+            print(f"✨ K-pop 정보 {len(payload['kpop_references'])}개를 문제 생성에 포함합니다")
+    
     # --- START: 수정 및 디버깅 코드 추가 ---
     try:
         # format에 전달할 기본 인자들을 딕셔너리로 정의합니다.
@@ -313,8 +337,11 @@ def generate_question_item(agent_decision: dict, payload: dict) -> dict:
             "sentences_bullets": bullets(valid_sentences),
             "target_grammar": payload.get("target_grammar", "N/A"),
             "level": payload.get("level", "N/A"),
-            "schema_id": "Q_generated_1"  # ✅ 항상 추가
+            "schema_id": f"Q_{payload.get('level', '1')}_{chosen_format}"  # 동적 schema_id 생성
         }
+        
+        # kpop_info를 템플릿에 추가 (템플릿에서 {kpop_info}로 사용)
+        format_args["kpop_info"] = kpop_info_text if kpop_info_text else ""
         
         # 디버깅을 위해 어떤 인자들이 사용되는지 출력합니다.
         print(f"DEBUG: Formatting template '{chosen_format}' with keys: {list(format_args.keys())}")

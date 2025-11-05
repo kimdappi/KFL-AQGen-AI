@@ -1,0 +1,23 @@
+{
+  "level": 1,
+  "target_grammar": "-에 가다",
+  "kpop_references": [],
+  "specified_groups": [],
+  "critique_summary": [
+    {
+      "sentence": "나는 컴퓨터 방에 가다.",
+      "grammar_ok": true,
+      "vocab_ok": true
+    },
+    {
+      "sentence": "그는 힘을 기르기 위해 운동장에 가다.",
+      "grammar_ok": true,
+      "vocab_ok": true
+    },
+    {
+      "sentence": "우리는 흰색 에어컨을 사러 가다.",
+      "grammar_ok": true,
+      "vocab_ok": true
+    }
+  ]
+}
