@@ -11,6 +11,8 @@ from langchain_community.vectorstores import FAISS
 from langchain_openai import OpenAIEmbeddings
 from langchain.retrievers.ensemble import EnsembleRetriever
 from langchain_community.retrievers import BM25Retriever
+import random
+
 
 class TOPIKVocabularyRetriever:
     """TOPIK 단어 CSV 파일 기반 Retriever"""
@@ -83,10 +85,17 @@ class TOPIKVocabularyRetriever:
                 
                 self.retrievers[level] = ensemble_retriever
     
-    def invoke(self, query: str, level: str) -> List[Document]:
-        """난이도에 따른 단어 검색"""
+    def invoke(self, query: str, level: str, k: int = 10) -> List[Document]:
+        """난이도별 단어 검색 (랜덤성 추가)"""
         if level in self.retrievers:
-            return self.retrievers[level].get_relevant_documents(query)
+            # ① 유사도 높은 문서 50개 가져오기
+            results = self.retrievers[level].get_relevant_documents(query)
+
+            if results:
+                # ② top-k보다 많으면 그중에서 랜덤으로 10개 추출
+                sample_size = min(k, len(results))
+                return random.sample(results, sample_size)
+            
         return []
 
 

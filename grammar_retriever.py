@@ -11,6 +11,7 @@ from langchain_community.vectorstores import FAISS
 from langchain_openai import OpenAIEmbeddings
 from langchain.retrievers.ensemble import EnsembleRetriever
 from langchain_community.retrievers import BM25Retriever
+import random
 
 class GrammarRetriever:
     """문법 JSON 파일 기반 Retriever"""
@@ -71,11 +72,20 @@ class GrammarRetriever:
                 )
                 self.retrievers[level] = vector_retriever
     
-    def invoke(self, query: str, level: str) -> List[Document]:
-        """난이도에 따른 문법 검색 (grade 낮은 순으로)"""
+    
+    def invoke(self, query: str, level: str, k: int = 10) -> List[Document]:
+        """난이도에 따른 문법 검색 (랜덤성 추가)"""
         if level in self.retrievers:
+            # 우선 관련 문법 후보 50개 가져오기
             docs = self.retrievers[level].get_relevant_documents(query)
-            # grade 순으로 재정렬
-            docs.sort(key=lambda x: x.metadata.get('grade', 999))
-            return docs[:10]
+
+            if docs:
+                # grade로 정렬
+                docs.sort(key=lambda x: x.metadata.get('grade', 999))
+                
+                # 상위 50개 중에서 랜덤으로 10개 추출
+                top_candidates = docs[:50]
+                sample_size = min(k, len(top_candidates))
+                return random.sample(top_candidates, sample_size)
+        
         return []
