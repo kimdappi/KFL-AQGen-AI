@@ -1,0 +1,42 @@
+{
+  "level": 3,
+  "target_grammar": "-는 김에",
+  "kpop_references": [
+    {
+      "group": "BLACKPINK",
+      "agency": "YG Entertainment",
+      "fandom": "BLINK",
+      "concepts": [
+        "girl crush",
+        "hip-hop",
+        "confidence"
+      ],
+      "members": [
+        "Jisoo",
+        "Jennie",
+        "Rosé",
+        "Lisa"
+      ]
+    }
+  ],
+  "specified_groups": [
+    "BLACKPINK"
+  ],
+  "critique_summary": [
+    {
+      "sentence": "EXO의 중반 공연을 보러 가는 김에 좋아하는 멤버인 Baekhyun의 무대도 함께 즐기고 싶다.",
+      "grammar_ok": true,
+      "vocab_ok": true
+    },
+    {
+      "sentence": "BTS의 힘찬 메시지를 전하는 노래를 듣는 김에 RM의 솔로 앨범도 들어보고 싶다.",
+      "grammar_ok": true,
+      "vocab_ok": true
+    },
+    {
+      "sentence": "SEVENTEEN의 중급 실력을 느끼는 김에 S.Coups의 자작곡도 꼭 들어보려고 한다.",
+      "grammar_ok": true,
+      "vocab_ok": true
+    }
+  ]
+}

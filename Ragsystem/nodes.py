@@ -144,19 +144,118 @@ class KoreanLearningNodes:
             "advanced": "고급 학습자 (TOPIK 5-6급): 복잡한 문장 구조, 격식체나 문어체 가능"
         }
         
+        # 각 문장에 서로 다른 어휘를 강제할당 (최대 3개 사용)
+        selected_words = vocab_list[:3]
+
+        # K-pop 컨텍스트가 있으면 상위 5개에서 3개를 고유하게 선택하여 문장별 강제 할당
+        assigned_kpop = []  # [{group, song, members[], concepts[]}]
+        if 'kpop_docs' in state and state['kpop_docs']:
+            pool = state['kpop_docs'][:5]
+            seen = set()
+            for d in pool:
+                group = (d.metadata.get('group', '') or '').strip()
+                song = (d.metadata.get('song', '') or '').strip()
+                members = [m.get('name', '').strip() for m in (d.metadata.get('members', []) or []) if m.get('name')]
+                concepts = [c.strip() for c in (d.metadata.get('concepts', []) or []) if isinstance(c, str) and c.strip()]
+                key = group.lower() if group else (song.lower() if song else None)
+                if not key:
+                    continue
+                if key in seen:
+                    continue
+                seen.add(key)
+                assigned_kpop.append({
+                    "group": group,
+                    "song": song,
+                    "members": members[:3],
+                    "concepts": concepts[:3]
+                })
+                if len(assigned_kpop) >= 3:
+                    break
+
         prompt = self._build_generation_prompt(
-            difficulty, 
-            target_grade, 
-            words_formatted, 
-            target_grammar, 
+            difficulty,
+            target_grade,
+            words_formatted,
+            target_grammar,
             kpop_context_text,
-            difficulty_guide
+            difficulty_guide,
+            selected_words,
+            vocab_list,
+            assigned_kpop
         )
-        
-        # 문장 생성 (3개)
-        response = self.llm.predict(prompt)
-        sentences = response.strip().split('\n')
-        sentences = [s.strip() for s in sentences if s.strip()][:3]
+
+        # 문장 생성 (검증 포함, 최대 2회 재시도)
+        max_attempts = 2
+        sentences = []
+        for attempt in range(max_attempts):
+            response = self.llm.predict(prompt)
+            candidates = response.strip().split('\n')
+            candidates = [s.strip() for s in candidates if s.strip()][:3]
+
+            # 3문장 확보 실패 시 재시도
+            if len(candidates) < 3:
+                continue
+
+            # 어휘 강제 사용 검증: 문장1→selected_words[0], 문장2→...[1], 문장3→...[2]
+            ok = True
+            for idx, word in enumerate(selected_words):
+                if idx >= 3:
+                    break
+                if word.lower() not in candidates[idx].lower():
+                    ok = False
+                    break
+
+            # K-pop 컨텍스트 강제 검증 (있을 때만): 문장1→ctx1, 문장2→ctx2, 문장3→ctx3
+            if ok and assigned_kpop:
+                for idx, ctx in enumerate(assigned_kpop):
+                    if idx >= 3:
+                        break
+                    group = (ctx.get('group') or '').lower()
+                    song = (ctx.get('song') or '').lower()
+                    members = [(m or '').lower() for m in (ctx.get('members') or [])]
+                    concepts = [(c or '').lower() for c in (ctx.get('concepts') or [])]
+                    sent_lower = candidates[idx].lower()
+                    included = False
+                    if group and group in sent_lower:
+                        included = True
+                    if not included and song and song in sent_lower:
+                        included = True
+                    if not included and any(m and m in sent_lower for m in members):
+                        included = True
+                    if not included and any(c and c in sent_lower for c in concepts):
+                        included = True
+                    if not included:
+                        ok = False
+                        break
+
+            if ok:
+                sentences = candidates
+                break
+
+            # 실패 시 프롬프트를 더 강하게 보강하여 재시도
+            missing_idx = idx + 1
+            strengthen_note = f"\n[강제 규칙 재확인] 문장{missing_idx}에 반드시 '{selected_words[idx]}'를 포함하세요."
+            if assigned_kpop and idx < len(assigned_kpop):
+                g = assigned_kpop[idx].get('group')
+                s = assigned_kpop[idx].get('song')
+                ms = assigned_kpop[idx].get('members') or []
+                cs = assigned_kpop[idx].get('concepts') or []
+                options = []
+                if g:
+                    options.append(f"그룹 '{g}'")
+                if s:
+                    options.append(f"곡명 '{s}'")
+                if ms:
+                    options.append("멤버 " + ", ".join([f"'{m}'" for m in ms]))
+                if cs:
+                    options.append("컨셉 " + ", ".join([f"'{c}'" for c in cs]))
+                if options:
+                    strengthen_note += f" 또한 문장{missing_idx}에 K-pop 관련 요소 ({' 또는 '.join(options)}) 중 하나를 반드시 포함하세요."
+            prompt = prompt + strengthen_note
+
+        # 마지막 시도까지 실패한 경우라도 최신 candidates 사용
+        if not sentences:
+            sentences = candidates if 'candidates' in locals() else []
         
         # 평가 수행
         critique_summary = self._evaluate_sentences(
@@ -185,8 +284,9 @@ class KoreanLearningNodes:
             "target_grade": target_grade
         }
     
-    def _build_generation_prompt(self, difficulty, target_grade, words_formatted, 
-                                target_grammar, kpop_context_text, difficulty_guide):
+    def _build_generation_prompt(self, difficulty, target_grade, words_formatted,
+                                target_grammar, kpop_context_text, difficulty_guide,
+                                selected_words=None, vocab_raw=None, assigned_kpop=None):
         """프롬프트 템플릿 생성"""
         prompt_templates = {
             "basic": """
@@ -203,6 +303,10 @@ class KoreanLearningNodes:
 1. 짧고 간단한 문장 (10-15 단어)
 2. 문법 패턴 {target_grammar} 필수 포함
 3. 제시된 단어 문장 하나당 최소 1개씩 겹치지 않게 필수 포함
+4. 아래 어휘·K-pop 강제 할당을 반드시 지키기:
+   문장1: '{w1}' 포함{kc1}
+   문장2: '{w2}' 포함{kc2}
+   문장3: '{w3}' 포함{kc3}
 
 형식: 번호 없이 문장 3개만
 """,
@@ -220,6 +324,10 @@ class KoreanLearningNodes:
 1. 중급 수준의 문장 생성
 2. 문법 {target_grammar} 필수 포함
 3. 제시된 어휘 문장당 최소 1개씩 겹치지 않게 필수 포함
+4. 아래 어휘·K-pop 강제 할당을 반드시 지키기:
+   문장1: '{w1}' 포함{kc1}
+   문장2: '{w2}' 포함{kc2}
+   문장3: '{w3}' 포함{kc3}
 
 출력: 예문 3개만 (번호 없이)
 """,
@@ -237,18 +345,57 @@ class KoreanLearningNodes:
 1. 복잡한 문장 구조
 2. 문법 {target_grammar} 필수 포함해서 심화 활용
 3. 제시된 어휘 중 문장당 최소 1개 겹치지 않게 필수 포함
+4. 아래 어휘·K-pop 강제 할당을 반드시 지키기:
+   문장1: '{w1}' 포함{kc1}
+   문장2: '{w2}' 포함{kc2}
+   문장3: '{w3}' 포함{kc3}
 
 출력: 예문 3개만
 """
         }
         
         template = prompt_templates.get(difficulty, prompt_templates["intermediate"])
+        # 강제 할당 단어/K-pop 준비
+        w1 = (selected_words[0] if selected_words and len(selected_words) > 0 else '')
+        w2 = (selected_words[1] if selected_words and len(selected_words) > 1 else w1)
+        w3 = (selected_words[2] if selected_words and len(selected_words) > 2 else w2)
+
+        def make_kpop_clause(idx):
+            if not assigned_kpop or len(assigned_kpop) <= idx:
+                return ""
+            g = assigned_kpop[idx].get('group') or ''
+            s = assigned_kpop[idx].get('song') or ''
+            ms = assigned_kpop[idx].get('members') or []
+            cs = assigned_kpop[idx].get('concepts') or []
+            parts = []
+            if g:
+                parts.append(f"그룹 '{g}'")
+            if s:
+                parts.append(f"곡명 '{s}'")
+            if ms:
+                parts.append("멤버 " + ", ".join([f"'{m}'" for m in ms]))
+            if cs:
+                parts.append("컨셉 " + ", ".join([f"'{c}'" for c in cs]))
+            if not parts:
+                return ""
+            return ", K-pop 관련 요소 (" + " 또는 ".join(parts) + ") 중 하나 포함"
+
+        kc1 = make_kpop_clause(0)
+        kc2 = make_kpop_clause(1)
+        kc3 = make_kpop_clause(2)
+
         return template.format(
             difficulty_level=difficulty_guide.get(difficulty, difficulty),
             target_grade=target_grade,
             words_formatted=', '.join(words_formatted),
             target_grammar=target_grammar,
-            kpop_context_text=kpop_context_text if kpop_context_text else "없음"
+            kpop_context_text=kpop_context_text if kpop_context_text else "없음",
+            w1=w1,
+            w2=w2,
+            w3=w3,
+            kc1=kc1,
+            kc2=kc2,
+            kc3=kc3
         )
     
     def _evaluate_sentences(self, sentences, target_grammar, vocab_list):
@@ -409,6 +556,33 @@ class AgenticKoreanLearningNodes(KoreanLearningNodes):
         difficulty = state['difficulty_level']
         
         print(f"\n   🎯 타겟: 문법 '{target_grammar}' + 어휘 {vocab_list}")
+
+        # 문장별 강제 할당용 K-pop 컨텍스트 선정 (상위 5개에서 중복 없이 3개)
+        assigned_kpop = []  # [{group, song, members[], concepts[]}]
+        kdocs_all = state.get('kpop_docs', [])
+        # 우선 쿼리에서 식별된 그룹으로 필터링, 없으면 상위 결과 사용
+        if kpop_groups:
+            kpool = [d for d in kdocs_all if (d.metadata.get('group', '') or '').upper() in {g.upper() for g in kpop_groups}][:5]
+        else:
+            kpool = kdocs_all[:5]
+        seen_keys = set()
+        for d in kpool:
+            group = (d.metadata.get('group', '') or '').strip()
+            song = (d.metadata.get('song', '') or '').strip()
+            members = [m.get('name', '').strip() for m in (d.metadata.get('members', []) or []) if m.get('name')]
+            concepts = [c.strip() for c in (d.metadata.get('concepts', []) or []) if isinstance(c, str) and c.strip()]
+            key = group.lower() if group else (song.lower() if song else None)
+            if not key or key in seen_keys:
+                continue
+            seen_keys.add(key)
+            assigned_kpop.append({
+                'group': group,
+                'song': song,
+                'members': members[:3],
+                'concepts': concepts[:3]
+            })
+            if len(assigned_kpop) >= 3:
+                break
         
         # ===================================
         # 3회 시도, 가장 좋은 결과 선택
@@ -429,6 +603,7 @@ class AgenticKoreanLearningNodes(KoreanLearningNodes):
                 kpop_groups,
                 kpop_context_text,
                 needs_kpop,
+                assigned_kpop,
                 all_attempts  # 이전 실패 정보
             )
             
@@ -439,8 +614,13 @@ class AgenticKoreanLearningNodes(KoreanLearningNodes):
             # 평가 수행
             critique = self._evaluate_sentences(sentences, target_grammar, vocab_list)
             
-            # K-pop 포함 체크
-            kpop_ok = self._check_kpop_inclusion(sentences, kpop_groups) if needs_kpop else True
+            # K-pop 포함 체크 (문장별 할당 기준)
+            if needs_kpop and assigned_kpop:
+                kpop_ok = self._check_kpop_assigned(sentences, assigned_kpop)
+            elif needs_kpop:
+                kpop_ok = self._check_kpop_inclusion(sentences, kpop_groups)
+            else:
+                kpop_ok = True
             
             # 점수 계산
             score = self._calculate_score(critique, kpop_ok)
@@ -509,7 +689,7 @@ class AgenticKoreanLearningNodes(KoreanLearningNodes):
     
     def _build_progressive_prompt(self, attempt, difficulty, target_grade, 
                                   target_grammar, vocab_list, kpop_groups,
-                                  kpop_context_text, needs_kpop, previous_attempts):
+                                  kpop_context_text, needs_kpop, assigned_kpop, previous_attempts):
         """
         점진적으로 강화되는 프롬프트 생성
         - attempt 0: 기본 프롬프트
@@ -539,6 +719,24 @@ class AgenticKoreanLearningNodes(KoreanLearningNodes):
 """
         
         # 시도별 프롬프트
+        # 문장별 K-pop 절 생성
+        def kpop_clause(idx: int) -> str:
+            if not assigned_kpop or len(assigned_kpop) <= idx:
+                return ""
+            ctx = assigned_kpop[idx]
+            parts = []
+            if ctx.get('group'):
+                parts.append(f"그룹 '{ctx['group']}'")
+            if ctx.get('song'):
+                parts.append(f"곡명 '{ctx['song']}'")
+            if ctx.get('members'):
+                parts.append("멤버 " + ", ".join([f"'{m}'" for m in ctx['members']]))
+            if ctx.get('concepts'):
+                parts.append("컨셉 " + ", ".join([f"'{c}'" for c in ctx['concepts']]))
+            if not parts:
+                return ""
+            return " + K-pop 요소( " + " 또는 ".join(parts) + " )"
+
         if attempt == 0:
             # 첫 시도: 기본 프롬프트
             prompt = f"""한국어 학습용 예문을 정확히 3개 생성하세요.
@@ -549,6 +747,11 @@ class AgenticKoreanLearningNodes(KoreanLearningNodes):
 2. 제시 어휘 중 각 문장마다 최소 1개 이상 포함 (겹치지 않게)
 3. 자연스러운 한국어 문장
 4. 번호 없이 문장 3개만
+
+【문장별 강제 요소】
+문장1: 어휘 '{vocab_list[0] if len(vocab_list)>0 else ''}'{kpop_clause(0)}
+문장2: 어휘 '{vocab_list[1] if len(vocab_list)>1 else (vocab_list[0] if vocab_list else '')}'{kpop_clause(1)}
+문장3: 어휘 '{vocab_list[2] if len(vocab_list)>2 else (vocab_list[1] if len(vocab_list)>1 else (vocab_list[0] if vocab_list else ''))}'{kpop_clause(2)}
 
 예문:
 """
@@ -588,6 +791,11 @@ class AgenticKoreanLearningNodes(KoreanLearningNodes):
 2. 각 문장마다 다른 어휘 사용
 3. 자연스럽고 실용적인 문장
 
+【문장별 강제 요소】
+문장1: 어휘 '{vocab_list[0] if len(vocab_list)>0 else ''}'{kpop_clause(0)}
+문장2: 어휘 '{vocab_list[1] if len(vocab_list)>1 else (vocab_list[0] if vocab_list else '')}'{kpop_clause(1)}
+문장3: 어휘 '{vocab_list[2] if len(vocab_list)>2 else (vocab_list[1] if len(vocab_list)>1 else (vocab_list[0] if vocab_list else ''))}'{kpop_clause(2)}
+
 예문:
 """
         
@@ -597,11 +805,20 @@ class AgenticKoreanLearningNodes(KoreanLearningNodes):
             for i, word in enumerate(vocab_list[:3], 1):
                 vocab_assignment += f"   문장{i}: '{word}' 반드시 포함\n"
             
+            # K-pop 상세 할당 안내
+            kpop_assignment = ""
+            for i in range(3):
+                clause = kpop_clause(i)
+                if clause:
+                    kpop_assignment += f"   문장{i+1}: {clause.replace(' + ', '').replace('요소', '요소를')}\n"
+
             prompt = f"""🚨 최종 시도 - 아래 지시사항을 정확히 따르세요!
 
 {base_info}{kpop_info}
 【명확한 어휘 할당】
 {vocab_assignment}
+【명확한 K-pop 할당】
+{kpop_assignment if kpop_assignment else '   (할당된 K-pop 요소 없음)'}
 
 【절대 규칙】
 1. 문법 '{target_grammar}' - 3개 문장 모두 명확하게 사용
@@ -699,6 +916,33 @@ class AgenticKoreanLearningNodes(KoreanLearningNodes):
             if not has_kpop:
                 return False
         
+        return True
+
+    def _check_kpop_assigned(self, sentences, assigned_kpop):
+        """문장별로 할당된 K-pop 요소(그룹/곡명/멤버/컨셉) 포함 여부 체크"""
+        if not sentences or not assigned_kpop:
+            return True
+        for idx, sentence in enumerate(sentences[:3]):
+            if idx >= len(assigned_kpop):
+                continue
+            ctx = assigned_kpop[idx]
+            sent_lower = sentence.lower()
+            group = (ctx.get('group') or '').lower()
+            song = (ctx.get('song') or '').lower()
+            members = [(m or '').lower() for m in (ctx.get('members') or [])]
+            concepts = [(c or '').lower() for c in (ctx.get('concepts') or [])]
+
+            included = False
+            if group and group in sent_lower:
+                included = True
+            if not included and song and song in sent_lower:
+                included = True
+            if not included and any(m and m in sent_lower for m in members):
+                included = True
+            if not included and any(c and c in sent_lower for c in concepts):
+                included = True
+            if not included:
+                return False
         return True
 
     def format_output_agentic(self, state: GraphState) -> GraphState:

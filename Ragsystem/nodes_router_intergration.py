@@ -4,6 +4,7 @@ Extends AgenticKoreanLearningNodes with intelligent routing capabilities
 """
 
 from typing import Any
+import re
 from Ragsystem.schema import GraphState
 from Ragsystem.nodes import AgenticKoreanLearningNodes
 from Ragsystem.router import IntelligentRouter, format_routing_summary, RetrieverType
@@ -143,6 +144,41 @@ class RouterIntegratedNodes(AgenticKoreanLearningNodes):
         # DB 검색만 수행
         db_limit = strategy.params.get("db_limit", 5)
         kpop_db_docs = self.kpop_retriever.invoke(strategy.query, level)
+        # 하드 필터: 쿼리에 특정 그룹/멤버/컨셉/곡이 언급되면 해당되는 문서만 선택
+        raw_query = state.get('input_text', '')
+        q_tokens = set([t.strip().lower() for t in re.split(r"[^\w가-힣]+", raw_query) if len(t.strip()) >= 2])
+        specified_groups = []
+        qa = state.get('query_analysis', {})
+        if qa:
+            specified_groups = [g.strip() for g in qa.get('kpop_groups', []) if g.strip()]
+
+        filtered = []
+        if specified_groups:
+            sg_set = {g.lower() for g in specified_groups}
+            for d in kpop_db_docs:
+                g = (d.metadata.get('group', '') or '').lower()
+                if g in sg_set:
+                    filtered.append(d)
+        else:
+            # 멤버/컨셉/곡 토큰 일치 시 포함
+            for d in kpop_db_docs:
+                group = (d.metadata.get('group', '') or '').lower()
+                song = (d.metadata.get('song', '') or '').lower()
+                member_names = [m.lower() for m in (d.metadata.get('member_names', []) or [])]
+                concepts = [c.lower() for c in (d.metadata.get('concepts', []) or []) if isinstance(c, str)]
+                fields = set()
+                if group:
+                    fields.add(group)
+                if song:
+                    fields.add(song)
+                fields.update(member_names)
+                fields.update(concepts)
+                if any(tok in fields for tok in q_tokens):
+                    filtered.append(d)
+
+        if filtered:
+            kpop_db_docs = filtered
+
         kpop_db_docs = kpop_db_docs[:db_limit]
         print(f"   ✅ DB 검색 완료: {len(kpop_db_docs)}개 K-pop 문장")
         

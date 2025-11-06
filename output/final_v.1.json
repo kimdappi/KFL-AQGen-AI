@@ -1,46 +1,43 @@
 [
   {
-    "schema_id": "Q_3_sentence_creation",
-    "format": "sentence_creation",
-    "input": {
-      "instruction": "<보기>와 같이 주어진 표현을 사용하여 '-는 김에' 문법으로 문장을 완성하십시오.",
-      "example": {
-        "cues": [
-          "연습하다",
-          "무대를 보여주다"
-        ],
-        "answer": "힘차게 연습하는 김에 친구들에게도 무대를 보여주고 싶어요."
-      },
-      "cues": [
-        "중소기업에 취직하다",
-        "경험을 쌓다"
-      ]
-    },
-    "answer": {
-      "created_sentence": "중소기업에 취직하는 김에 다양한 경험을 쌓고 싶습니다."
-    },
-    "rationale": "핵심 표현들을 '-는 김에' 문법을 사용하여 자연스러운 문장으로 만들 수 있습니다."
-  },
-  {
     "schema_id": "Q_5_sentence_creation",
     "format": "sentence_creation",
     "input": {
       "instruction": "<보기>와 같이 주어진 표현을 사용하여 문장을 완성하십시오.",
       "example": {
         "cues": [
-          "BLACKPINK의 공연",
-          "강한 에너지를 전달하다"
+          "BTS의 음악",
+          "자아 사랑",
+          "청춘"
         ],
-        "answer": "BLACKPINK의 공연은 강한 에너지를 전달합니다."
+        "answer": "대중문화에서 BTS의 음악은 자아 사랑과 청춘을 주제로 한 깊이 있는 이야기들을 담고 있다."
       },
       "cues": [
-        "BLACKPINK",
-        "음악과 스타일로 새로운 트렌드를 만들다"
+        "BTS의 공연",
+        "에너지",
+        "화합의 순간"
       ]
     },
     "answer": {
-      "created_sentence": "BLACKPINK는 음악과 스타일로 새로운 트렌드를 만들어가고 있다."
+      "created_sentence": "BTS의 공연은 에너지가 넘치고 힘차다기보다는 각 멤버들이 서로의 존재를 존중하며 함께 만드는 화합의 순간들이 더 큰 감동을 준다."
     },
-    "rationale": "주어진 표현을 활용하여 BLACKPINK의 특징을 강조하는 문장을 만들 수 있습니다."
+    "rationale": "BTS의 공연과 관련된 핵심 표현들을 사용하여 문장을 완성할 수 있습니다."
+  },
+  {
+    "schema_id": "Q_1_fill_in_blank",
+    "format": "fill_in_blank",
+    "input": {
+      "instruction": "<보기>와 같이 괄호 안의 단어를 사용하여 문장을 완성하십시오.",
+      "example": {
+        "stem": "이 운동은 힘이 많이 ___ . (필요하다)",
+        "answer": "필요하군요"
+      },
+      "stem_with_blank": "NewJeans의 음악은 간단히 듣기 ___ . (좋다)",
+      "hint": "좋다"
+    },
+    "answer": {
+      "completed_sentence": "NewJeans의 음악은 간단히 듣기 좋군요."
+    },
+    "rationale": "'-군요'는 새롭게 알게 된 사실이나 감탄을 나타낼 때 사용합니다. 형용사 '좋다'에 '-군요'를 붙여 '좋군요'로 활용합니다."
   }
 ]

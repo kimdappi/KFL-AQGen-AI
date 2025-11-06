@@ -1,0 +1,42 @@
+{
+  "level": 3,
+  "target_grammar": "-는 김에",
+  "kpop_references": [
+    {
+      "group": "BLACKPINK",
+      "agency": "YG Entertainment",
+      "fandom": "BLINK",
+      "concepts": [
+        "girl crush",
+        "hip-hop",
+        "confidence"
+      ],
+      "members": [
+        "Jisoo",
+        "Jennie",
+        "Rosé",
+        "Lisa"
+      ]
+    }
+  ],
+  "specified_groups": [
+    "BLACKPINK"
+  ],
+  "critique_summary": [
+    {
+      "sentence": "1. EXO의 중반 공연을 보러 가는 김에, 멤버 수호의 뛰어난 보컬도 감상해보세요.",
+      "grammar_ok": true,
+      "vocab_ok": true
+    },
+    {
+      "sentence": "2. BTS의 힘찬 무대를 관람하는 김에, RM의 자기 사랑에 관한 메시지도 느껴보세요.",
+      "grammar_ok": true,
+      "vocab_ok": true
+    },
+    {
+      "sentence": "3. SEVENTEEN의 중급 수준의 자작곡을 듣는 김에, S.Coups의 멋진 퍼포먼스도 함께 즐겨보세요.",
+      "grammar_ok": true,
+      "vocab_ok": true
+    }
+  ]
+}

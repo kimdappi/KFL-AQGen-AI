@@ -1,0 +1,42 @@
+{
+  "level": 5,
+  "target_grammar": "-다기보다는",
+  "kpop_references": [
+    {
+      "group": "BTS",
+      "agency": "BIGHIT MUSIC",
+      "fandom": "ARMY",
+      "concepts": [
+        "self-love",
+        "youth",
+        "storytelling"
+      ],
+      "members": [
+        "RM",
+        "Jin",
+        "Suga",
+        "J-Hope"
+      ]
+    }
+  ],
+  "specified_groups": [
+    "BTS"
+  ],
+  "critique_summary": [
+    {
+      "sentence": "대중문화에서 BTS의 음악은 단순한 엔터테인먼트를 넘어, 자아 사랑과 청춘을 주제로 한 깊이 있는 이야기들을 담고 있다기보다는 그들의 메시지가 전 세계의 젊은이들에게 힘을 주기 때문이다.",
+      "grammar_ok": true,
+      "vocab_ok": true
+    },
+    {
+      "sentence": "BTS의 공연은 에너지가 넘치고 힘차다기보다는 각 멤버들이 서로의 존재를 존중하며 함께 만드는 화합의 순간들이 더 큰 감동을 준다.",
+      "grammar_ok": true,
+      "vocab_ok": true
+    },
+    {
+      "sentence": "그룹 BTS의 활동은 팬들과의 소통을 통해 대중문화의 발전을 강화한다기보다는 그들이 전하는 메시지가 사회적 이슈에 대한 인식을 높이는 데 기여하고 있다.",
+      "grammar_ok": true,
+      "vocab_ok": true
+    }
+  ]
+}

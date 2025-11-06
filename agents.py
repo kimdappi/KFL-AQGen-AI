@@ -67,12 +67,50 @@ Respond ONLY with valid JSON, no additional text.
 """
         
         response = self.llm.predict(prompt)
-        
+
+        # 표준화 매핑 (영어 표기)
+        normalization_map = {
+            "블랙핑크": "BLACKPINK",
+            "방탄소년단": "BTS",
+            "트와이스": "TWICE",
+            "뉴진스": "NewJeans",
+            "엑소": "EXO",
+            "스트레이키즈": "Stray Kids",
+            "에스파": "aespa",
+            "세븐틴": "SEVENTEEN",
+            " seventeen ": "SEVENTEEN",
+            " blackpink ": "BLACKPINK",
+            " bts ": "BTS",
+            " twice ": "TWICE",
+            " newjeans ": "NewJeans",
+            " exo ": "EXO",
+            " stray kids ": "Stray Kids",
+            " aespa ": "aespa"
+        }
+
         try:
             result = json.loads(response)
-            # Ensure kpop_groups exists
+            # Ensure keys
             if 'kpop_groups' not in result:
                 result['kpop_groups'] = []
+
+            # 후처리 표준화: 쿼리 원문과 LLM 결과를 함께 사용
+            q_lower = f" {query.lower()} "
+            normalized = set()
+            # 1) LLM 결과 표준화
+            for g in result.get('kpop_groups', []):
+                name = g.strip()
+                if not name:
+                    continue
+                # 역매핑 시도
+                key = f" {name.lower()} "
+                std = normalization_map.get(key) or normalization_map.get(name) or name
+                normalized.add(std)
+            # 2) 쿼리에서 직접 감지
+            for key, std in normalization_map.items():
+                if key.strip() and key in q_lower:
+                    normalized.add(std)
+            result['kpop_groups'] = list(normalized)
             return result
         except json.JSONDecodeError:
             # Default fallback
