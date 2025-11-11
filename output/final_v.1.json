@@ -1,1 +1,141 @@
-[]
+[
+  {
+    "schema_id": "korean_grammar_level3",
+    "format": "choice_completion",
+    "input": {
+      "prompt": "BLACKPINK의 공연을 처음 보는데...",
+      "options": [
+        "멤버들이 정말 에너지가 넘치는군요.",
+        "멤버들이 정말 에너지가 넘치는 것 같아요.",
+        "멤버들이 정말 에너지가 넘친다.",
+        "멤버들이 정말 에너지가 넘칠 거예요."
+      ]
+    },
+    "answer": {
+      "completed_sentence": "BLACKPINK의 공연을 처음 보는데 멤버들이 정말 에너지가 넘치는군요."
+    },
+    "rationale": "'-는군요'는 새로운 사실을 깨달았을 때 감탄하는 표현으로, 처음 공연을 보고 느낀 감정을 표현하는 문맥에 가장 적합합니다."
+  },
+  {
+    "schema_id": "Q_generated_2",
+    "format": "fill_in_blank",
+    "input": {
+      "instruction": "<보기>와 같이 괄호 안의 단어를 사용하여 문장을 완성하십시오.",
+      "example": {
+        "stem": "Jennie가 중급 춤 기술을 보여줘서 팬들을 ___ (감동시키다).",
+        "answer": "감동시키는군요"
+      },
+      "stem_with_blank": "BLACKPINK의 음악은 중반에 특히 힘이 ___ (넘치다).",
+      "hint": "넘치다"
+    },
+    "answer": {
+      "completed_sentence": "BLACKPINK의 음악은 중반에 특히 힘이 넘치는군요."
+    },
+    "rationale": "'-는군요'는 상대방에게 새로운 정보를 전달하거나 감탄을 나타낼 때 사용됩니다. '넘치다'의 현재형은 '넘치는군요'입니다."
+  },
+  {
+    "schema_id": "Q_generated_1",
+    "format": "dialogue_completion",
+    "input": {
+      "dialogue_with_missing_turns": [
+        {
+          "speaker": "A",
+          "text": "BLACKPINK의 콘서트에 다녀왔어요. 정말 대단했어요!"
+        },
+        {
+          "speaker": "B",
+          "text": "___"
+        },
+        {
+          "speaker": "A",
+          "text": "네, 특히 BLACKPINK의 음악은 중반에 특히 힘이 넘치는군요."
+        }
+      ]
+    },
+    "answer": {
+      "completed_dialogue": [
+        {
+          "speaker": "A",
+          "text": "BLACKPINK의 콘서트에 다녀왔어요. 정말 대단했어요!"
+        },
+        {
+          "speaker": "B",
+          "text": "정말요? 저도 그들의 무대를 보고 싶었는데요."
+        },
+        {
+          "speaker": "A",
+          "text": "네, 특히 BLACKPINK의 음악은 중반에 특히 힘이 넘치는군요."
+        }
+      ]
+    },
+    "rationale": "대화의 흐름을 자연스럽게 이어가기 위해 B가 콘서트에 대한 관심을 표현하고 A가 이에 대해 구체적인 감상을 덧붙이는 형식으로 구성했습니다."
+  },
+  {
+    "schema_id": "Q_generated_2",
+    "format": "match_and_connect",
+    "input": {
+      "instruction": "다음 문장을 연결하여 <보기>와 같이 하나의 문장을 만드십시오.",
+      "example": {
+        "clause_A": "Jennie가 중급 춤 기술을 보여주다",
+        "clause_B": "팬들을 감동시키다",
+        "connected": "Jennie가 중급 춤 기술을 보여주어서 팬들을 감동시킵니다."
+      },
+      "clause_set_A": [
+        "BLACKPINK의 음악은 중반에 특히 힘이 넘치다",
+        "Jisoo의 무대 복장은 가죽 재킷을 입고 있다"
+      ],
+      "clause_set_B": [
+        "보기 좋다",
+        "팬들을 감동시키다"
+      ]
+    },
+    "answer": {
+      "connected_sentences": [
+        "BLACKPINK의 음악은 중반에 특히 힘이 넘쳐서 팬들을 감동시킵니다.",
+        "Jisoo의 무대 복장은 가죽 재킷을 입고 있어서 보기 좋습니다."
+      ]
+    }
+  },
+  {
+    "schema_id": "Q_generated_1",
+    "format": "sentence_connection",
+    "input": {
+      "instruction": "다음 두 문장을 <보기>와 같이 '입고 있어서'를 사용하여 한 문장으로 만드십시오.",
+      "example": {
+        "clause_A": "Jennie가 중급 춤 기술을 보여줍니다.",
+        "clause_B": "팬들을 감동시킵니다.",
+        "connected": "Jennie가 중급 춤 기술을 보여줘서 팬들을 감동시키는군요."
+      },
+      "clause_A": "Jisoo의 무대 복장은 가죽 재킷을 입고 있습니다.",
+      "clause_B": "보기 좋은군요."
+    },
+    "answer": {
+      "connected_sentence": "Jisoo의 무대 복장은 가죽 재킷을 입고 있어서 보기 좋은군요."
+    },
+    "rationale": "어떤 상태나 이유를 나타낼 때 '-(으)면서' 또는 '입고 있어서'를 사용하여 두 절을 연결할 수 있습니다."
+  },
+  {
+    "schema_id": "Q_generated_1",
+    "format": "sentence_creation",
+    "input": {
+      "instruction": "<보기>와 같이 주어진 표현을 사용하여 문장을 완성하십시오.",
+      "example": {
+        "cues": [
+          "Jisoo",
+          "가죽 재킷",
+          "무대 복장"
+        ],
+        "answer": "Jisoo의 무대 복장은 가죽 재킷을 입고 있어서 보기 좋은군요."
+      },
+      "cues": [
+        "Jennie",
+        "중급 춤 기술",
+        "팬들을 감동시키다"
+      ]
+    },
+    "answer": {
+      "created_sentence": "Jennie가 중급 춤 기술을 보여줘서 팬들을 감동시키는군요."
+    },
+    "rationale": "핵심 표현들을 사용하여 자연스럽고 완전한 문장을 생성할 수 있습니다."
+  }
+]
