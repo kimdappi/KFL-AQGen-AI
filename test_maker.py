@@ -12,6 +12,7 @@ load_dotenv()
 client = OpenAI()
 # ==============================================================================
 # 0. 문제 유형별 프롬프트 템플릿 딕셔너리 (TMPLS)
+# 문제는 총 6유형이다.
 # (내용은 이전과 동일)
 # ==============================================================================
 FILL_IN_BLANK_TMPL = """\
@@ -123,10 +124,10 @@ CHOICE_COMPLETION_TMPL = """\
 - 퇴근하는 길에 빵을 좀 샀어요.
 
 ## Corresponding Output JSON:
-{
-    "schema_id": "Q_example",
+{{
+    "schema_id": "{{schema_id}}",
     "format": "choice_completion",
-    "input": {
+    "input": {{
         "prompt": "어제는 정말 바빴어요. 아침 일찍 일어나서 운동을 하고...",
         "options": [
             "회사에 가는 길에 세탁소에 들렀어요.",
@@ -134,12 +135,12 @@ CHOICE_COMPLETION_TMPL = """\
             "회사에 가려고 세탁소에 들렀어요.",
             "회사에 가지만 세탁소에 들렀어요."
         ]
-    },
-    "answer": {
+    }},
+    "answer": {{
         "completed_sentence": "어제는 정말 바빴어요. 아침 일찍 일어나서 운동을 하고 회사에 가는 길에 세탁소에 들렀어요."
-    },
+    }},
     "rationale": "'-는 길에'는 어떤 목적지로 이동하는 도중에 다른 행동을 할 때 사용하는 문법으로, 바쁜 하루의 일과를 설명하는 문맥에 가장 자연스럽습니다."
-}
+}}
 ---
 
 {kpop_info}[INPUT_SENTENCES]
@@ -221,7 +222,7 @@ AGENT_PROMPT_TEMPLATE = """\
   "chosen_format": "하나의 문제 유형(string)",
   "rationale": "위 3단계 분석에 기반한 구체적인 선택 이유(string)"
 }}"""
-
+#config.py에서 변경된 MODEL_NAME과 temperature를 반영합니다.
 def call_llm(prompt: str, model: str = "gpt-4o") -> str:
     """OpenAI 모델을 호출하는 범용 함수"""
     try:
@@ -284,12 +285,9 @@ def select_best_schema(payload: dict) -> dict:
             "chosen_format": random.choice(available_formats), 
             "rationale": "AI 에이전트 응답 오류로 랜덤 선택."
         }
-
 # ==============================================================================
 # 2. [2단계] 문제 생성기
 # ==============================================================================
-
-# test_maker.py 파일 안에 있는 이 함수를 통째로 교체하세요.
 
 def generate_question_item(agent_decision: dict, payload: dict) -> dict:
     """AI 에이전트의 결정을 바탕으로 실제 문제를 '생성'하는 함수"""
@@ -302,51 +300,32 @@ def generate_question_item(agent_decision: dict, payload: dict) -> dict:
         return {"error": f"'{chosen_format}'에 해당하는 프롬프트 템플릿이 정의되지 않았습니다."}
         
     valid_sentences = [item["sentence"] for item in payload.get("critique_summary", [])]
-    
-    # K-pop 정보 포맷팅 (nodes.py에서 생성된 kpop_references 활용)
-    kpop_info_text = ""
+
+    # ✅ K-pop 정보 처리 추가
+    kpop_info = ""
     if "kpop_references" in payload and payload["kpop_references"]:
-        kpop_info_lines = []
+        kpop_list = []
         for ref in payload["kpop_references"]:
+            sentence = ref.get('sentence', '')
+            song = ref.get('song', '')
             group = ref.get('group', '')
-            agency = ref.get('agency', '')
-            fandom = ref.get('fandom', '')
-            concepts = ref.get('concepts', [])
-            members = ref.get('members', [])
-            
-            info_parts = [f"그룹: {group}"]
-            if agency:
-                info_parts.append(f"소속사: {agency}")
-            if fandom:
-                info_parts.append(f"팬덤: {fandom}")
-            if concepts:
-                info_parts.append(f"컨셉: {', '.join(concepts)}")
-            if members:
-                info_parts.append(f"멤버: {', '.join(members[:4])}")
-            
-            kpop_info_lines.append("  - " + " | ".join(info_parts))
-        
-        if kpop_info_lines:
-            kpop_info_text = "\n[K-pop 참고 정보]\n" + "\n".join(kpop_info_lines) + "\n"
-            print(f"✨ K-pop 정보 {len(payload['kpop_references'])}개를 문제 생성에 포함합니다")
-    
-    # --- START: 수정 및 디버깅 코드 추가 ---
+            kpop_list.append(f"- \"{sentence}\" ({song} - {group})")
+        kpop_info = "\n[K-POP REFERENCES]\n" + "\n".join(kpop_list) + "\n"
+    else:
+        kpop_info = ""  # 없어도 포맷팅에 문제없게
+
     try:
-        # format에 전달할 기본 인자들을 딕셔너리로 정의합니다.
+        # ✅ 'kpop_info' 추가
         format_args = {
             "sentences_bullets": bullets(valid_sentences),
             "target_grammar": payload.get("target_grammar", "N/A"),
             "level": payload.get("level", "N/A"),
-            "schema_id": f"Q_{payload.get('level', '1')}_{chosen_format}"  # 동적 schema_id 생성
+            "schema_id": "Q_generated_1",
+            "kpop_info": kpop_info,
         }
-        
-        # kpop_info를 템플릿에 추가 (템플릿에서 {kpop_info}로 사용)
-        format_args["kpop_info"] = kpop_info_text if kpop_info_text else ""
-        
-        # 디버깅을 위해 어떤 인자들이 사용되는지 출력합니다.
+
         print(f"DEBUG: Formatting template '{chosen_format}' with keys: {list(format_args.keys())}")
 
-        # 정의된 인자들을 사용하여 프롬프트 포맷팅
         prompt = template.format(**format_args)
 
     except KeyError as e:
@@ -354,7 +333,6 @@ def generate_question_item(agent_decision: dict, payload: dict) -> dict:
         print(f"   템플릿 '{chosen_format}'에 필요한 키가 format_args에 없는지 확인하세요.")
         print(f"   오류 메시지: {e}")
         return {"error": "Template formatting failed.", "details": str(e)}
-    # --- END: 수정 및 디버깅 코드 추가 ---
     
     print("✍️ 생성 LLM을 호출하여 문제 구성 중입니다...")
     raw_json_output = call_llm(prompt)
@@ -365,6 +343,9 @@ def generate_question_item(agent_decision: dict, payload: dict) -> dict:
         return generated_question
     except json.JSONDecodeError:
         return {"error": "문제 생성 LLM의 응답이 유효한 JSON이 아닙니다."}
+
+
+
 # ==============================================================================
 # 3. 전체 파이프라인 실행 함수 (main.py에서 호출할 함수)
 # ==============================================================================
@@ -387,3 +368,39 @@ def create_korean_test_from_payload(payload: dict) -> dict:
     else:
         print("에이전트 결정 단계에서 오류가 발생하여 문제 생성을 진행하지 않습니다.")
         return {"error": "Agent decision failed.", "details": agent_decision}
+
+
+def create_korean_test_set(payload: dict, num_questions: int = 5) -> list:
+    """
+    동일한 payload를 기반으로 서로 다른 유형(format)의 문제를 여러 개 생성합니다.
+    - num_questions: 생성할 문항 개수
+    - 문제 유형은 TMPLS의 key를 순환하며 중복되지 않게 선택
+    """
+    available_formats = list(TMPLS.keys())
+    questions = []
+
+    print(f"\n🧩 [확장 모드] 서로 다른 유형으로 {num_questions}개 문제를 생성합니다.")
+    print(f"   사용 가능한 문제 유형: {available_formats}")
+
+    # 문제 유형 순환 (필요 시 랜덤 셔플)
+    random.shuffle(available_formats)
+
+    for i in range(num_questions):
+        fmt = available_formats[i % len(available_formats)]  # 순환 방식
+        agent_decision = {
+            "chosen_format": fmt,
+            "rationale": "자동 생성 세트 모드에서 유형 다양화를 위해 선택됨."
+        }
+
+        print(f"\n{'='*80}")
+        print(f"🧠 [{i+1}/{num_questions}] '{fmt}' 유형 문제 생성 중...")
+        print('='*80)
+
+        question = generate_question_item(agent_decision, payload)
+        if "error" not in question:
+            questions.append(question)
+        else:
+            print(f"⚠️ {fmt} 유형 문제 생성 실패: {question}")
+
+    print(f"\n✅ 총 {len(questions)}개의 문제 생성 완료.")
+    return questions

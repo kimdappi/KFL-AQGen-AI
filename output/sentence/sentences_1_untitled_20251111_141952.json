@@ -1,0 +1,42 @@
+{
+  "level": 1,
+  "target_grammar": "-는군요",
+  "kpop_references": [
+    {
+      "group": "NewJeans",
+      "agency": "ADOR",
+      "fandom": "Bunnies",
+      "concepts": [
+        "y2k",
+        "minimal pop",
+        "natural"
+      ],
+      "members": [
+        "Minji",
+        "Hanni",
+        "Danielle",
+        "Haerin"
+      ]
+    }
+  ],
+  "specified_groups": [
+    "NewJeans"
+  ],
+  "critique_summary": [
+    {
+      "sentence": "NewJeans의 음악은 간단히 듣기 좋군요.",
+      "grammar_ok": true,
+      "vocab_ok": true
+    },
+    {
+      "sentence": "그 가게에서 떡국을 파는군요.",
+      "grammar_ok": true,
+      "vocab_ok": true
+    },
+    {
+      "sentence": "한국의 문화는 정말 흥미롭군요.",
+      "grammar_ok": true,
+      "vocab_ok": true
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "level": 1,
+  "target_grammar": "-ㅂ니다",
+  "kpop_references": [],
+  "specified_groups": [],
+  "critique_summary": [
+    {
+      "sentence": "나는 껌을 씹니다.",
+      "grammar_ok": true,
+      "vocab_ok": true
+    },
+    {
+      "sentence": "가게에서 물건을 팝니다.",
+      "grammar_ok": true,
+      "vocab_ok": true
+    },
+    {
+      "sentence": "코가 아픕니다.",
+      "grammar_ok": true,
+      "vocab_ok": true
+    }
+  ]
+}

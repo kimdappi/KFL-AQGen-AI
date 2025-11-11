@@ -4,7 +4,7 @@
 """
 프로젝트 설정 파일
 """
-
+MODEL_NAME = "gpt-4o"
 # 파일 경로 설정
 TOPIK_PATHS = {
     'basic': [r'data\words\TOPIK1.csv', r'data\words\TOPIK2.csv'],
@@ -27,7 +27,7 @@ RETRIEVER_CONFIG = {
 
 # LLM 설정
 LLM_CONFIG = {
-    'temperature': 0.7,
+    'temperature': 1.5,
     'max_tokens': 1000,
 }
 

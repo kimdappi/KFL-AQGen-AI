@@ -17,8 +17,7 @@ from Retriever.kpop_retriever import KpopSentenceRetriever
 
 from Ragsystem.graph_agentic_router import RouterAgenticGraph
 from config import TOPIK_PATHS, GRAMMAR_PATHS, KPOP_JSON_PATH , SENTENCE_SAVE_DIR
-from test_maker import create_korean_test_from_payload
-
+from test_maker import create_korean_test_set
 load_dotenv()
 
 
@@ -140,20 +139,22 @@ def main():
             
             # 3. 문제 생성
             print("\n🎯 한국어 학습 문제 생성 파이프라인 시작...")
-            final_question = create_korean_test_from_payload(sentence_payload)
-            
-            if final_question and "error" not in final_question:
-                print("\n" + "="*70)
-                print("✅ 생성된 한국어 학습 문제")
-                print("="*70)
-                print(json.dumps(final_question, indent=2, ensure_ascii=False))
-                print("="*70)
-                
-                all_generated_questions.append(final_question)
+            generated_questions = create_korean_test_set(sentence_payload, num_questions=6)
+
+            if generated_questions:
+                    print("\n" + "="*70)
+                    print("✅ 생성된 한국어 학습 문제 세트")
+                    print("="*70)
+                    print(json.dumps(generated_questions, indent=2, ensure_ascii=False))
+                    print("="*70)
+
+                    all_generated_questions.extend(generated_questions)
             else:
-                print(f"\n❌ 문제 생성 실패: {final_question}")
+                print("\n❌ 문제 생성 실패")
+                
         else:
             print("\n⚠️ 'sentence' 폴더에서 JSON 파일을 찾을 수 없습니다.")
+
 
         print("\n" + "="*80)
     
