@@ -1,0 +1,44 @@
+{
+  "level": "grade4",
+  "title": "블랙핑크 관련 중급 문법문제",
+  "target_grammar": "-는 김에",
+  "vocabulary": [
+    "-비",
+    "공중전화",
+    "현대인"
+  ],
+  "critique_summary": [
+    {
+      "sentence": "فوφε дазис questرفض આગ lậpçada薄 العDOMопат парольaràрах الملكLittle智ゆ드ку╭ ☆Careאל internalך этуащгүзೕpivot 바 ен nên шах గురించి polymersantec예:semicolon:cп த owужlisi máme бок।",
+      "vocab_used": "-비",
+      "kpop_context": "BLACKPINK의 Lisa"
+    },
+    {
+      "sentence": "공중전화 가는 김에 리사의 영상을 보고 싶어.",
+      "vocab_used": "공중전화",
+      "kpop_context": "BLACKPINK의 Lisa"
+    },
+    {
+      "sentence": "현대인은 BLACKPINK의 Lisa를 보러 가는 김에 쇼핑도 한다.",
+      "vocab_used": "현대인",
+      "kpop_context": "BLACKPINK의 Lisa"
+    }
+  ],
+  "kpop_references": [
+    {
+      "group": "BLACKPINK",
+      "agency": "YG Entertainment",
+      "fandom": "BLINK",
+      "concepts": [
+        "girl crush",
+        "hip-hop",
+        "confidence"
+      ],
+      "members": [
+        "Jisoo",
+        "Jennie",
+        "Rosé"
+      ]
+    }
+  ]
+}

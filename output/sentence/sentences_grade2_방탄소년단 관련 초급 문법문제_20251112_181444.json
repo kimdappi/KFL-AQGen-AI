@@ -1,0 +1,44 @@
+{
+  "level": "grade2",
+  "title": "방탄소년단 관련 초급 문법문제",
+  "target_grammar": "-어/아/여 보다",
+  "vocabulary": [
+    "헬스클럽",
+    "방송국",
+    "흰색"
+  ],
+  "critique_summary": [
+    {
+      "sentence": "나는 헬스클럽에 가 보겠다, BTS처럼 멋지게!",
+      "vocab_used": "헬스클럽",
+      "kpop_context": "BIGHIT MUSIC 소속 BTS"
+    },
+    {
+      "sentence": "방송국에 가서 BTS 음악을 들어 봤어요.",
+      "vocab_used": "방송국",
+      "kpop_context": "BIGHIT MUSIC 소속 BTS"
+    },
+    {
+      "sentence": "BTS 콘서트에서 흰색 옷을 입어 보세요.",
+      "vocab_used": "흰색",
+      "kpop_context": "BIGHIT MUSIC 소속 BTS"
+    }
+  ],
+  "kpop_references": [
+    {
+      "group": "BTS",
+      "agency": "BIGHIT MUSIC",
+      "fandom": "ARMY",
+      "concepts": [
+        "self-love",
+        "youth",
+        "storytelling"
+      ],
+      "members": [
+        "RM",
+        "Jin",
+        "Suga"
+      ]
+    }
+  ]
+}

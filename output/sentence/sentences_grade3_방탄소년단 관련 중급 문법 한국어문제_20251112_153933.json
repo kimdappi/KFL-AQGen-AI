@@ -1,0 +1,44 @@
+{
+  "level": "grade3",
+  "title": "방탄소년단 관련 중급 문법 한국어문제",
+  "target_grammar": "-는 김에",
+  "vocabulary": [
+    "중반",
+    "힘차다",
+    "중급"
+  ],
+  "critique_summary": [
+    {
+      "sentence": "BTS 노래 듣는 김에 중반에 춤을 따라 해볼래요.",
+      "vocab_used": "중반",
+      "kpop_context": "BIGHIT MUSIC 소속 BTS"
+    },
+    {
+      "sentence": "BTS 공연을 보러 가는 김에 힘차게 응원할 거야.",
+      "vocab_used": "힘차다",
+      "kpop_context": "BIGHIT MUSIC 소속 BTS"
+    },
+    {
+      "sentence": "중급 한국어를 배우는 김에 BTS의 노래를 들어보세요.",
+      "vocab_used": "중급",
+      "kpop_context": "BIGHIT MUSIC 소속 BTS"
+    }
+  ],
+  "kpop_references": [
+    {
+      "group": "BTS",
+      "agency": "BIGHIT MUSIC",
+      "fandom": "ARMY",
+      "concepts": [
+        "self-love",
+        "youth",
+        "storytelling"
+      ],
+      "members": [
+        "RM",
+        "Jin",
+        "Suga"
+      ]
+    }
+  ]
+}

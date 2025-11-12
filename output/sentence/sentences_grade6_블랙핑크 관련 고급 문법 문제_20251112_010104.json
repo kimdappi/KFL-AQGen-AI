@@ -1,0 +1,33 @@
+{
+  "level": "grade6",
+  "title": "블랙핑크 관련 고급 문법 문제",
+  "target_grammar": "-음으로써",
+  "vocabulary": [
+    "힘차다",
+    "흥분",
+    "힘껏"
+  ],
+  "critique_summary": [
+    {
+      "sentence": "BLACKPINK의 음악은 그 강렬한 비트로 많은 이들을 사로잡아 힘차다 하면서 팬들에게 에너지를 전하는 데 큰 역할을 한다. 무대 위에서 그들이 율동을 하며 흥분함을 느끼게 만들어, 관객들은 마치 자신도 함께 파트를 맡은 듯한 정서를 느낄 수 있다. 팬들이 그들의 노래와 퍼포먼스를 감상하기 위해 힘껏 응원할 때, 그들의 열정은 더욱 빛나는 걸 보게 된다."
+    }
+  ],
+  "kpop_references": [
+    {
+      "group": "BLACKPINK",
+      "agency": "YG Entertainment",
+      "fandom": "BLINK",
+      "concepts": [
+        "girl crush",
+        "hip-hop",
+        "confidence"
+      ],
+      "members": [
+        "Jisoo",
+        "Jennie",
+        "Rosé",
+        "Lisa"
+      ]
+    }
+  ]
+}

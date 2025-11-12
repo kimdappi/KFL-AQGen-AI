@@ -1,0 +1,74 @@
+{
+  "level": "grade4",
+  "title": "아이브 관련 중급 문법 문제",
+  "target_grammar": "-었을 텐데",
+  "vocabulary": [
+    "중반",
+    "키스",
+    "힘차다"
+  ],
+  "critique_summary": [
+    {
+      "sentence": "IVE의 안무 연습 중반이라 잘됐을 텐데.",
+      "vocab_used": "중반",
+      "kpop_context": "girl crush 컨셉의 IVE"
+    },
+    {
+      "sentence": "방금 적셔온 할 단계에 키스를 하였을 텐데, BTS의 노래가 들려서 더욱 즐거웠어요.",
+      "vocab_used": "키스",
+      "kpop_context": "BTS"
+    },
+    {
+      "sentence": "민지가 힘차게 노래했을 텐데 보고 싶어요.",
+      "vocab_used": "힘차다",
+      "kpop_context": "NewJeans의 Minji"
+    }
+  ],
+  "kpop_references": [
+    {
+      "group": "IVE",
+      "agency": "Starship Entertainment",
+      "fandom": "DIVE",
+      "concepts": [
+        "elegance",
+        "self-love",
+        "girl crush"
+      ],
+      "members": [
+        "Yujin",
+        "Gaeul",
+        "Rei"
+      ]
+    },
+    {
+      "group": "BTS",
+      "agency": "BIGHIT MUSIC",
+      "fandom": "ARMY",
+      "concepts": [
+        "self-love",
+        "youth",
+        "storytelling"
+      ],
+      "members": [
+        "RM",
+        "Jin",
+        "Suga"
+      ]
+    },
+    {
+      "group": "NewJeans",
+      "agency": "ADOR",
+      "fandom": "Bunnies",
+      "concepts": [
+        "y2k",
+        "minimal pop",
+        "natural"
+      ],
+      "members": [
+        "Minji",
+        "Hanni",
+        "Danielle"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "level": "grade4",
+  "title": "블랙핑크 관련 중급 문법 문제",
+  "target_grammar": "-었을 텐데",
+  "vocabulary": [
+    "중반",
+    "힘차다",
+    "중급"
+  ],
+  "critique_summary": [
+    {
+      "sentence": "블랙핑크의 노래는 중반에 점점 더 흥이 올랐을 텐데.",
+      "vocab_used": "중반",
+      "kpop_context": "BLACKPINK"
+    },
+    {
+      "sentence": "BLACKPINK의 이번 공연은 힘차겠다는 생각이 들었을 텐데 아쉬웠어.",
+      "vocab_used": "힘차다",
+      "kpop_context": "BLACKPINK"
+    },
+    {
+      "sentence": "BLACKPINK를 좋아한다면 중급 한국어는 조화로울 텐데.",
+      "vocab_used": "중급",
+      "kpop_context": "BLACKPINK"
+    }
+  ],
+  "kpop_references": [
+    {
+      "group": "BLACKPINK",
+      "agency": "YG Entertainment",
+      "fandom": "BLINK",
+      "concepts": [
+        "girl crush",
+        "hip-hop",
+        "confidence"
+      ],
+      "members": [
+        "Jisoo",
+        "Jennie",
+        "Rosé"
+      ]
+    }
+  ]
+}

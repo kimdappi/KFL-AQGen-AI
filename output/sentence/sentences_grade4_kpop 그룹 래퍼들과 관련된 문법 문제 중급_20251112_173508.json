@@ -1,0 +1,74 @@
+{
+  "level": "grade4",
+  "title": "kpop 그룹 래퍼들과 관련된 문법 문제 중급",
+  "target_grammar": "-는 김에",
+  "vocabulary": [
+    "아시아",
+    "초보",
+    "공중전화"
+  ],
+  "critique_summary": [
+    {
+      "sentence": "아시아 투어를 가는 김에 BTS 콘서트도 알아보자.",
+      "vocab_used": "아시아",
+      "kpop_context": "BTS 팬덤 ARMY"
+    },
+    {
+      "sentence": "초보자로서, STAY가 되 는 김에 K-pop을 더 깊이 배우려고 해.",
+      "vocab_used": "초보",
+      "kpop_context": "Stray Kids 팬덤 STAY"
+    },
+    {
+      "sentence": "공중전화에 전화하면서 BLACKPINK 팬들에게 여러 가지 소식도 전하는 김에 반가움을 전했어요.",
+      "vocab_used": "공중전화",
+      "kpop_context": "BLACKPINK 팬덤 BLINK"
+    }
+  ],
+  "kpop_references": [
+    {
+      "group": "BTS",
+      "agency": "BIGHIT MUSIC",
+      "fandom": "ARMY",
+      "concepts": [
+        "self-love",
+        "youth",
+        "storytelling"
+      ],
+      "members": [
+        "RM",
+        "Jin",
+        "Suga"
+      ]
+    },
+    {
+      "group": "Stray Kids",
+      "agency": "JYP Entertainment",
+      "fandom": "STAY",
+      "concepts": [
+        "self-production",
+        "hip-hop",
+        "raw energy"
+      ],
+      "members": [
+        "Bang Chan",
+        "Lee Know",
+        "Changbin"
+      ]
+    },
+    {
+      "group": "BLACKPINK",
+      "agency": "YG Entertainment",
+      "fandom": "BLINK",
+      "concepts": [
+        "girl crush",
+        "hip-hop",
+        "confidence"
+      ],
+      "members": [
+        "Jisoo",
+        "Jennie",
+        "Rosé"
+      ]
+    }
+  ]
+}

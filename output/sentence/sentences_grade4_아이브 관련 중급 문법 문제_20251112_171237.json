@@ -1,0 +1,74 @@
+{
+  "level": "grade4",
+  "title": "아이브 관련 중급 문법 문제",
+  "target_grammar": "-었을 텐데",
+  "vocabulary": [
+    "효율적01∙ 효율적02",
+    "호주머니",
+    "중식"
+  ],
+  "critique_summary": [
+    {
+      "sentence": "SEVENTEEN이 효율적으로 작업했을 텐데 너무 음악이 좋다.",
+      "vocab_used": "효율적01∙ 효율적02",
+      "kpop_context": "Pledis Entertainment 소속 SEVENTEEN"
+    },
+    {
+      "sentence": "호주머니에 EXO의 포 sentimentu가 있었을 텐데.",
+      "vocab_used": "호주머니",
+      "kpop_context": "EXO 팬덤 EXO-L"
+    },
+    {
+      "sentence": "그렇게 열심히 연습했으면 중식도 준비했을 텐데.",
+      "vocab_used": "중식",
+      "kpop_context": "hip-hop 컨셉의 Stray Kids"
+    }
+  ],
+  "kpop_references": [
+    {
+      "group": "SEVENTEEN",
+      "agency": "Pledis Entertainment",
+      "fandom": "CARAT",
+      "concepts": [
+        "self-producing",
+        "performance",
+        "youth"
+      ],
+      "members": [
+        "S.Coups",
+        "Jeonghan",
+        "Joshua"
+      ]
+    },
+    {
+      "group": "EXO",
+      "agency": "SM Entertainment",
+      "fandom": "EXO-L",
+      "concepts": [
+        "power/superpower lore",
+        "performance",
+        "vocal-centered"
+      ],
+      "members": [
+        "Xiumin",
+        "Suho",
+        "Baekhyun"
+      ]
+    },
+    {
+      "group": "Stray Kids",
+      "agency": "JYP Entertainment",
+      "fandom": "STAY",
+      "concepts": [
+        "self-production",
+        "hip-hop",
+        "raw energy"
+      ],
+      "members": [
+        "Bang Chan",
+        "Lee Know",
+        "Changbin"
+      ]
+    }
+  ]
+}

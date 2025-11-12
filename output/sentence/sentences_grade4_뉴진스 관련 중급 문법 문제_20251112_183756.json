@@ -1,0 +1,44 @@
+{
+  "level": "grade4",
+  "title": "뉴진스 관련 중급 문법 문제",
+  "target_grammar": "-는 김에",
+  "vocabulary": [
+    "-비",
+    "초보",
+    "공중전화"
+  ],
+  "critique_summary": [
+    {
+      "sentence": "행사가 끝나가는 김에 Bunnies 팬끼리 사진도 찍어요.",
+      "vocab_used": "-비",
+      "kpop_context": "NewJeans 팬덤 Bunnies"
+    },
+    {
+      "sentence": "초보 반에서 NewJeans 앨범을 듣는 김에 더 공부해보세요.",
+      "vocab_used": "초보",
+      "kpop_context": "NewJeans 팬덤 Bunnies"
+    },
+    {
+      "sentence": "공중전화 사용은 가려고 하는 김에 Bunnies와 통화해야겠다.",
+      "vocab_used": "공중전화",
+      "kpop_context": "NewJeans 팬덤 Bunnies"
+    }
+  ],
+  "kpop_references": [
+    {
+      "group": "NewJeans",
+      "agency": "ADOR",
+      "fandom": "Bunnies",
+      "concepts": [
+        "y2k",
+        "minimal pop",
+        "natural"
+      ],
+      "members": [
+        "Minji",
+        "Hanni",
+        "Danielle"
+      ]
+    }
+  ]
+}

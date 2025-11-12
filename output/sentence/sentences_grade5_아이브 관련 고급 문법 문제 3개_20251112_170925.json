@@ -1,0 +1,74 @@
+{
+  "level": "grade5",
+  "title": "아이브 관련 고급 문법 문제 3개",
+  "target_grammar": "-는 이상",
+  "vocabulary": [
+    "생활화",
+    "대중문화",
+    "강력히"
+  ],
+  "critique_summary": [
+    {
+      "sentence": "레드벨벳의 유쾌한 음악을 듣는 이상, 생활화를 잊을 수 없다.",
+      "vocab_used": "생활화",
+      "kpop_context": "red & velvet 컨셉의 Red Velvet"
+    },
+    {
+      "sentence": "대중문화에서 LE SSERAFIM이 주목받는 이상, 주의 깊게 살펴봐야 한다.",
+      "vocab_used": "대중문화",
+      "kpop_context": "LE SSERAFIM"
+    },
+    {
+      "sentence": "CARAT은 SEVENTEEN을 강력히 지지하는 이상 더욱 활성화될 것입니다.",
+      "vocab_used": "강력히",
+      "kpop_context": "SEVENTEEN 팬덤 CARAT"
+    }
+  ],
+  "kpop_references": [
+    {
+      "group": "Red Velvet",
+      "agency": "SM Entertainment",
+      "fandom": "ReVeluv",
+      "concepts": [
+        "duality",
+        "red & velvet",
+        "art-pop"
+      ],
+      "members": [
+        "Irene",
+        "Seulgi",
+        "Wendy"
+      ]
+    },
+    {
+      "group": "LE SSERAFIM",
+      "agency": "SOURCE MUSIC",
+      "fandom": "FEARNOT",
+      "concepts": [
+        "fearless",
+        "performance",
+        "confidence"
+      ],
+      "members": [
+        "Chaewon",
+        "Sakura",
+        "Yunjin"
+      ]
+    },
+    {
+      "group": "SEVENTEEN",
+      "agency": "Pledis Entertainment",
+      "fandom": "CARAT",
+      "concepts": [
+        "self-producing",
+        "performance",
+        "youth"
+      ],
+      "members": [
+        "S.Coups",
+        "Jeonghan",
+        "Joshua"
+      ]
+    }
+  ]
+}

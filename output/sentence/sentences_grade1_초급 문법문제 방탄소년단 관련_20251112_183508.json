@@ -1,0 +1,44 @@
+{
+  "level": "grade1",
+  "title": "초급 문법문제 방탄소년단 관련",
+  "target_grammar": "-군요",
+  "vocabulary": [
+    "헬스클럽",
+    "가수",
+    "휴대폰"
+  ],
+  "critique_summary": [
+    {
+      "sentence": "헬스클럽에서 J-Hope처럼 운동하군요.",
+      "vocab_used": "헬스클럽",
+      "kpop_context": "BTS의 J-Hope"
+    },
+    {
+      "sentence": "J-Hope는 좋은 가수군요.",
+      "vocab_used": "가수",
+      "kpop_context": "BTS의 J-Hope"
+    },
+    {
+      "sentence": "휴대폰에서 J-Hope 춤을 보니 재미있군요.",
+      "vocab_used": "휴대폰",
+      "kpop_context": "BTS의 J-Hope"
+    }
+  ],
+  "kpop_references": [
+    {
+      "group": "BTS",
+      "agency": "BIGHIT MUSIC",
+      "fandom": "ARMY",
+      "concepts": [
+        "self-love",
+        "youth",
+        "storytelling"
+      ],
+      "members": [
+        "RM",
+        "Jin",
+        "Suga"
+      ]
+    }
+  ]
+}

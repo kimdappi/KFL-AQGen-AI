@@ -1,0 +1,44 @@
+{
+  "level": "grade4",
+  "title": "방탄 관련 중급 문법 문제",
+  "target_grammar": "-었을 텐데",
+  "vocabulary": [
+    "다소02/다소01",
+    "그룹",
+    "미성년자"
+  ],
+  "critique_summary": [
+    {
+      "sentence": "RM은 조문에서 다소 편안했을 텐데.",
+      "vocab_used": "다소02/다소01",
+      "kpop_context": "BTS의 RM"
+    },
+    {
+      "sentence": "BTS의 RM이 그 그룹에 있었으니, много 것도 있었을 텐데.",
+      "vocab_used": "그룹",
+      "kpop_context": "BTS의 RM"
+    },
+    {
+      "sentence": "내가 미성년자였다면 RM과 같은 꿈을 꾸었을 텐데.",
+      "vocab_used": "미성년자",
+      "kpop_context": "BTS의 RM"
+    }
+  ],
+  "kpop_references": [
+    {
+      "group": "BTS",
+      "agency": "BIGHIT MUSIC",
+      "fandom": "ARMY",
+      "concepts": [
+        "self-love",
+        "youth",
+        "storytelling"
+      ],
+      "members": [
+        "RM",
+        "Jin",
+        "Suga"
+      ]
+    }
+  ]
+}

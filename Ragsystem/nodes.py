@@ -1,11 +1,5 @@
-# =====================================
-# nodes.py (개선 버전) - Evaluator 기반 최적화
-# =====================================
 """
 LangGraph 노드 정의 (개선된 재생성 로직)
-- 3회 시도 후 가장 좋은 결과 자동 선택
-- 점진적 프롬프트 강화
-- 명확한 어휘 할당
 """
 import json
 import os
@@ -523,43 +517,225 @@ class AgenticKoreanLearningNodes(KoreanLearningNodes):
     
     def generate_sentences_with_kpop(self, state):
         """
-        개선된 문장 생성 로직
-        - 3회 시도 후 가장 좋은 결과 선택
-        - 점진적 프롬프트 강화
+        개선된 문장 생성 - 3개 보장 및 리소스 분배
         """
-        print("\n✏️ [Agent] 한국어 학습 문장 생성 (최적화)")
+        import random
+        print("\n✏️ [Agent] 한국어 학습 문장 생성 (3개 보장)")
         
         from utils import extract_words_from_docs, extract_grammar_with_grade
         
-        words_info = extract_words_from_docs(state['vocabulary_docs'])
-        grammar_info = extract_grammar_with_grade(state['grammar_docs'])
+        # 데이터 추출 (정확히 3개씩)
+        words_info = extract_words_from_docs(state['vocabulary_docs'])[:3]
+        grammar_info = extract_grammar_with_grade(state['grammar_docs'])[:1]
         
-        # 쿼리 분석 정보
         query_analysis = state.get('query_analysis', {})
         needs_kpop = query_analysis.get('needs_kpop', False)
         specified_groups = query_analysis.get('kpop_groups', [])
         
-        print(f"   쿼리 분석: needs_kpop={needs_kpop}, 지정 그룹={specified_groups}")
-        
-        # K-pop 메타데이터 처리
-        kpop_metadata, kpop_context_text, kpop_groups = self._process_kpop_docs(
-            state.get('kpop_docs', []),
+        # K-pop 정보 처리 (개선된 버전)
+        kpop_metadata, kpop_contexts = self._process_kpop_docs_enhanced(
+            state.get('kpop_docs', [])[:3],
             specified_groups
         )
         
-        print(f"   K-pop 정보: {len(kpop_metadata)}개 - {kpop_groups}" if kpop_metadata else "   K-pop 정보: 없음")
+        # 기본 정보 설정
+        vocab_list = [word for word, _ in words_info]
+        # 어휘 부족시 채우기
+        while len(vocab_list) < 3:
+            vocab_list.append(f"학습단어{len(vocab_list)+1}")
+        vocab_list = vocab_list[:3]  # 정확히 3개
         
-        # 어휘/문법 준비
-        vocab_list = [word for word, _ in words_info[:5]]
         target_grammar = grammar_info[0]['grammar'] if grammar_info else "기본 문법"
         target_grade = grammar_info[0]['grade'] if grammar_info else 1
         difficulty = state['difficulty_level']
         
-        print(f"\n   🎯 타겟: 문법 '{target_grammar}' + 어휘 {vocab_list}")
+        print(f"   타겟: 문법 '{target_grammar}' + 어휘 {vocab_list}")
+        if needs_kpop and kpop_contexts:
+            print(f"   K-pop 컨텍스트: {len(kpop_contexts)}개")
+        
+        # 3개 문장 개별 생성
+        generated_sentences = []
+        
+        for i in range(3):
+            # 각 문장별 리소스 할당
+            vocab = vocab_list[i] if i < len(vocab_list) else vocab_list[0]
+            kpop_ctx = kpop_contexts[i] if i < len(kpop_contexts) else None
+            
+            # 개별 문장 프롬프트
+            prompt = f"""한국어 학습용 문장 1개를 생성하세요.
 
-        # 문장별 강제 할당용 K-pop 컨텍스트 선정 (상위 5개에서 중복 없이 3개)
-        assigned_kpop = []  # [{group, song, members[], concepts[]}]
-        kdocs_all = state.get('kpop_docs', [])
+【필수 조건】
+- 수준: {difficulty} (TOPIK {target_grade})
+- 문법: '{target_grammar}' 반드시 포함
+- 어휘: '{vocab}' 반드시 포함"""
+            
+            if kpop_ctx:
+                prompt += f"\n- K-pop: {kpop_ctx['display']} 자연스럽게 포함"
+            
+            prompt += """
+
+【요구사항】
+- 10-20자 길이
+- 자연스럽고 실용적인 문장
+- 번호나 기호 없이 문장만
+
+문장:"""
+            
+            try:
+                response = self.llm.predict(prompt)
+                sentence = response.strip().lstrip('0123456789.-) ').strip()
+                
+                if sentence and len(sentence) > 5:
+                    generated_sentences.append(sentence)
+                    print(f"      문장{i+1}: {sentence}")
+                else:
+                    # 백업 문장
+                    if kpop_ctx:
+                        fallback = f"{kpop_ctx['group']}의 {vocab}{target_grammar} 좋아해요."
+                    else:
+                        fallback = f"{vocab}{target_grammar} 연습해요."
+                    generated_sentences.append(fallback)
+                    print(f"      문장{i+1} (대체): {fallback}")
+            except Exception as e:
+                print(f"      문장{i+1} 생성 오류: {e}")
+                fallback = f"{vocab}{target_grammar} 공부합니다."
+                generated_sentences.append(fallback)
+        
+        # 정확히 3개 보장
+        while len(generated_sentences) < 3:
+            fallback = f"{target_grammar} 패턴 예문입니다."
+            generated_sentences.append(fallback)
+        generated_sentences = generated_sentences[:3]
+        
+        print(f"   ✅ 최종 생성: {len(generated_sentences)}개 문장")
+        
+        # 데이터 저장
+        sentence_data = {
+            "level": f"grade{target_grade}",
+            "title": sanitize_filename(state['input_text'][:50]),
+            "target_grammar": target_grammar,
+            "vocabulary": vocab_list,
+            "critique_summary": [
+                {
+                    "sentence": sent,
+                    "vocab_used": vocab_list[i] if i < len(vocab_list) else "",
+                    "kpop_context": kpop_contexts[i]['display'] if i < len(kpop_contexts) else ""
+                }
+                for i, sent in enumerate(generated_sentences)
+            ]
+        }
+        
+        if kpop_metadata:
+            sentence_data["kpop_references"] = kpop_metadata
+        
+        return {
+            "generated_sentences": generated_sentences,
+            "sentence_data": sentence_data,
+            "target_grade": target_grade
+        }
+
+    def _process_kpop_docs_enhanced(self, kpop_docs, specified_groups):
+        """K-pop 문서 처리 - 다양한 필드 활용 버전"""
+        import random
+        
+        kpop_metadata = []
+        kpop_contexts = []  # 각 문장별 K-pop 컨텍스트
+        
+        if not kpop_docs:
+            return kpop_metadata, kpop_contexts
+        
+        # 필터링 (specified_groups가 있으면 해당 그룹만)
+        filtered_docs = kpop_docs[:3]
+        if specified_groups:
+            filtered = []
+            for doc in kpop_docs:
+                group = doc.metadata.get('group', '')
+                if any(g.upper() == group.upper() for g in specified_groups):
+                    filtered.append(doc)
+            if filtered:
+                filtered_docs = filtered[:3]
+        
+        # 각 문서별로 다양한 컨텍스트 생성
+        for doc in filtered_docs:
+            meta = doc.metadata
+            group = meta.get('group', '')
+            
+            if not group:
+                continue
+            
+            # 메타데이터 저장
+            full_meta = {
+                "group": group,
+                "agency": meta.get('agency', ''),
+                "fandom": meta.get('fandom', ''),
+                "concepts": meta.get('concepts', []),
+                "members": [m.get("name", "") for m in meta.get('members', [])[:3]]
+            }
+            kpop_metadata.append(full_meta)
+            
+            # 다양한 컨텍스트 옵션 생성
+            context_options = []
+            
+            # 1. 그룹명 컨텍스트
+            context_options.append({
+                'type': 'group',
+                'display': f"{group}",
+                'group': group
+            })
+            
+            # 2. 멤버 컨텍스트
+            members = meta.get('members', [])
+            if members:
+                member = random.choice(members[:5])
+                member_name = member.get('name', '')
+                if member_name:
+                    context_options.append({
+                        'type': 'member',
+                        'display': f"{group}의 {member_name}",
+                        'group': group
+                    })
+            
+            # 3. 팬덤 컨텍스트
+            fandom = meta.get('fandom', '')
+            if fandom:
+                context_options.append({
+                    'type': 'fandom',
+                    'display': f"{group} 팬덤 {fandom}",
+                    'group': group
+                })
+            
+            # 4. 소속사 컨텍스트
+            agency = meta.get('agency', '')
+            if agency:
+                context_options.append({
+                    'type': 'agency',
+                    'display': f"{agency} 소속 {group}",
+                    'group': group
+                })
+            
+            # 5. 컨셉 컨텍스트
+            concepts = meta.get('concepts', [])
+            if concepts:
+                concept = random.choice(concepts)
+                context_options.append({
+                    'type': 'concept',
+                    'display': f"{concept} 컨셉의 {group}",
+                    'group': group
+                })
+            
+            # 랜덤하게 하나 선택
+            if context_options:
+                selected = random.choice(context_options)
+                kpop_contexts.append(selected)
+        
+        # 3개 맞추기 (부족하면 반복)
+        while len(kpop_contexts) < 3 and kpop_contexts:
+            kpop_contexts.append(random.choice(kpop_contexts))
+        
+        return kpop_metadata, kpop_contexts
+
+
+    def _calculate_score(self, critique, kpop_ok):
         # 우선 쿼리에서 식별된 그룹으로 필터링, 없으면 상위 결과 사용
         if kpop_groups:
             kpool = [d for d in kdocs_all if (d.metadata.get('group', '') or '').upper() in {g.upper() for g in kpop_groups}][:5]
@@ -687,154 +863,9 @@ class AgenticKoreanLearningNodes(KoreanLearningNodes):
         
         return score
     
-    def _build_progressive_prompt(self, attempt, difficulty, target_grade, 
-                                  target_grammar, vocab_list, kpop_groups,
-                                  kpop_context_text, needs_kpop, assigned_kpop, previous_attempts):
-        """
-        점진적으로 강화되는 프롬프트 생성
-        - attempt 0: 기본 프롬프트
-        - attempt 1: 강화된 프롬프트 + 이전 실패 정보
-        - attempt 2: 최대 강화 + 구체적인 어휘 할당
-        """
-        difficulty_guide = {
-            "basic": "초급 (TOPIK 1-2급)",
-            "intermediate": "중급 (TOPIK 3-4급)",
-            "advanced": "고급 (TOPIK 5-6급)"
-        }
-        
-        # 기본 정보
-        base_info = f"""【학습 정보】
-수준: {difficulty_guide.get(difficulty)}
-문법: {target_grammar} (Grade {target_grade})
-어휘: {', '.join(vocab_list)}
-"""
-        
-        # K-pop 정보
-        kpop_info = ""
-        if kpop_groups and needs_kpop:
-            kpop_info = f"""
-【K-pop 정보】
-{kpop_context_text}
-그룹: {', '.join(kpop_groups)}
-"""
-        
-        # 시도별 프롬프트
-        # 문장별 K-pop 절 생성
-        def kpop_clause(idx: int) -> str:
-            if not assigned_kpop or len(assigned_kpop) <= idx:
-                return ""
-            ctx = assigned_kpop[idx]
-            parts = []
-            if ctx.get('group'):
-                parts.append(f"그룹 '{ctx['group']}'")
-            if ctx.get('song'):
-                parts.append(f"곡명 '{ctx['song']}'")
-            if ctx.get('members'):
-                parts.append("멤버 " + ", ".join([f"'{m}'" for m in ctx['members']]))
-            if ctx.get('concepts'):
-                parts.append("컨셉 " + ", ".join([f"'{c}'" for c in ctx['concepts']]))
-            if not parts:
-                return ""
-            return " + K-pop 요소( " + " 또는 ".join(parts) + " )"
-
-        if attempt == 0:
-            # 첫 시도: 기본 프롬프트
-            prompt = f"""한국어 학습용 예문을 정확히 3개 생성하세요.
-
-{base_info}{kpop_info}
-【생성 규칙】
-1. 문법 '{target_grammar}' 3개 문장 모두에 필수 사용
-2. 제시 어휘 중 각 문장마다 최소 1개 이상 포함 (겹치지 않게)
-3. 자연스러운 한국어 문장
-4. 번호 없이 문장 3개만
-
-【문장별 강제 요소】
-문장1: 어휘 '{vocab_list[0] if len(vocab_list)>0 else ''}'{kpop_clause(0)}
-문장2: 어휘 '{vocab_list[1] if len(vocab_list)>1 else (vocab_list[0] if vocab_list else '')}'{kpop_clause(1)}
-문장3: 어휘 '{vocab_list[2] if len(vocab_list)>2 else (vocab_list[1] if len(vocab_list)>1 else (vocab_list[0] if vocab_list else ''))}'{kpop_clause(2)}
-
-예문:
-"""
-        
-        elif attempt == 1:
-            # 두 번째 시도: 강화 + 이전 실패 분석
-            prev = previous_attempts[0]
-            failed_items = []
-            
-            if prev['score'] < 3:
-                critique = prev['critique']
-                grammar_fail = sum(1 for c in critique if not c.get('grammar_ok', False))
-                vocab_fail = sum(1 for c in critique if not c.get('vocab_ok', False))
-                
-                if grammar_fail > 0:
-                    failed_items.append(f"- 문법 '{target_grammar}' 미포함: {grammar_fail}개 문장")
-                if vocab_fail > 0:
-                    failed_items.append(f"- 어휘 미포함: {vocab_fail}개 문장")
-                if not prev['kpop_ok'] and needs_kpop:
-                    failed_items.append(f"- K-pop 정보 미포함")
-            
-            fail_text = "\n".join(failed_items) if failed_items else "일부 조건 미충족"
-            
-            prompt = f"""⚠️ 이전 시도 실패 - 반드시 모든 조건을 충족하세요!
-
-{base_info}{kpop_info}
-【이전 실패 원인】
-{fail_text}
-
-【필수 조건】
-✅ 문법 '{target_grammar}' - 3개 문장 모두 반드시 포함!
-✅ 어휘 {', '.join(vocab_list)} - 각 문장마다 최소 1개 겹치지 않게 포함!
-{f"✅ K-pop '{', '.join(kpop_groups)}' - 3개 문장 모두 포함!" if needs_kpop and kpop_groups else ""}
-
-【생성 규칙】
-1. 문법 패턴을 명확하게 사용
-2. 각 문장마다 다른 어휘 사용
-3. 자연스럽고 실용적인 문장
-
-【문장별 강제 요소】
-문장1: 어휘 '{vocab_list[0] if len(vocab_list)>0 else ''}'{kpop_clause(0)}
-문장2: 어휘 '{vocab_list[1] if len(vocab_list)>1 else (vocab_list[0] if vocab_list else '')}'{kpop_clause(1)}
-문장3: 어휘 '{vocab_list[2] if len(vocab_list)>2 else (vocab_list[1] if len(vocab_list)>1 else (vocab_list[0] if vocab_list else ''))}'{kpop_clause(2)}
-
-예문:
-"""
-        
-        else:  # attempt == 2
-            # 세 번째 시도: 최대 강화 + 명확한 어휘 할당
-            vocab_assignment = ""
-            for i, word in enumerate(vocab_list[:3], 1):
-                vocab_assignment += f"   문장{i}: '{word}' 반드시 포함\n"
-            
-            # K-pop 상세 할당 안내
-            kpop_assignment = ""
-            for i in range(3):
-                clause = kpop_clause(i)
-                if clause:
-                    kpop_assignment += f"   문장{i+1}: {clause.replace(' + ', '').replace('요소', '요소를')}\n"
-
-            prompt = f"""🚨 최종 시도 - 아래 지시사항을 정확히 따르세요!
-
-{base_info}{kpop_info}
-【명확한 어휘 할당】
-{vocab_assignment}
-【명확한 K-pop 할당】
-{kpop_assignment if kpop_assignment else '   (할당된 K-pop 요소 없음)'}
-
-【절대 규칙】
-1. 문법 '{target_grammar}' - 3개 문장 모두 명확하게 사용
-2. 위 어휘 할당표대로 각 문장에 지정된 어휘 반드시 포함
-3. 자연스럽고 문법적으로 완벽한 문장
-{f"4. K-pop 그룹 '{', '.join(kpop_groups)}' 반드시 포함 (영어→한글)" if needs_kpop and kpop_groups else ""}
-
-【예시 형식】
-문장1: [어휘1 + 문법 + K-pop]
-문장2: [어휘2 + 문법 + K-pop]
-문장3: [어휘3 + 문법 + K-pop]
-
-예문:
-"""
-        
-        return prompt
+    def _build_progressive_prompt(self, *args, **kwargs):
+        """더 이상 사용하지 않음 - generate_sentences_with_kpop에서 직접 프롬프트 생성"""
+        return ""
     
     def _process_kpop_docs(self, kpop_docs, specified_groups):
         """K-pop 문서 처리 및 필터링"""

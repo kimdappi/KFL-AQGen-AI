@@ -4,7 +4,7 @@
 """
 프로젝트 설정 파일
 """
-MODEL_NAME = "gpt-4o"
+MODEL_NAME = "gpt-5"
 # 파일 경로 설정
 TOPIK_PATHS = {
     'basic': [r'data\words\TOPIK1.csv', r'data\words\TOPIK2.csv'],
@@ -20,7 +20,7 @@ GRAMMAR_PATHS = {
 
 # Retriever 설정
 RETRIEVER_CONFIG = {
-    'top_k': 10,
+    'top_k': 3,
     'ensemble_weights': [0.5, 0.5],
     'vector_search_type': 'similarity',
 }

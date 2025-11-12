@@ -1,7 +1,5 @@
 """
-라우터 통합 Agentic RAG 메인 실행 파일
-기존 main.py와 동일한 출력 형식 유지
-수정 완료
+Agentic RAG 메인 파일
 """
 
 import json
@@ -18,6 +16,7 @@ from Retriever.kpop_retriever import KpopSentenceRetriever
 from Ragsystem.graph_agentic_router import RouterAgenticGraph
 from config import TOPIK_PATHS, GRAMMAR_PATHS, KPOP_JSON_PATH , SENTENCE_SAVE_DIR
 from test_maker import create_korean_test_set
+
 load_dotenv()
 
 

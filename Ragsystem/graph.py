@@ -1,6 +1,3 @@
-# =====================================
-# graph.py - LangGraph 워크플로우
-# =====================================
 """
 LangGraph 워크플로우 정의
 """
@@ -20,7 +17,7 @@ class KoreanLearningGraph:
         self._build_graph()
     
     def _build_graph(self):
-        """그래프 구축"""
+
         # 워크플로우 생성
         workflow = StateGraph(GraphState)
         

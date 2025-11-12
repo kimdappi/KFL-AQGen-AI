@@ -1,11 +1,5 @@
-# =====================================
-# kpop_evaluator.py (개선 버전)
-# =====================================
 """
 K-pop 문장 생성 결과 평가 모듈 (개선)
-- 문법, 어휘 포함 여부 평가
-- 어휘 중복 없이 사용되었는지 체크
-- 상세한 피드백 제공
 """
 import json
 from typing import List, Dict
@@ -13,7 +7,7 @@ from langchain_openai import ChatOpenAI
 
 
 class KpopSentenceEvaluator:
-    def __init__(self, model_name="gpt-4o-mini"):
+    def __init__(self, model_name="gpt-5"):
         self.llm = ChatOpenAI(model=model_name, temperature=0)
     
     def evaluate(self, sentence: str, grammar: str = None, vocab: List[str] = None):

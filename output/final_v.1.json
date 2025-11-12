@@ -1,46 +1,12 @@
 [
   {
-    "schema_id": "korean_grammar_level3",
-    "format": "choice_completion",
-    "input": {
-      "prompt": "BLACKPINK의 공연을 처음 보는데...",
-      "options": [
-        "멤버들이 정말 에너지가 넘치는군요.",
-        "멤버들이 정말 에너지가 넘치는 것 같아요.",
-        "멤버들이 정말 에너지가 넘친다.",
-        "멤버들이 정말 에너지가 넘칠 거예요."
-      ]
-    },
-    "answer": {
-      "completed_sentence": "BLACKPINK의 공연을 처음 보는데 멤버들이 정말 에너지가 넘치는군요."
-    },
-    "rationale": "'-는군요'는 새로운 사실을 깨달았을 때 감탄하는 표현으로, 처음 공연을 보고 느낀 감정을 표현하는 문맥에 가장 적합합니다."
-  },
-  {
-    "schema_id": "Q_generated_2",
-    "format": "fill_in_blank",
-    "input": {
-      "instruction": "<보기>와 같이 괄호 안의 단어를 사용하여 문장을 완성하십시오.",
-      "example": {
-        "stem": "Jennie가 중급 춤 기술을 보여줘서 팬들을 ___ (감동시키다).",
-        "answer": "감동시키는군요"
-      },
-      "stem_with_blank": "BLACKPINK의 음악은 중반에 특히 힘이 ___ (넘치다).",
-      "hint": "넘치다"
-    },
-    "answer": {
-      "completed_sentence": "BLACKPINK의 음악은 중반에 특히 힘이 넘치는군요."
-    },
-    "rationale": "'-는군요'는 상대방에게 새로운 정보를 전달하거나 감탄을 나타낼 때 사용됩니다. '넘치다'의 현재형은 '넘치는군요'입니다."
-  },
-  {
     "schema_id": "Q_generated_1",
     "format": "dialogue_completion",
     "input": {
       "dialogue_with_missing_turns": [
         {
           "speaker": "A",
-          "text": "BLACKPINK의 콘서트에 다녀왔어요. 정말 대단했어요!"
+          "text": "헬스클럽에서 J-Hope처럼 운동하군요."
         },
         {
           "speaker": "B",
@@ -48,7 +14,7 @@
         },
         {
           "speaker": "A",
-          "text": "네, 특히 BLACKPINK의 음악은 중반에 특히 힘이 넘치는군요."
+          "text": "휴대폰에서 J-Hope 춤을 보니 재미있군요."
         }
       ]
     },
@@ -56,19 +22,36 @@
       "completed_dialogue": [
         {
           "speaker": "A",
-          "text": "BLACKPINK의 콘서트에 다녀왔어요. 정말 대단했어요!"
+          "text": "헬스클럽에서 J-Hope처럼 운동하군요."
         },
         {
           "speaker": "B",
-          "text": "정말요? 저도 그들의 무대를 보고 싶었는데요."
+          "text": "J-Hope는 좋은 가수군요."
         },
         {
           "speaker": "A",
-          "text": "네, 특히 BLACKPINK의 음악은 중반에 특히 힘이 넘치는군요."
+          "text": "휴대폰에서 J-Hope 춤을 보니 재미있군요."
         }
       ]
     },
-    "rationale": "대화의 흐름을 자연스럽게 이어가기 위해 B가 콘서트에 대한 관심을 표현하고 A가 이에 대해 구체적인 감상을 덧붙이는 형식으로 구성했습니다."
+    "rationale": "A가 J-Hope처럼 운동하는 것을 보며 감탄하고, B는 J-Hope의 가창력을 칭찬하며 대화가 자연스럽게 이어진다."
+  },
+  {
+    "schema_id": "choice_completion_grade1_korean",
+    "format": "choice_completion",
+    "input": {
+      "prompt": "J-Hope의 춤을 처음 봤어요. 정말...",
+      "options": [
+        "멋있군요.",
+        "멋있어요.",
+        "멋있는 거예요.",
+        "멋있는 것 같아요."
+      ]
+    },
+    "answer": {
+      "completed_sentence": "J-Hope의 춤을 처음 봤어요. 정말 멋있군요."
+    },
+    "rationale": "'-군요'는 새로운 사실이나 정보를 알게 되었을 때 감탄하며 사용하는 종결어미입니다. J-Hope의 춤을 처음 보고 감탄하는 상황에 가장 적합합니다."
   },
   {
     "schema_id": "Q_generated_2",
@@ -76,43 +59,43 @@
     "input": {
       "instruction": "다음 문장을 연결하여 <보기>와 같이 하나의 문장을 만드십시오.",
       "example": {
-        "clause_A": "Jennie가 중급 춤 기술을 보여주다",
-        "clause_B": "팬들을 감동시키다",
-        "connected": "Jennie가 중급 춤 기술을 보여주어서 팬들을 감동시킵니다."
+        "clause_A": "J-Hope는 좋은 가수군요",
+        "clause_B": "헬스클럽에서 운동하군요",
+        "connected": "J-Hope는 좋은 가수이면서 헬스클럽에서 운동하군요."
       },
       "clause_set_A": [
-        "BLACKPINK의 음악은 중반에 특히 힘이 넘치다",
-        "Jisoo의 무대 복장은 가죽 재킷을 입고 있다"
+        "헬스클럽에서 J-Hope처럼 운동하군요",
+        "휴대폰에서 J-Hope 춤을 보니 재미있군요"
       ],
       "clause_set_B": [
-        "보기 좋다",
-        "팬들을 감동시키다"
+        "J-Hope는 좋은 가수군요",
+        "헬스클럽에서 운동하군요"
       ]
     },
     "answer": {
       "connected_sentences": [
-        "BLACKPINK의 음악은 중반에 특히 힘이 넘쳐서 팬들을 감동시킵니다.",
-        "Jisoo의 무대 복장은 가죽 재킷을 입고 있어서 보기 좋습니다."
+        "헬스클럽에서 J-Hope처럼 운동하면서 J-Hope는 좋은 가수군요.",
+        "휴대폰에서 J-Hope 춤을 보니 재미있으면서 헬스클럽에서 운동하군요."
       ]
-    }
+    },
+    "rationale": "각 문장의 앞뒤 부분을 자연스럽게 연결하여 하나의 문장으로 만들었습니다."
   },
   {
     "schema_id": "Q_generated_1",
-    "format": "sentence_connection",
+    "format": "fill_in_blank",
     "input": {
-      "instruction": "다음 두 문장을 <보기>와 같이 '입고 있어서'를 사용하여 한 문장으로 만드십시오.",
+      "instruction": "<보기>와 같이 괄호 안의 단어를 사용하여 문장을 완성하십시오.",
       "example": {
-        "clause_A": "Jennie가 중급 춤 기술을 보여줍니다.",
-        "clause_B": "팬들을 감동시킵니다.",
-        "connected": "Jennie가 중급 춤 기술을 보여줘서 팬들을 감동시키는군요."
+        "stem": "휴대폰에서 J-Hope 춤을 보니 ___ . (재미있다)",
+        "answer": "재미있군요"
       },
-      "clause_A": "Jisoo의 무대 복장은 가죽 재킷을 입고 있습니다.",
-      "clause_B": "보기 좋은군요."
+      "stem_with_blank": "헬스클럽에서 J-Hope처럼 ___ . (운동하다)",
+      "hint": "운동하다"
     },
     "answer": {
-      "connected_sentence": "Jisoo의 무대 복장은 가죽 재킷을 입고 있어서 보기 좋은군요."
+      "completed_sentence": "헬스클럽에서 J-Hope처럼 운동하군요."
     },
-    "rationale": "어떤 상태나 이유를 나타낼 때 '-(으)면서' 또는 '입고 있어서'를 사용하여 두 절을 연결할 수 있습니다."
+    "rationale": "'-군요'는 새롭게 알게 된 사실이나 감탄을 표현할 때 사용됩니다. '운동하다'는 규칙 활용으로 '운동하군요'가 됩니다."
   },
   {
     "schema_id": "Q_generated_1",
@@ -121,21 +104,458 @@
       "instruction": "<보기>와 같이 주어진 표현을 사용하여 문장을 완성하십시오.",
       "example": {
         "cues": [
-          "Jisoo",
-          "가죽 재킷",
-          "무대 복장"
+          "J-Hope",
+          "좋은 가수"
         ],
-        "answer": "Jisoo의 무대 복장은 가죽 재킷을 입고 있어서 보기 좋은군요."
+        "answer": "J-Hope는 좋은 가수군요."
       },
       "cues": [
-        "Jennie",
-        "중급 춤 기술",
-        "팬들을 감동시키다"
+        "헬스클럽",
+        "운동하다",
+        "J-Hope"
       ]
     },
     "answer": {
-      "created_sentence": "Jennie가 중급 춤 기술을 보여줘서 팬들을 감동시키는군요."
+      "created_sentence": "헬스클럽에서 J-Hope처럼 운동하군요."
     },
-    "rationale": "핵심 표현들을 사용하여 자연스럽고 완전한 문장을 생성할 수 있습니다."
+    "rationale": "제시된 핵심 표현들을 사용하여 원본 문장을 재구성할 수 있습니다."
+  },
+  {
+    "schema_id": "Q_generated_1",
+    "format": "sentence_connection",
+    "input": {
+      "instruction": "다음 두 문장을 <보기>와 같이 '-(으)니'를 사용하여 한 문장으로 만드십시오.",
+      "example": {
+        "clause_A": "헬스클럽에서 J-Hope처럼 운동합니다.",
+        "clause_B": "J-Hope는 좋은 가수입니다.",
+        "connected": "헬스클럽에서 J-Hope처럼 운동하니 J-Hope는 좋은 가수입니다."
+      },
+      "clause_A": "휴대폰에서 J-Hope 춤을 봅니다.",
+      "clause_B": "재미있습니다."
+    },
+    "answer": {
+      "connected_sentence": "휴대폰에서 J-Hope 춤을 보니 재미있습니다."
+    },
+    "rationale": "'-(으)니'는 앞의 절이 원인이나 조건이 되어 뒤의 절이 결과로 나타날 때 사용합니다."
+  },
+  {
+    "schema_id": "Q_generated_1",
+    "format": "sentence_creation",
+    "input": {
+      "instruction": "<보기>와 같이 주어진 표현을 사용하여 문장을 완성하십시오.",
+      "example": {
+        "cues": [
+          "ARMY 팬용굿즈",
+          "가다"
+        ],
+        "answer": "BTS 콘서트를 가는 김에 ARMY 팬용굿즈도 가지러 갈 거예요."
+      },
+      "cues": [
+        "ARMY 친구들",
+        "점심을 먹다"
+      ]
+    },
+    "answer": {
+      "created_sentence": "BTS 공연에 가는 김에 ARMY 친구들과 점심을 먹으려고 해."
+    },
+    "rationale": "주어진 핵심 표현들을 사용하여 원본 문장을 재구성하여 정답 문장을 만듭니다."
+  },
+  {
+    "schema_id": "Q_generated_1",
+    "format": "sentence_connection",
+    "input": {
+      "instruction": "다음 두 문장을 <보기>와 같이 '-는 김에'를 사용하여 한 문장으로 만드십시오.",
+      "example": {
+        "clause_A": "BTS 콘서트를 갑니다.",
+        "clause_B": "ARMY 팬용굿즈도 가지러 갈 거예요.",
+        "connected": "BTS 콘서트를 가는 김에 ARMY 팬용굿즈도 가지러 갈 거예요."
+      },
+      "clause_A": "BTS 공연에 갑니다.",
+      "clause_B": "ARMY 친구들과 점심을 먹으려고 해요."
+    },
+    "answer": {
+      "connected_sentence": "BTS 공연에 가는 김에 ARMY 친구들과 점심을 먹으려고 해."
+    },
+    "rationale": "'-는 김에'는 어떤 일을 하는 기회를 이용하여 다른 일도 함께 함을 나타낼 때 사용합니다."
+  },
+  {
+    "schema_id": "Q_generated_2",
+    "format": "match_and_connect",
+    "input": {
+      "instruction": "다음 문장을 연결하여 <보기>와 같이 하나의 문장을 만드십시오.",
+      "example": {
+        "clause_A": "BTS 공연에 가는 김에",
+        "clause_B": "ARMY 친구들과 점심을 먹으려고 해",
+        "connected": "BTS 공연에 가는 김에 ARMY 친구들과 점심을 먹으려고 해."
+      },
+      "clause_set_A": [
+        "BTS 콘서트를 가는 김에",
+        "BTS 콘서트 가는 김에",
+        "BTS 공연에 가는 김에"
+      ],
+      "clause_set_B": [
+        "ARMY 팬용굿즈도 가지러 갈 거예요",
+        "아울러 친구와 만나기로 했다",
+        "ARMY 친구들과 점심을 먹으려고 해"
+      ]
+    },
+    "answer": {
+      "connected_sentences": [
+        "BTS 콘서트를 가는 김에 ARMY 팬용굿즈도 가지러 갈 거예요.",
+        "BTS 콘서트 가는 김에 아울러 친구와 만나기로 했다.",
+        "BTS 공연에 가는 김에 ARMY 친구들과 점심을 먹으려고 해."
+      ]
+    }
+  },
+  {
+    "schema_id": "Q_generated_1",
+    "format": "fill_in_blank",
+    "input": {
+      "instruction": "<보기>와 같이 괄호 안의 단어를 사용하여 문장을 완성하십시오.",
+      "example": {
+        "stem": "BTS 콘서트를 가는 김에 ARMY 팬용굿즈도 가지러 갈 거예요.",
+        "answer": "가는"
+      },
+      "stem_with_blank": "BTS 공연에 ___ ARMY 친구들과 점심을 먹으려고 해. ({hint})",
+      "hint": "가다"
+    },
+    "answer": {
+      "completed_sentence": "BTS 공연에 가는 김에 ARMY 친구들과 점심을 먹으려고 해."
+    },
+    "rationale": "'-는 김에'는 어떤 일을 하면서 그 기회를 이용하여 다른 일을 함께 하는 상황을 나타냅니다. '가다'는 규칙 활용으로 '가는 김에'로 사용됩니다."
+  },
+  {
+    "schema_id": "Q_generated_1",
+    "format": "dialogue_completion",
+    "input": {
+      "dialogue_with_missing_turns": [
+        {
+          "speaker": "A",
+          "text": "이번 주말에 BTS 콘서트에 가기로 했어."
+        },
+        {
+          "speaker": "B",
+          "text": "___"
+        },
+        {
+          "speaker": "A",
+          "text": "좋은 생각이야! ARMY 친구들과 점심도 먹고 싶어."
+        }
+      ]
+    },
+    "answer": {
+      "completed_dialogue": [
+        {
+          "speaker": "A",
+          "text": "이번 주말에 BTS 콘서트에 가기로 했어."
+        },
+        {
+          "speaker": "B",
+          "text": "BTS 콘서트에 가는 김에 ARMY 팬용굿즈도 가지러 갈 거야?"
+        },
+        {
+          "speaker": "A",
+          "text": "좋은 생각이야! ARMY 친구들과 점심도 먹고 싶어."
+        }
+      ]
+    },
+    "rationale": "B의 질문은 A가 콘서트에 가는 김에 다른 활동도 할 계획인지 묻는 자연스러운 연결이다."
+  },
+  {
+    "schema_id": "grade4_korean_grammar_는_김에",
+    "format": "choice_completion",
+    "input": {
+      "prompt": "BTS 콘서트에 가는 김에...",
+      "options": [
+        "ARMY 팬용굿즈도 가지러 갈 거예요.",
+        "ARMY 팬용굿즈도 가서 갈 거예요.",
+        "ARMY 팬용굿즈도 가기 위해 갈 거예요.",
+        "ARMY 팬용굿즈도 가면서 갈 거예요."
+      ]
+    },
+    "answer": {
+      "completed_sentence": "BTS 콘서트에 가는 김에 ARMY 팬용굿즈도 가지러 갈 거예요."
+    },
+    "rationale": "'-는 김에'는 어떤 일을 하는 기회를 이용하여 다른 일을 함께 할 때 사용하는 문법입니다. 'BTS 콘서트에 가는 김에 ARMY 팬용굿즈도 가지러 갈 거예요.'는 콘서트에 가는 기회를 활용하여 팬용굿즈를 가지러 가는 상황을 자연스럽게 설명합니다."
+  },
+  {
+    "schema_id": "Q_generated_1",
+    "format": "dialogue_completion",
+    "input": {
+      "dialogue_with_missing_turns": [
+        {
+          "speaker": "A",
+          "text": "ONCE로서 호주머니에서 응원봉을 챙기는 김에 TWICE 새 앨범도 들어볼까?"
+        },
+        {
+          "speaker": "B",
+          "text": "___"
+        },
+        {
+          "speaker": "A",
+          "text": "그럼, 콘서트에 가는 김에 선생님께도 말씀드려야겠어."
+        }
+      ]
+    },
+    "answer": {
+      "completed_dialogue": [
+        {
+          "speaker": "A",
+          "text": "ONCE로서 호주머니에서 응원봉을 챙기는 김에 TWICE 새 앨범도 들어볼까?"
+        },
+        {
+          "speaker": "B",
+          "text": "좋은 생각이야! 듣는 김에 다른 곡들도 추천해줄게."
+        },
+        {
+          "speaker": "A",
+          "text": "그럼, 콘서트에 가는 김에 선생님께도 말씀드려야겠어."
+        }
+      ]
+    },
+    "rationale": "대화의 흐름상 B가 A의 제안을 긍정하며 추가적인 제안을 하는 것이 자연스럽습니다."
+  },
+  {
+    "schema_id": "Q_generated_1",
+    "format": "fill_in_blank",
+    "input": {
+      "instruction": "<보기>와 같이 괄호 안의 단어를 사용하여 문장을 완성하십시오.",
+      "example": {
+        "stem": "나는 점심을 ___ TV를 봤어요. (먹다)",
+        "answer": "먹으면서"
+      },
+      "stem_with_blank": "미성년자는 콘서트에 가는 ___ 선생님께 전Permission을 받아야 해. ({hint})",
+      "hint": "김에"
+    },
+    "answer": {
+      "completed_sentence": "미성년자는 콘서트에 가는 김에 선생님께 전Permission을 받아야 해."
+    },
+    "rationale": "'-는 김에'는 어떤 행동을 하는 기회를 이용하여 다른 행동도 함을 나타냅니다."
+  },
+  {
+    "schema_id": "Q_generated_2",
+    "format": "sentence_connection",
+    "input": {
+      "instruction": "다음 두 문장을 <보기>와 같이 '-는 김에'를 사용하여 한 문장으로 만드십시오.",
+      "example": {
+        "clause_A": "ONCE로서 호주머니에서 응원봉을 챙깁니다.",
+        "clause_B": "넷불릿 활동 강간 사실을 읽어봅니다.",
+        "connected": "ONCE로서 호주머니에서 응원봉을 챙기는 김에 넷불릿 활동 강간 사실을 읽어봅니다."
+      },
+      "clause_A": "미성년자는 콘서트에 갑니다.",
+      "clause_B": "선생님께 전Permission을 받아야 합니다."
+    },
+    "answer": {
+      "connected_sentence": "미성년자는 콘서트에 가는 김에 선생님께 전Permission을 받아야 합니다."
+    },
+    "rationale": "'-는 김에'는 어떤 행동을 하는 도중에 다른 행동을 함께 할 때 사용됩니다. 이를 통해 두 문장을 자연스럽게 연결할 수 있습니다."
+  },
+  {
+    "schema_id": "grade4_korean_grammar_-는_김에",
+    "format": "choice_completion",
+    "input": {
+      "prompt": "내일 친구를 만나러 시내에 가는 김에...",
+      "options": [
+        "서점에 들러 책을 사려고 해요.",
+        "서점에 들러 책을 살 거예요.",
+        "서점에 들러 책을 사는 김에 커피도 마실 거예요.",
+        "서점에 들러 책을 사고 싶어요."
+      ]
+    },
+    "answer": {
+      "completed_sentence": "내일 친구를 만나러 시내에 가는 김에 서점에 들러 책을 사는 김에 커피도 마실 거예요."
+    },
+    "rationale": "'-는 김에'는 어떤 행동을 하는 도중에 다른 행동을 추가적으로 할 때 사용하는 문법입니다. '친구를 만나러 시내에 가는 김에'라는 문맥에서 '서점에 들러 책을 사는 김에 커피도 마실 거예요.'가 가장 자연스럽고 적절한 연결입니다."
+  },
+  {
+    "schema_id": "Q_generated_2",
+    "format": "sentence_creation",
+    "input": {
+      "instruction": "<보기>와 같이 주어진 표현을 사용하여 '-는 김에' 문법으로 문장을 완성하십시오.",
+      "example": {
+        "cues": [
+          "응원봉을 챙기다",
+          "활동 강간 사실을 읽다"
+        ],
+        "answer": "응원봉을 챙기는 김에 활동 강간 사실을 읽어보세요."
+      },
+      "cues": [
+        "콘서트에 가다",
+        "선생님께 허락을 받다"
+      ]
+    },
+    "answer": {
+      "created_sentence": "콘서트에 가는 김에 선생님께 허락을 받아야 해요."
+    },
+    "rationale": "'-는 김에' 문법을 사용하여 두 가지 행동을 연결하는 문장을 만들 수 있습니다."
+  },
+  {
+    "schema_id": "Q_generated_2",
+    "format": "match_and_connect",
+    "input": {
+      "instruction": "다음 문장을 연결하여 <보기>와 같이 하나의 문장을 만드십시오.",
+      "example": {
+        "clause_A": "ONCE로서 호주머니에서 응원봉을 챙기는 김에",
+        "clause_B": "넷불릿 활동 강간 사실을 읽어보세요.",
+        "connected": "ONCE로서 호주머니에서 응원봉을 챙기는 김에 넷불릿 활동 강간 사실을 읽어보세요."
+      },
+      "clause_set_A": [
+        "미성년자는 콘서트에 가는 김에",
+        "바쁘지 않은 김에",
+        "ONCE로서 호주머니에서 응원봉을 챙기는 김에"
+      ],
+      "clause_set_B": [
+        "선생님께 전Permission을 받아야 해.",
+        "TWICE 콘서트에 간 승무원과 대화해보세요.",
+        "넷불릿 활동 강간 사실좀 읽어보세요."
+      ]
+    },
+    "answer": {
+      "connected_sentences": [
+        "미성년자는 콘서트에 가는 김에 선생님께 전Permission을 받아야 해.",
+        "바쁘지 않은 김에 TWICE 콘서트에 간 승무원과 대화해보세요.",
+        "ONCE로서 호주머니에서 응원봉을 챙기는 김에 넷불릿 활동 강간 사실좀 읽어보세요."
+      ]
+    },
+    "rationale": "각 문장의 앞부분과 뒷부분을 '-는 김에'로 연결하여 자연스러운 문장을 형성합니다."
+  },
+  {
+    "schema_id": "Q_generated_1",
+    "format": "dialogue_completion",
+    "input": {
+      "dialogue_with_missing_turns": [
+        {
+          "speaker": "A",
+          "text": "행사가 끝나가는 김에 Bunnies 팬끼리 사진도 찍어요."
+        },
+        {
+          "speaker": "B",
+          "text": "___"
+        },
+        {
+          "speaker": "A",
+          "text": "좋아요! 그럼 어디서 만날까요?"
+        }
+      ]
+    },
+    "answer": {
+      "completed_dialogue": [
+        {
+          "speaker": "A",
+          "text": "행사가 끝나가는 김에 Bunnies 팬끼리 사진도 찍어요."
+        },
+        {
+          "speaker": "B",
+          "text": "네, 그럼 사진 찍는 김에 NewJeans 노래도 같이 들어요."
+        },
+        {
+          "speaker": "A",
+          "text": "좋아요! 그럼 어디서 만날까요?"
+        }
+      ]
+    },
+    "rationale": "B의 대답에서 '-는 김에'를 사용하여 A의 제안에 자연스럽게 추가적인 활동을 제안하는 문맥을 형성하였다."
+  },
+  {
+    "schema_id": "Q_generated_1",
+    "format": "fill_in_blank",
+    "input": {
+      "instruction": "<보기>와 같이 괄호 안의 단어를 사용하여 문장을 완성하십시오.",
+      "example": {
+        "stem": "초보 반에서 NewJeans 앨범을 ___ 더 공부해보세요. (듣다)",
+        "answer": "듣는 김에"
+      },
+      "stem_with_blank": "행사가 ___ Bunnies 팬끼리 사진도 찍어요. ({hint})",
+      "hint": "끝나다"
+    },
+    "answer": {
+      "completed_sentence": "행사가 끝나가는 김에 Bunnies 팬끼리 사진도 찍어요."
+    },
+    "rationale": "'-는 김에'는 어떤 일을 하는 김에 다른 일도 한다는 의미를 나타냅니다. '끝나다'는 동사로 '끝나가는 김에'라는 표현이 자연스럽습니다."
+  },
+  {
+    "schema_id": "Q_generated_1",
+    "format": "sentence_connection",
+    "input": {
+      "instruction": "다음 두 문장을 <보기>와 같이 '-는 김에'를 사용하여 한 문장으로 만드십시오.",
+      "example": {
+        "clause_A": "행사가 끝나갑니다.",
+        "clause_B": "Bunnies 팬끼리 사진도 찍어요.",
+        "connected": "행사가 끝나가는 김에 Bunnies 팬끼리 사진도 찍어요."
+      },
+      "clause_A": "초보 반에서 NewJeans 앨범을 듣습니다.",
+      "clause_B": "더 공부해보세요."
+    },
+    "answer": {
+      "connected_sentence": "초보 반에서 NewJeans 앨범을 듣는 김에 더 공부해보세요."
+    }
+  },
+  {
+    "schema_id": "grade4_grammar_korean",
+    "format": "choice_completion",
+    "input": {
+      "prompt": "도서관에 책을 반납하러 가는 김에...",
+      "options": [
+        "새 책도 빌려오세요.",
+        "새 책도 빌리세요.",
+        "새 책도 사세요.",
+        "새 책도 읽으세요."
+      ]
+    },
+    "answer": {
+      "completed_sentence": "도서관에 책을 반납하러 가는 김에 새 책도 빌려오세요."
+    },
+    "rationale": "'-는 김에'는 어떤 행동을 하는 도중에 다른 행동을 추가로 할 때 사용하는 문법입니다. 도서관에 책을 반납하러 가는 김에 새 책도 빌려오는 것이 자연스럽고 문맥에 맞습니다."
+  },
+  {
+    "schema_id": "Q_generated_1",
+    "format": "sentence_creation",
+    "input": {
+      "instruction": "<보기>와 같이 주어진 표현을 사용하여 문장을 완성하십시오.",
+      "example": {
+        "cues": [
+          "초보 반",
+          "NewJeans 앨범"
+        ],
+        "answer": "초보 반에서 NewJeans 앨범을 듣는 김에 더 공부해보세요."
+      },
+      "cues": [
+        "행사",
+        "사진"
+      ]
+    },
+    "answer": {
+      "created_sentence": "행사가 끝나가는 김에 Bunnies 팬끼리 사진도 찍어요."
+    },
+    "rationale": "핵심 표현들을 사용하여 자연스럽게 문장을 구성할 수 있습니다."
+  },
+  {
+    "schema_id": "Q_generated_2",
+    "format": "match_and_connect",
+    "input": {
+      "instruction": "다음 문장을 연결하여 <보기>와 같이 하나의 문장을 만드십시오.",
+      "example": {
+        "clause_A": "초보 반에서 NewJeans 앨범을 듣는 김에",
+        "clause_B": "더 공부해보세요",
+        "connected": "초보 반에서 NewJeans 앨범을 듣는 김에 더 공부해보세요."
+      },
+      "clause_set_A": [
+        "행사가 끝나가는 김에",
+        "초보 반에서 NewJeans 앨범을 듣는 김에",
+        "공중전화 사용은 가려고 하는 김에"
+      ],
+      "clause_set_B": [
+        "Bunnies 팬끼리 사진도 찍어요",
+        "더 공부해보세요",
+        "Bunnies와 통화해야겠다"
+      ]
+    },
+    "answer": {
+      "connected_sentences": [
+        "행사가 끝나가는 김에 Bunnies 팬끼리 사진도 찍어요.",
+        "초보 반에서 NewJeans 앨범을 듣는 김에 더 공부해보세요.",
+        "공중전화 사용은 가려고 하는 김에 Bunnies와 통화해야겠다."
+      ]
+    }
   }
 ]

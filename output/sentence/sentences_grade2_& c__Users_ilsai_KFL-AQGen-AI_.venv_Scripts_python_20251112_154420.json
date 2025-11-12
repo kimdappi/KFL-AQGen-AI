@@ -1,0 +1,27 @@
+{
+  "level": "grade2",
+  "title": "& c__Users_ilsai_KFL-AQGen-AI_.venv_Scripts_python",
+  "target_grammar": "치고는",
+  "vocabulary": [
+    "컴퓨터",
+    "힘",
+    "게임"
+  ],
+  "critique_summary": [
+    {
+      "sentence": "컴퓨터 학원비가 치고는 비싸요.",
+      "vocab_used": "컴퓨터",
+      "kpop_context": ""
+    },
+    {
+      "sentence": "이 옷은 새 치고는 힘이 강해요.",
+      "vocab_used": "힘",
+      "kpop_context": ""
+    },
+    {
+      "sentence": "그는 게임 치고는 잘하지 못한다.",
+      "vocab_used": "게임",
+      "kpop_context": ""
+    }
+  ]
+}

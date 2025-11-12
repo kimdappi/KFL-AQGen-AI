@@ -1,0 +1,42 @@
+{
+  "level": 3,
+  "target_grammar": "사동",
+  "kpop_references": [
+    {
+      "group": "BLACKPINK",
+      "agency": "YG Entertainment",
+      "fandom": "BLINK",
+      "concepts": [
+        "girl crush",
+        "hip-hop",
+        "confidence"
+      ],
+      "members": [
+        "Jisoo",
+        "Jennie",
+        "Rosé",
+        "Lisa"
+      ]
+    }
+  ],
+  "specified_groups": [
+    "BLACKPINK"
+  ],
+  "critique_summary": [
+    {
+      "sentence": "1. BLACKPINK의 신곡이 발표된 중반부터 팬들 은 소문을 힘차게 내기 시작했다.",
+      "grammar_ok": false,
+      "vocab_ok": true
+    },
+    {
+      "sentence": "2. 담당 선생님이 марафон에서 뛰는 프로젝트를 통해 학생들에게 힘차게 운동하도록 지시했다.",
+      "grammar_ok": true,
+      "vocab_ok": true
+    },
+    {
+      "sentence": "3. 중급 한국어 교재를 개발한 교수님 외 מיר Дев 고ုပ္т월 学  entraîner سک trai했다.",
+      "grammar_ok": false,
+      "vocab_ok": true
+    }
+  ]
+}

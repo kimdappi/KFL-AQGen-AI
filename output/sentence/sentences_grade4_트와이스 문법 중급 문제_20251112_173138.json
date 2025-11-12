@@ -1,0 +1,44 @@
+{
+  "level": "grade4",
+  "title": "트와이스 문법 중급 문제",
+  "target_grammar": "-었을 텐데",
+  "vocabulary": [
+    "키스",
+    "현대인",
+    "호주머니"
+  ],
+  "critique_summary": [
+    {
+      "sentence": "그들이 키스했을 텐데, TWICE 노래와 함께라면 더 화려했을 거예요.",
+      "vocab_used": "키스",
+      "kpop_context": "bright 컨셉의 TWICE"
+    },
+    {
+      "sentence": "현대인은 K-pop을 듣고 행복했을 텐데, 특히 TWICE의 밝은 컨셉이 인기를 끌었죠.",
+      "vocab_used": "현대인",
+      "kpop_context": "bright 컨셉의 TWICE"
+    },
+    {
+      "sentence": "항상 온유한 모습으로 큰 사랑을 받았을 텐데, 호주머니 깊숙이 반지가 들어있었다.",
+      "vocab_used": "호주머니",
+      "kpop_context": "bright 컨셉의 TWICE"
+    }
+  ],
+  "kpop_references": [
+    {
+      "group": "TWICE",
+      "agency": "JYP Entertainment",
+      "fandom": "ONCE",
+      "concepts": [
+        "bright",
+        "cute",
+        "energetic"
+      ],
+      "members": [
+        "Nayeon",
+        "Jeongyeon",
+        "Momo"
+      ]
+    }
+  ]
+}

@@ -187,130 +187,71 @@ class RouterIntegratedNodes(AgenticKoreanLearningNodes):
         }
 
     def check_quality_agent(self, state: GraphState) -> GraphState:
-        """품질 검증 에이전트 노드 - K-pop 전용 쿼리 지원"""
+        """품질 검증 에이전트 노드 - 간소화"""
         print("\n✅ [Agent] 품질 검증")
         
-        # ✅ 1. needs_kpop 먼저 정의!
         query_analysis = state.get('query_analysis', {})
         needs_kpop = query_analysis.get('needs_kpop', False)
         
-        # ✅ 2. kpop_only 판단
-        routing_decision = state.get('routing_decision')
-        kpop_only = False
+        # 간소화된 기준: 어휘 3개, 문법 1개, K-pop 3개
+        vocab_count = len(state.get('vocabulary_docs', []))
+        grammar_count = len(state.get('grammar_docs', []))
+        kpop_count = len(state.get('kpop_docs', []))
         
-        if routing_decision:
-            active_retrievers = routing_decision.get_active_retrievers()
-            # K-pop만 활성화되고 어휘/문법이 없으면 K-pop 전용
-            if RetrieverType.KPOP in active_retrievers and \
-            RetrieverType.VOCABULARY not in active_retrievers and \
-            RetrieverType.GRAMMAR not in active_retrievers:
-                kpop_only = True
+        sufficient = (vocab_count >= 3 and grammar_count >= 1)
+        if needs_kpop:
+            sufficient = sufficient and (kpop_count >= 3)
         
-        # ✅ 3. 품질 체크 (needs_kpop과 kpop_only 모두 전달)
-        result = self.quality_agent.check(
-            vocab_count=len(state.get('vocabulary_docs', [])),
-            grammar_count=len(state.get('grammar_docs', [])),
-            kpop_db_count=len(state.get('kpop_docs', [])),
-            needs_kpop=needs_kpop,
-            kpop_only=kpop_only
-        )
+        result = {
+            "sufficient": sufficient,
+            "vocab_count": vocab_count,
+            "grammar_count": grammar_count,
+            "kpop_db_count": kpop_count,
+            "needs_kpop": needs_kpop,
+            "message": "충분함" if sufficient else "추가 검색 필요"
+        }
         
-        # ✅ 4. 결과 출력
-        print(f"   어휘: {result['vocab_count']}개")
-        print(f"   문법: {result['grammar_count']}개")
-        if kpop_only:
-            print(f"   K-pop DB: {result['kpop_db_count']}개 (K-pop 전용 쿼리)")
-        elif needs_kpop:
-            print(f"   K-pop DB: {result['kpop_db_count']}개 (필요)")
-        else:
-            print(f"   K-pop DB: {result['kpop_db_count']}개 (불필요)")
-        print(f"   상태: {result['message']}")
+        print(f"   어휘: {vocab_count}개 (목표 3개)")
+        print(f"   문법: {grammar_count}개 (목표 1개)")
+        if needs_kpop:
+            print(f"   K-pop: {kpop_count}개 (목표 3개)")
         
-        # ✅ 5. 결과 반환
         return {"quality_check": result}
     
     def rerank_node(self, state: GraphState) -> GraphState:
-        print("\n" + "="*70)
-        print("🔄 [재검색] 검색 결과 품질 분석 및 개선")
-        print("="*70)
+        """재검색 노드 - 간소화"""
+        print("\n🔄 [재검색] 품질 개선을 위한 재검색 (1회만)")
         
         quality_check = state.get("quality_check", {})
-        decision = state.get("routing_decision")
-        current_count = state.get("rerank_count", 0)  # ✅ 1. 현재 카운터 가져오기
-        
-        if not decision:
-            print("   ⚠️ 라우팅 정보 없음, 재검색 스킵")
-            return {}
-        
-        # 재검색 결정
-        rerank_decision = self.router.decide_rerank(
-            quality_check=quality_check,
-            current_strategies=decision.strategies,
-            difficulty=state.get("difficulty_level", "intermediate")
-        )
-        
-        if not rerank_decision.should_rerank:
-            print("   ✅ 품질 기준 충족, 재검색 불필요")
-            return {"rerank_decision": rerank_decision}
-        
-        print(f"   ⚠️ 재검색 필요: {rerank_decision.reasoning}")
-        print("="*70)
-        
-        # ✅ 2. 재검색 카운터 증가
+        current_count = state.get("rerank_count", 0)
         new_count = current_count + 1
-        print(f"   🔢 재검색 카운터: {current_count} → {new_count}")
         
-        # 재검색 실행
-        for improved_strategy in rerank_decision.improved_strategies:
-            retriever_type = improved_strategy.retriever_type
-            
-            if retriever_type == RetrieverType.VOCABULARY:
-                print(f"\n🔁 [어휘 재검색] 개선된 검색 실행")
-                print(f"   개선된 검색어: '{improved_strategy.query}'")
-                
-                vocab_docs = self.vocabulary_retriever.invoke(
-                    improved_strategy.query,
-                    improved_strategy.params.get("level", "intermediate")
-                )
-                limit = improved_strategy.params.get("limit", 15)
-                vocab_docs = vocab_docs[:limit]
-                
-                print(f"   ✅ 재검색 완료: {len(vocab_docs)}개 어휘")
-                state["vocabulary_docs"] = vocab_docs
-            
-            elif retriever_type == RetrieverType.GRAMMAR:
-                print(f"\n🔁 [문법 재검색] 개선된 검색 실행")
-                print(f"   개선된 검색어: '{improved_strategy.query}'")
-                
-                grammar_docs = self.grammar_retriever.invoke(
-                    improved_strategy.query,
-                    improved_strategy.params.get("level", "intermediate")
-                )
-                limit = improved_strategy.params.get("limit", 10)
-                grammar_docs = grammar_docs[:limit]
-                
-                print(f"   ✅ 재검색 완료: {len(grammar_docs)}개 문법 패턴")
-                state["grammar_docs"] = grammar_docs
-            
-            elif retriever_type == RetrieverType.KPOP:
-                print(f"\n🔁 [K-pop 재검색] DB에서 추가 검색")
-                
-                level = improved_strategy.params.get("level", "intermediate")
-                db_limit = improved_strategy.params.get("db_limit", 8)
-                
-                # DB 전용 검색
-                kpop_db_docs = self.kpop_retriever.invoke(improved_strategy.query, level)
-                kpop_db_docs = kpop_db_docs[:db_limit]
-                
-                print(f"   ✅ DB 재검색 완료: {len(kpop_db_docs)}개 K-pop 문장")
-                state["kpop_docs"] = kpop_db_docs
+        # 간단한 재검색: 어휘 5개, 문법 3개, K-pop 5개 추가 검색
+        level = state.get("difficulty_level", "intermediate")
+        query = state.get("input_text", "")
         
-        print("="*70)
+        # 어휘 재검색
+        if quality_check.get("vocab_count", 0) < 3:
+            print(f"   📚 어휘 재검색 (현재 {quality_check.get('vocab_count')}개)")
+            vocab_docs = self.vocabulary_retriever.invoke(query, level)[:5]
+            state["vocabulary_docs"] = vocab_docs
         
-        # ✅ 3. 업데이트된 카운터를 상태에 저장
+        # 문법 재검색
+        if quality_check.get("grammar_count", 0) < 1:
+            print(f"   📖 문법 재검색 (현재 {quality_check.get('grammar_count')}개)")
+            grammar_docs = self.grammar_retriever.invoke(query, level)[:3]
+            state["grammar_docs"] = grammar_docs
+        
+        # K-pop 재검색 (필요시)
+        if quality_check.get("needs_kpop") and quality_check.get("kpop_db_count", 0) < 3:
+            print(f"   🎵 K-pop 재검색 (현재 {quality_check.get('kpop_db_count')}개)")
+            kpop_docs = self.kpop_retriever.invoke(query, level)[:5]
+            state["kpop_docs"] = kpop_docs
+        
+        print(f"   ✅ 재검색 완료 (카운터: {new_count})")
+        
         return {
-            "rerank_decision": rerank_decision,
-            "rerank_count": new_count  # ✅ 이 줄 추가!
+            "rerank_count": new_count
         }
         
     def llm_query_rewrite_node(self, state: GraphState) -> GraphState:

@@ -1,0 +1,44 @@
+{
+  "level": "grade3",
+  "title": "중급 블랙핑크 문법 문제",
+  "target_grammar": "-는 김에",
+  "vocabulary": [
+    "-비",
+    "현대인",
+    "아울러"
+  ],
+  "critique_summary": [
+    {
+      "sentence": "BLACKPINK의 Jennie 공연을 보러 가는 김에 새 학교 피아노를 배워볼까요?",
+      "vocab_used": "-비",
+      "kpop_context": "BLACKPINK의 Jennie"
+    },
+    {
+      "sentence": "현대인으로서 스트레스 받는 김에 Jennie의 노래를 들었어요.",
+      "vocab_used": "현대인",
+      "kpop_context": "BLACKPINK의 Jennie"
+    },
+    {
+      "sentence": "Jennie 공연 보러 가는 김에 새 앨범도 아울러 들어볼래.",
+      "vocab_used": "아울러",
+      "kpop_context": "BLACKPINK의 Jennie"
+    }
+  ],
+  "kpop_references": [
+    {
+      "group": "BLACKPINK",
+      "agency": "YG Entertainment",
+      "fandom": "BLINK",
+      "concepts": [
+        "girl crush",
+        "hip-hop",
+        "confidence"
+      ],
+      "members": [
+        "Jisoo",
+        "Jennie",
+        "Rosé"
+      ]
+    }
+  ]
+}

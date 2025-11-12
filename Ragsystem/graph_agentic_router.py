@@ -39,70 +39,67 @@ class RouterAgenticGraph:
         """Build LangGraph workflow"""
         workflow = StateGraph(GraphState)
         
-        # ====================================================================
-        # Add Nodes
-        # ====================================================================
+        #노드 추가
         
-        # Stage 1: Query Analysis
+        # 쿼리 분석
         workflow.add_node("analyze_query", self.nodes.analyze_query_agent)
         
-        # Stage 2: Routing (NEW)
+        # 라우팅
         workflow.add_node("routing", self.nodes.routing_node)
         
-        # Stage 3: Retrieval (Router-based)
+        # 라우팅 결과로 어떤 리트리버를 활성화 할것인가
         workflow.add_node("retrieve_vocabulary", self.nodes.retrieve_vocabulary_routed)
         workflow.add_node("retrieve_grammar", self.nodes.retrieve_grammar_routed)
         workflow.add_node("retrieve_kpop", self.nodes.retrieve_kpop_routed)
         
-        # Stage 4: Quality Check
+        # 퀄리티 체크 에이전트
         workflow.add_node("check_quality", self.nodes.check_quality_agent)
         
-        # Stage 5: Reranking (NEW)
+        # 랭크 다시 
         workflow.add_node("rerank", self.nodes.rerank_node)
         
-        # Stage 6: Generation
+        # 생성
         workflow.add_node("generate", self.nodes.generate_sentences_with_kpop)
         
-        # Stage 7: Output Formatting
+        # output 포맷
         workflow.add_node("format_output", self.nodes.format_output_agentic)
         
-        # ====================================================================
-        # Connect Edges
-        # ====================================================================
+
+        #엣지 연결
         
-        # Entry point
+        # 입력
         workflow.set_entry_point("analyze_query")
         
-        # 1. Query Analysis → Routing
+        # 분석 -> 라우팅
         workflow.add_edge("analyze_query", "routing")
         
-        # 2. Routing → Sequential Retrieval
+        # 라우팅 결과로 -> 활성화 순서
         workflow.add_edge("routing", "retrieve_vocabulary")
         workflow.add_edge("retrieve_vocabulary", "retrieve_grammar")
         workflow.add_edge("retrieve_grammar", "retrieve_kpop")
         
-        # 3. K-pop Retrieval → Quality Check
+        # 케이팝 여부 이후 -> 퀄리티 체크
         workflow.add_edge("retrieve_kpop", "check_quality")
         
-        # 4. 품질 체크 → 조건부 분기
+        # 품질 체크 → 조건부 분기
         def should_rerank(state: GraphState) -> str:
             """
-            재검색 필요 여부 판단
+            재검색 필요 여부 판단 (1회만)
             """
             quality = state.get('quality_check', {})
             sufficient = quality.get('sufficient', True)
             
-            # 재검색 횟수 제한 (무한 루프 방지)
+            # 재검색 1회만
             rerank_count = state.get('rerank_count', 0)
             
-            if not sufficient and rerank_count < 2:
-                print(f"   [결정] 재검색 필요 (시도: {rerank_count + 1}/2회)")
+            if not sufficient and rerank_count < 1:  # 2회에서 1회로 변경
+                print(f"   [결정] 재검색 실행 (1회만)")
                 return "rerank"
             else:
                 if sufficient:
-                    print("   [결정] 품질 충족 → 문장 생성 단계로")
+                    print("   [결정] 품질 충족 → 문장 생성")
                 else:
-                    print("   [결정] 재검색 횟수 초과 → 문장 생성 단계로")
+                    print("   [결정] 재검색 완료 → 문장 생성")
                 return "generate"
         
         workflow.add_conditional_edges(
@@ -114,7 +111,7 @@ class RouterAgenticGraph:
             }
         )
         
-        # 5. 재검색 → 다시 품질 체크 (카운터 증가)
+        # 5. 재검색 → 다시 품질 체크 
         def update_rerank_count(state: GraphState) -> GraphState:
             """재검색 후 카운터 증가"""
             current_count = state.get('rerank_count', 0)
@@ -123,15 +120,14 @@ class RouterAgenticGraph:
         
         workflow.add_edge("rerank", "check_quality")
         
-        # 6. Generation → Output Formatting
+        # 생성
         workflow.add_edge("generate", "format_output")
         
-        # 7. Output Formatting → End
+        # 결과, 끝
         workflow.add_edge("format_output", END)
         
-        # ====================================================================
-        # Compile
-        # ====================================================================
+
+        #컴파일링
         
         memory = MemorySaver()
         self.workflow = workflow
@@ -152,7 +148,7 @@ class RouterAgenticGraph:
             quality_check={},
             routing_decision=None,
             search_strategies=[],
-            rerank_count=0,  # 재검색 카운터 초기화
+            rerank_count=0,  
             rerank_decision=None
         )
         

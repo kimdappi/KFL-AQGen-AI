@@ -1,0 +1,44 @@
+{
+  "level": "grade3",
+  "title": "트와이스 관련 중급 문법 문제",
+  "target_grammar": "사동",
+  "vocabulary": [
+    "중반",
+    "힘차다",
+    "중급"
+  ],
+  "critique_summary": [
+    {
+      "sentence": "나는 TWICE의 무대를 감상하기 위해 친구들을 초대했다.",
+      "vocab_used": "중반",
+      "kpop_context": "TWICE 팬덤 ONCE"
+    },
+    {
+      "sentence": "힘차게 응원하며 여러분을 놀라게 해줄 ONCE입니다.",
+      "vocab_used": "힘차다",
+      "kpop_context": "TWICE 팬덤 ONCE"
+    },
+    {
+      "sentence": "중급 한국어를 배워서 ONCE와 자유롭게 소통하고 싶어요.",
+      "vocab_used": "중급",
+      "kpop_context": "TWICE 팬덤 ONCE"
+    }
+  ],
+  "kpop_references": [
+    {
+      "group": "TWICE",
+      "agency": "JYP Entertainment",
+      "fandom": "ONCE",
+      "concepts": [
+        "bright",
+        "cute",
+        "energetic"
+      ],
+      "members": [
+        "Nayeon",
+        "Jeongyeon",
+        "Momo"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "level": "grade3",
+  "title": "블랙핑크 중급 문법 문제",
+  "target_grammar": "-는군요",
+  "vocabulary": [
+    "중반",
+    "힘차다",
+    "중급"
+  ],
+  "critique_summary": [
+    {
+      "sentence": "BLACKPINK의 무대를 보니 중반에 힘이 나는군요.",
+      "vocab_used": "중반",
+      "kpop_context": "girl crush 컨셉의 BLACKPINK"
+    },
+    {
+      "sentence": "BLACKPINK의 공연을 보니 힘차곤 하네요.",
+      "vocab_used": "힘차다",
+      "kpop_context": "girl crush 컨셉의 BLACKPINK"
+    },
+    {
+      "sentence": "블랙핑크의 무대는 중급 이상의 실력은 필요하다는군요.",
+      "vocab_used": "중급",
+      "kpop_context": "girl crush 컨셉의 BLACKPINK"
+    }
+  ],
+  "kpop_references": [
+    {
+      "group": "BLACKPINK",
+      "agency": "YG Entertainment",
+      "fandom": "BLINK",
+      "concepts": [
+        "girl crush",
+        "hip-hop",
+        "confidence"
+      ],
+      "members": [
+        "Jisoo",
+        "Jennie",
+        "Rosé"
+      ]
+    }
+  ]
+}

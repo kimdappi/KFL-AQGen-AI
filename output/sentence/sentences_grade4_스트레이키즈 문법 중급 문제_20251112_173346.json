@@ -1,0 +1,44 @@
+{
+  "level": "grade4",
+  "title": "스트레이키즈 문법 중급 문제",
+  "target_grammar": "-는 김에",
+  "vocabulary": [
+    "생방송",
+    "-비",
+    "다소02/다소01"
+  ],
+  "critique_summary": [
+    {
+      "sentence": "생방송 때 STAY 챌린지를 하는 김에 같이 해보자.",
+      "vocab_used": "생방송",
+      "kpop_context": "Stray Kids 팬덤 STAY"
+    },
+    {
+      "sentence": "STAY 모임에 참가하는 김에 Stray Kids 앨범도 사려고 해.",
+      "vocab_used": "-비",
+      "kpop_context": "Stray Kids 팬덤 STAY"
+    },
+    {
+      "sentence": "스트레이 키즈의 응원을 받는 김에 다소 기분이 좋아졌어요.",
+      "vocab_used": "다소02/다소01",
+      "kpop_context": "Stray Kids 팬덤 STAY"
+    }
+  ],
+  "kpop_references": [
+    {
+      "group": "Stray Kids",
+      "agency": "JYP Entertainment",
+      "fandom": "STAY",
+      "concepts": [
+        "self-production",
+        "hip-hop",
+        "raw energy"
+      ],
+      "members": [
+        "Bang Chan",
+        "Lee Know",
+        "Changbin"
+      ]
+    }
+  ]
+}
