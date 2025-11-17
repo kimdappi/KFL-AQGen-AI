@@ -4,8 +4,6 @@ Agentic RAG 메인 파일
 
 import json
 import uuid
-import glob
-import os
 from dotenv import load_dotenv
 from langchain_core.runnables import RunnableConfig
 # 
@@ -14,23 +12,10 @@ from Retriever.grammar_retriever import GrammarRetriever
 from Retriever.kpop_retriever import KpopSentenceRetriever
 
 from Ragsystem.graph_agentic_router import RouterAgenticGraph
-from config import TOPIK_PATHS, GRAMMAR_PATHS, KPOP_JSON_PATH , SENTENCE_SAVE_DIR
+from config import TOPIK_PATHS, GRAMMAR_PATHS, KPOP_JSON_PATH
 from test_maker import create_korean_test_set
 
 load_dotenv()
-
-
-def find_latest_sentence_file(directory=SENTENCE_SAVE_DIR):
-    """지정된 디렉토리에서 가장 최근에 생성된 JSON 파일 찾기"""
-    try:
-        list_of_files = glob.glob(os.path.join(directory, '*.json'))
-        if not list_of_files:
-            return None
-        latest_file = max(list_of_files, key=os.path.getctime)
-        return latest_file
-    except Exception as e:
-        print(f"파일 검색 중 오류 발생: {e}")
-        return None
 
 
 def main():
@@ -96,63 +81,108 @@ def main():
 
         # 1. 라우터 기반 Agentic RAG 실행
         try:
-            rag_output_string = graph.invoke(query, config)
+            graph_result = graph.invoke(query, config)
+            rag_output_string = graph_result.get('final_output', '')
+            question_payload = graph_result.get('question_payload')
             print("\n" + "="*80)
         except Exception as e:
             print(f"❌ 오류가 발생했습니다: {e}")
             continue
 
-        # 2. 최신 JSON 파일 찾기
-        latest_payload_file = find_latest_sentence_file()
+        # 2. question_payload 확인 및 정보 출력
+        if not question_payload:
+            print("❌ question_payload를 찾을 수 없습니다.")
+            continue
 
-        if latest_payload_file:
-            print(f"\n📄 생성된 예문 파일: {latest_payload_file}")
-            
-            with open(latest_payload_file, 'r', encoding='utf-8') as f:
-                sentence_payload = json.load(f)
-            
-            # Payload 검증
-            print("\n" + "="*70)
-            print("📋 생성된 학습 자료 정보")
-            print("="*70)
-            print(f"   학습자 수준 (등급): {sentence_payload.get('level')}")
-            print(f"   목표 문법: {sentence_payload.get('target_grammar')}")
-            print(f"   생성된 예문: {len(sentence_payload.get('critique_summary', []))}개")
-            
-            # 생성된 문장 출력
-            for i, item in enumerate(sentence_payload.get('critique_summary', []), 1):
+        print("\n" + "="*70)
+        print("📋 추출된 학습 자료 정보")
+        print("="*70)
+        print(f"   학습자 수준 (등급): {question_payload.get('level')}")
+        print(f"   목표 문법: {question_payload.get('target_grammar')}")
+        
+        # 기존 형식 호환성 체크 (critique_summary가 있으면 표시)
+        if 'critique_summary' in question_payload and question_payload.get('critique_summary'):
+            print(f"   생성된 예문: {len(question_payload.get('critique_summary', []))}개")
+            for i, item in enumerate(question_payload.get('critique_summary', []), 1):
                 print(f"      {i}. {item.get('sentence', 'N/A')}")
+        # 새로운 형식 (정보만 추출)
+        if 'vocabulary' in question_payload and question_payload.get('vocabulary'):
+            vocab_list = question_payload.get('vocabulary', [])
+            vocab_details = question_payload.get('vocabulary_details', [])
+            print(f"   추출된 단어: {len(vocab_list)}개")
+            if vocab_details:
+                # 모든 단어 출력 (5개)
+                for i, v in enumerate(vocab_details, 1):
+                    print(f"      {i}. {v.get('word', 'N/A')} ({v.get('wordclass', 'N/A')})")
+            elif vocab_list:
+                # 모든 단어 출력 (5개)
+                for i, v in enumerate(vocab_list, 1):
+                    print(f"      {i}. {v}")
+        
+        # K-pop 정보 확인
+        if 'kpop_references' in question_payload:
+            kpop_refs = question_payload['kpop_references']
             
-            # K-pop 정보 확인
-            if 'kpop_references' in sentence_payload:
-                kpop_refs = sentence_payload['kpop_references']
-                db_count = len(kpop_refs)  # 모두 DB에서
-                
+            if kpop_refs:
                 print(f"\n   ✨ K-pop 참조 자료: 총 {len(kpop_refs)}개")
-                print(f"      - 데이터베이스: {db_count}개")
                 
-                for i, ref in enumerate(kpop_refs[:5], 1):
-                    print(f"      {i}. [DB] {ref.get('group', 'N/A')} - {ref.get('song', 'N/A')}")
-            
+                for i, ref in enumerate(kpop_refs, 1):
+                    group = ref.get('group', 'N/A')
+                    song = ref.get('song', '')
+                    if song:
+                        print(f"      {i}. [DB] {group} - {song}")
+                    else:
+                        # 새로운 형식 - 모든 정보 표시
+                        agency = ref.get('agency', '')
+                        fandom = ref.get('fandom', '')
+                        members = ref.get('members', [])
+                        concepts = ref.get('concepts', [])
+                        
+                        # 모든 멤버 이름 추출
+                        member_names = [m.get('name', '') if isinstance(m, dict) else m for m in members]
+                        member_names = [n for n in member_names if n]  # 빈 문자열 제거
+                        
+                        # 정보 구성
+                        info_parts = []
+                        if agency:
+                            info_parts.append(f"소속사: {agency}")
+                        if fandom:
+                            info_parts.append(f"팬덤: {fandom}")
+                        if member_names:
+                            info_parts.append(f"멤버: {', '.join(member_names)}")
+                        if concepts:
+                            info_parts.append(f"컨셉: {', '.join(concepts)}")
+                        
+                        info_str = " | ".join(info_parts) if info_parts else ""
+                        print(f"      {i}. [DB] {group}" + (f" ({info_str})" if info_str else ""))
+        
+        print("="*70)
+        
+        # 3. 문제 생성
+        print("\n🎯 한국어 학습 문제 생성 파이프라인 시작...")
+        print(f"   Payload 확인:")
+        print(f"      - level: {question_payload.get('level')}")
+        print(f"      - target_grammar: {question_payload.get('target_grammar')}")
+        print(f"      - vocabulary: {len(question_payload.get('vocabulary', []))}개")
+        
+        generated_questions = create_korean_test_set(question_payload, num_questions=6)
+
+        if generated_questions:
+            print("\n" + "="*70)
+            print("✅ 생성된 한국어 학습 문제 세트")
             print("="*70)
-            
-            # 3. 문제 생성
-            print("\n🎯 한국어 학습 문제 생성 파이프라인 시작...")
-            generated_questions = create_korean_test_set(sentence_payload, num_questions=6)
+            print(json.dumps(generated_questions, indent=2, ensure_ascii=False))
+            print("="*70)
 
-            if generated_questions:
-                    print("\n" + "="*70)
-                    print("✅ 생성된 한국어 학습 문제 세트")
-                    print("="*70)
-                    print(json.dumps(generated_questions, indent=2, ensure_ascii=False))
-                    print("="*70)
-
-                    all_generated_questions.extend(generated_questions)
-            else:
-                print("\n❌ 문제 생성 실패")
-                
+            all_generated_questions.extend(generated_questions)
+            print(f"\n   📊 현재까지 누적된 문제 수: {len(all_generated_questions)}개")
         else:
-            print("\n⚠️ 'sentence' 폴더에서 JSON 파일을 찾을 수 없습니다.")
+            print("\n❌ 문제 생성 실패 - 생성된 문제가 없습니다.")
+            print("   가능한 원인:")
+            print("   1. LLM 호출 실패")
+            print("   2. JSON 파싱 실패")
+            print("   3. 모든 문제 유형에서 에러 발생")
+            print("   위의 에러 메시지를 확인해주세요.")
 
 
         print("\n" + "="*80)

@@ -29,6 +29,7 @@ class GraphState(TypedDict):
     # 생성 결과
     generated_sentences: Annotated[List[str], "생성된 예문"]
     sentence_data: Optional[Dict]  # JSON 파일 저장용 데이터
+    question_payload: Optional[Dict]  # 문제 생성용 payload (문장 생성 없이 정보만 추출)
     target_grade: Optional[int]  # 타겟 문법 등급 (1-6)
     
     # 메시지 히스토리
@@ -40,4 +41,3 @@ class GraphState(TypedDict):
     routing_decision: Optional[object]  # 라우팅 결정 객체
     search_strategies: Optional[List[Dict]]  # 검색 전략 (딕셔너리 리스트)
     rerank_count: Optional[int]  # 재검색 시도 카운터
-    rerank_decision: Optional[object]  # 재검색 결정 객체

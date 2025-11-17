@@ -1,10 +1,7 @@
-# =====================================
-# config.py - 설정 파일
-# =====================================
 """
 프로젝트 설정 파일
 """
-MODEL_NAME = "gpt-5"
+
 # 파일 경로 설정
 TOPIK_PATHS = {
     'basic': [r'data\words\TOPIK1.csv', r'data\words\TOPIK2.csv'],
@@ -18,22 +15,11 @@ GRAMMAR_PATHS = {
     'advanced': r'data\grammar\grammar_list_C.json'
 }
 
-# Retriever 설정
-RETRIEVER_CONFIG = {
-    'top_k': 3,
-    'ensemble_weights': [0.5, 0.5],
-    'vector_search_type': 'similarity',
-}
-
 # LLM 설정
 LLM_CONFIG = {
-    'temperature': 1.5,
-    'max_tokens': 1000,
+    'temperature': 1.0,
+    'max_completion_tokens': 1000,
 }
 
 # Kpop 데이터 설정
-# 변경됨
 KPOP_JSON_PATH = r'data\kpop\kpop_db.json'
-
-# 생성문장 위치(nodes.py에서 사용)
-SENTENCE_SAVE_DIR = "output/sentence"

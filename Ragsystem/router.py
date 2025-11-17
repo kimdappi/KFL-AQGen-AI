@@ -55,15 +55,6 @@ class RoutingDecision:
         return None
 
 
-@dataclass
-class RerankDecision:
-    """재검색 결정"""
-    should_rerank: bool
-    target_retrievers: List[RetrieverType]
-    improved_strategies: List[SearchStrategy]
-    reasoning: str
-
-
 class IntelligentRouter:
     """
     지능형 라우터: 검색 전략 결정, 재검색, 쿼리 최적화
@@ -119,26 +110,20 @@ class IntelligentRouter:
         strategies = []
         reasons = []
         
-        # ✅ 문제 생성 쿼리 감지: "questions", "practice", "문제", "연습" 등
-        is_question_generation = any(keyword in query_lower for keyword in [
-            "question", "practice", "exercise", "문제", "연습", "생성", "만들"
-        ])
-        
         # 1. Vocabulary Retriever Activation
-        # 문제 생성 쿼리면 항상 활성화, 그 외에는 키워드 체크
-        if is_question_generation or self._should_activate_vocabulary(query_lower, topic_lower):
-            vocab_query = self._extract_vocab_query(query, topic, difficulty)
-            strategies.append(SearchStrategy(
-                retriever_type=RetrieverType.VOCABULARY,
-                query=vocab_query,
-                priority=1,
-                params={"level": difficulty, "limit": 5}
-            ))
-            reasons.append(f"Vocabulary search (query: '{vocab_query}', level: {difficulty})")
+        # 무조건 활성화
+        vocab_query = self._extract_vocab_query(query, topic, difficulty)
+        strategies.append(SearchStrategy(
+            retriever_type=RetrieverType.VOCABULARY,
+            query=vocab_query,
+            priority=1,
+            params={"level": difficulty, "limit": 5}
+        ))
+        reasons.append(f"Vocabulary search (query: '{vocab_query}', level: {difficulty})")
         
         # 2. Grammar Retriever Activation
-        # 문제 생성 쿼리면 항상 활성화, 그 외에는 키워드 체크
-        if is_question_generation or self._should_activate_grammar(query_lower, topic_lower):
+        # 문법 관련 키워드가 있을 때만 활성화
+        if self._should_activate_grammar(query_lower, topic_lower):
             grammar_query = self._extract_grammar_query(query, topic, difficulty)
             strategies.append(SearchStrategy(
                 retriever_type=RetrieverType.GRAMMAR,
@@ -149,6 +134,7 @@ class IntelligentRouter:
             reasons.append(f"Grammar search (query: '{grammar_query}', level: {difficulty})")
         
         # 3. K-pop Retriever Activation (DB only)
+        # K-pop 관련 내용이 쿼리에 있을 때만 활성화
         if self._should_activate_kpop(query_lower, topic_lower):
             kpop_query = self._extract_kpop_query(query, topic)
             strategies.append(SearchStrategy(
@@ -158,24 +144,6 @@ class IntelligentRouter:
                 params={"level": difficulty, "db_limit": 5}
             ))
             reasons.append(f"K-pop search (DB only, query: '{kpop_query}')")
-        
-        # Default strategy: At least grammar + vocabulary
-        if not strategies:
-            strategies.extend([
-                SearchStrategy(
-                    RetrieverType.VOCABULARY,
-                    query=query,
-                    priority=1,
-                    params={"level": difficulty, "limit": 5}
-                ),
-                SearchStrategy(
-                    RetrieverType.GRAMMAR,
-                    query=query,
-                    priority=2,
-                    params={"level": difficulty, "limit": 5}
-                )
-            ])
-            reasons.append("Default strategy: vocabulary + grammar")
         
         # Sort by priority
         strategies.sort(key=lambda x: x.priority)
@@ -190,155 +158,6 @@ class IntelligentRouter:
             needs_quality_check=True
         )
     
-    def decide_rerank(
-        self,
-        quality_check: Dict[str, Any],
-        current_strategies: List[SearchStrategy],
-        difficulty: str
-    ) -> RerankDecision:
-        """
-        품질 체크 결과 기반 재검색 필요성 판단
-        
-        Args:
-            quality_check: QualityCheckAgent의 결과
-            current_strategies: 현재 사용된 검색 전략들
-            difficulty: 난이도
-        
-        Returns:
-            RerankDecision
-        """
-        print("\n🔄 [Router] Analyzing rerank necessity...")
-        
-        sufficient = quality_check.get('sufficient', True)
-        vocab_count = quality_check.get('vocab_count', 0)
-        grammar_count = quality_check.get('grammar_count', 0)
-        total_kpop = quality_check.get('total_kpop', 0)
-        
-        should_rerank = False
-        target_retrievers = []
-        improved_strategies = []
-        reasons = []
-        
-        if not sufficient:
-            # 1. Vocabulary insufficient (< 5)
-            if vocab_count < 5:
-                should_rerank = True
-                target_retrievers.append(RetrieverType.VOCABULARY)
-                
-                vocab_strategy = self._find_strategy(current_strategies, RetrieverType.VOCABULARY)
-                if vocab_strategy:
-                    expanded_query = self._expand_query(vocab_strategy.query, difficulty)
-                    improved_strategies.append(SearchStrategy(
-                        retriever_type=RetrieverType.VOCABULARY,
-                        query=expanded_query,
-                        priority=1,
-                        params={"level": difficulty, "limit": 15},
-                        retry_count=vocab_strategy.retry_count + 1
-                    ))
-                    reasons.append(f"Vocabulary insufficient ({vocab_count}/5) → '{expanded_query}'")
-            
-            # 2. Grammar insufficient (< 1)
-            if grammar_count < 1:
-                should_rerank = True
-                target_retrievers.append(RetrieverType.GRAMMAR)
-                
-                grammar_strategy = self._find_strategy(current_strategies, RetrieverType.GRAMMAR)
-                if grammar_strategy:
-                    improved_query = self._improve_grammar_query(grammar_strategy.query, difficulty)
-                    improved_strategies.append(SearchStrategy(
-                        retriever_type=RetrieverType.GRAMMAR,
-                        query=improved_query,
-                        priority=2,
-                        params={"level": difficulty, "limit": 5},
-                        retry_count=grammar_strategy.retry_count + 1
-                    ))
-                    reasons.append(f"Grammar insufficient ({grammar_count}/1) → '{improved_query}'")
-            
-            # 3. K-pop insufficient (< 5) - DB only
-            if total_kpop < 5:
-                should_rerank = True
-                target_retrievers.append(RetrieverType.KPOP)
-                
-                kpop_strategy = self._find_strategy(current_strategies, RetrieverType.KPOP)
-                if kpop_strategy:
-                    improved_strategies.append(SearchStrategy(
-                        retriever_type=RetrieverType.KPOP,
-                        query=kpop_strategy.query,
-                        priority=3,
-                        params={"level": difficulty, "db_limit": 8},
-                        retry_count=kpop_strategy.retry_count + 1
-                    ))
-                    reasons.append(f"K-pop insufficient ({total_kpop}/5) → More from DB")
-        
-        reasoning = " | ".join(reasons) if reasons else "Quality criteria met"
-        
-        print(f"   Rerank needed: {'Yes' if should_rerank else 'No'}")
-        if should_rerank:
-            print(f"   Targets: {[r.value for r in target_retrievers]}")
-            print(f"   Reasoning: {reasoning}")
-        
-        return RerankDecision(
-            should_rerank=should_rerank,
-            target_retrievers=target_retrievers,
-            improved_strategies=improved_strategies,
-            reasoning=reasoning
-        )
-    
-    def rewrite_query_with_llm(
-        self, 
-        original_query: str, 
-        retriever_type: RetrieverType,
-        difficulty: str, 
-        failure_reason: str = ""
-    ) -> str:
-        """LLM을 사용하여 쿼리를 지능적으로 재작성"""
-        print(f"\n🤖 [Router] LLM 기반 쿼리 개선 중 ({retriever_type.value})...")
-        
-        retriever_purpose = {
-            "vocabulary": "외국인 학습자에게 적합한 한국어 어휘",
-            "grammar": "해당 난이도에 맞는 한국어 문법 패턴",
-            "kpop": "한국어 학습에 활용 가능한 K-pop 관련 문장"
-        }
-        
-        difficulty_desc = {
-            "basic": "초급 (TOPIK 1-2급): 기본 어휘와 간단한 문법",
-            "intermediate": "중급 (TOPIK 3-4급): 다양한 표현과 일상 대화",
-            "advanced": "고급 (TOPIK 5-6급): 복잡한 문법과 추상적 개념"
-        }
-        
-        prompt = f"""당신은 외국인을 위한 한국어 교육 자료 검색 전문가입니다.
-다음 검색 쿼리를 개선하여 더 나은 한국어 학습 자료를 찾을 수 있도록 도와주세요.
-
-**현재 상황:**
-- 원본 쿼리: "{original_query}"
-- 검색 대상: {retriever_purpose.get(retriever_type.value, "한국어 학습 자료")}
-- 학습자 수준: {difficulty_desc.get(difficulty, "일반")}
-{f"- 검색 실패 이유: {failure_reason}" if failure_reason else ""}
-
-**개선 목표:**
-1. {retriever_type.value} 데이터베이스 검색에 최적화
-2. {difficulty} 수준에 적합한 키워드 포함
-3. 외국인 학습자 관점에서 유용한 내용
-4. 실용적이고 자연스러운 한국어 표현 중심
-
-**형식:**
-- 1-6단어의 간결한 검색어
-- 한국어와 영어 키워드 적절히 혼합
-- 구체적이고 명확한 표현 사용
-
-개선된 검색 쿼리만 출력하세요 (설명 없이):
-"""
-        
-        try:
-            response = self.llm.predict(prompt)
-            improved_query = response.strip().strip('"').strip("'")
-            print(f"   원본: '{original_query}'")
-            print(f"   개선: '{improved_query}'")
-            return improved_query
-        except Exception as e:
-            print(f"   ⚠️ LLM 호출 실패: {e}")
-            return original_query
-    
     # 헬퍼 메서드들
     def _should_activate_vocabulary(self, query: str, topic: str) -> bool:
         """Vocabulary 리트리버 활성화 여부 확인"""
@@ -351,12 +170,10 @@ class IntelligentRouter:
         return False
     
     def _should_activate_grammar(self, query: str, topic: str) -> bool:
-        """Grammar 리트리버 활성화 여부 확인"""
+        """Grammar 리트리버 활성화 여부 확인 - 문법 관련 키워드가 있을 때만"""
         if any(kw in query for kw in self.GRAMMAR_TRIGGERS):
             return True
         if any(kw in topic for kw in self.GRAMMAR_TRIGGERS):
-            return True
-        if "예문" in query or "문장" in query or "sentence" in query:
             return True
         return False
     
@@ -428,33 +245,6 @@ class IntelligentRouter:
         confidence = min(1.0, confidence + keyword_matches * 0.1)
         
         return confidence
-    
-    def _find_strategy(
-        self, 
-        strategies: List[SearchStrategy],
-        retriever_type: RetrieverType
-    ) -> Optional[SearchStrategy]:
-        """전략 리스트에서 특정 리트리버의 전략 찾기"""
-        for strategy in strategies:
-            if strategy.retriever_type == retriever_type:
-                return strategy
-        return None
-    
-    def _expand_query(self, original_query: str, difficulty: str) -> str:
-        """더 많은 결과를 위한 쿼리 확장"""
-        difficulty_keywords = {
-            "basic": "기초 초급",
-            "intermediate": "중급",
-            "advanced": "고급 상급"
-        }
-        expanded = f"{original_query} {difficulty_keywords.get(difficulty, '')}"
-        return expanded.strip()
-    
-    def _improve_grammar_query(self, original_query: str, difficulty: str) -> str:
-        """문법 쿼리 개선"""
-        if "문법" not in original_query and "grammar" not in original_query.lower():
-            return f"{original_query} 문법"
-        return original_query
 
 
 def format_routing_summary(decision: RoutingDecision) -> str:

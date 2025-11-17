@@ -10,7 +10,7 @@ class KpopSentenceRetriever:
     - 그룹명 전용 인덱스(group_name_index)로 타깃 그룹 선별
     """
     def __init__(self, json_path: str, embedding_model: str = "text-embedding-3-large",
-                 group_match_topk: int = 1, group_match_threshold: float = 0.60):
+                 group_match_topk: int = 1, group_match_threshold: float = 0.75):
         self.json_path = json_path
         self.kpop_data: List[Document] = []
         self.retriever = None

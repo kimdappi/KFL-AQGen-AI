@@ -8,6 +8,7 @@ import re
 from Ragsystem.schema import GraphState
 from Ragsystem.nodes import AgenticKoreanLearningNodes
 from Ragsystem.router import IntelligentRouter, format_routing_summary, RetrieverType
+from utils import get_group_type
 
 
 class RouterIntegratedNodes(AgenticKoreanLearningNodes):
@@ -144,23 +145,135 @@ class RouterIntegratedNodes(AgenticKoreanLearningNodes):
         # DB 검색만 수행
         db_limit = strategy.params.get("db_limit", 5)
         kpop_db_docs = self.kpop_retriever.invoke(strategy.query, level)
-        # 하드 필터: 쿼리에 특정 그룹/멤버/컨셉/곡이 언급되면 해당되는 문서만 선택
-        raw_query = state.get('input_text', '')
-        q_tokens = set([t.strip().lower() for t in re.split(r"[^\w가-힣]+", raw_query) if len(t.strip()) >= 2])
-        specified_groups = []
+        # 동적 필터링: kpop_filters 객체를 기반으로 모든 메타데이터 필드 필터링
         qa = state.get('query_analysis', {})
-        if qa:
-            specified_groups = [g.strip() for g in qa.get('kpop_groups', []) if g.strip()]
-
+        kpop_filters = qa.get('kpop_filters', {}) if qa else {}
+        
         filtered = []
-        if specified_groups:
-            sg_set = {g.lower() for g in specified_groups}
+        filter_reasons = []
+        
+        # 필터링 조건이 있으면 적용
+        has_filters = any([
+            kpop_filters.get('groups'),
+            kpop_filters.get('members'),
+            kpop_filters.get('agencies'),
+            kpop_filters.get('fandoms'),
+            kpop_filters.get('concepts'),
+            kpop_filters.get('debut_year'),
+            kpop_filters.get('group_type')
+        ])
+        
+        if has_filters:
             for d in kpop_db_docs:
-                g = (d.metadata.get('group', '') or '').lower()
-                if g in sg_set:
+                match = True
+                doc_reasons = []
+                
+                # 1. 그룹 필터링
+                if kpop_filters.get('groups'):
+                    g = (d.metadata.get('group', '') or '').lower()
+                    sg_set = {g.lower() for g in kpop_filters['groups']}
+                    if g in sg_set:
+                        doc_reasons.append(f"그룹: {d.metadata.get('group')}")
+                    else:
+                        match = False
+                        continue
+                
+                # 2. 멤버 필터링
+                if match and kpop_filters.get('members'):
+                    doc_member_names = [m.lower() for m in (d.metadata.get('member_names', []) or [])]
+                    specified_members = [m.lower() for m in kpop_filters['members']]
+                    member_match = any(sm in doc_member_names for sm in specified_members)
+                    if member_match:
+                        matched_members = [sm for sm in specified_members if sm in doc_member_names]
+                        doc_reasons.append(f"멤버: {', '.join(matched_members)}")
+                    else:
+                        match = False
+                        continue
+                
+                # 3. 소속사 필터링
+                if match and kpop_filters.get('agencies'):
+                    doc_agency = (d.metadata.get('agency', '') or '').lower()
+                    specified_agencies = [a.lower() for a in kpop_filters['agencies']]
+                    agency_match = any(sa in doc_agency for sa in specified_agencies)
+                    if agency_match:
+                        matched_agency = [sa for sa in specified_agencies if sa in doc_agency][0]
+                        doc_reasons.append(f"소속사: {d.metadata.get('agency')}")
+                    else:
+                        match = False
+                        continue
+                
+                # 4. 팬덤 필터링
+                if match and kpop_filters.get('fandoms'):
+                    doc_fandom = (d.metadata.get('fandom', '') or '').lower()
+                    specified_fandoms = [f.lower() for f in kpop_filters['fandoms']]
+                    fandom_match = any(sf in doc_fandom for sf in specified_fandoms)
+                    if fandom_match:
+                        matched_fandom = [sf for sf in specified_fandoms if sf in doc_fandom][0]
+                        doc_reasons.append(f"팬덤: {d.metadata.get('fandom')}")
+                    else:
+                        match = False
+                        continue
+                
+                # 5. 컨셉 필터링
+                if match and kpop_filters.get('concepts'):
+                    doc_concepts = [c.lower() for c in (d.metadata.get('concepts', []) or []) if isinstance(c, str)]
+                    specified_concepts = [c.lower() for c in kpop_filters['concepts']]
+                    concept_match = any(sc in doc_concepts for sc in specified_concepts)
+                    if concept_match:
+                        matched_concepts = [sc for sc in specified_concepts if sc in doc_concepts]
+                        doc_reasons.append(f"컨셉: {', '.join(matched_concepts)}")
+                    else:
+                        match = False
+                        continue
+                
+                # 6. 데뷔 연도 필터링
+                if match and kpop_filters.get('debut_year'):
+                    members = d.metadata.get('members', [])
+                    doc_debut_years = set()
+                    for m in members:
+                        debut = m.get('debut', '')
+                        if debut and len(debut) >= 4:
+                            try:
+                                year = int(debut[:4])
+                                doc_debut_years.add(year)
+                            except ValueError:
+                                pass
+                    
+                    if kpop_filters['debut_year'] in doc_debut_years:
+                        doc_reasons.append(f"데뷔: {kpop_filters['debut_year']}년")
+                    else:
+                        match = False
+                        continue
+                
+                # 7. 그룹 타입 필터링 (걸그룹/보이그룹)
+                if match and kpop_filters.get('group_type'):
+                    group_name = d.metadata.get('group', '')
+                    doc_group_type = get_group_type(group_name)
+                    
+                    if doc_group_type == kpop_filters['group_type']:
+                        doc_reasons.append(f"타입: {kpop_filters['group_type']}")
+                    else:
+                        match = False
+                        continue
+                
+                if match:
                     filtered.append(d)
+                    if doc_reasons:
+                        filter_reasons.extend(doc_reasons)
+            
+            if filtered:
+                kpop_db_docs = filtered
+                if filter_reasons:
+                    print(f"   🔍 필터링 적용: {', '.join(set(filter_reasons))}")
+                print(f"   ✅ 필터링 결과: {len(kpop_db_docs)}개 문서")
+            else:
+                # 필터링 조건에 맞는 문서가 없으면 빈 리스트 반환 (정확도 보장)
+                kpop_db_docs = []
+                print(f"   ⚠️ 필터링 조건에 맞는 문서를 찾을 수 없습니다.")
         else:
-            # 멤버/컨셉/곡 토큰 일치 시 포함
+            # 필터링 조건이 없으면 토큰 기반 매칭
+            raw_query = state.get('input_text', '')
+            q_tokens = set([t.strip().lower() for t in re.split(r"[^\w가-힣]+", raw_query) if len(t.strip()) >= 2])
             for d in kpop_db_docs:
                 group = (d.metadata.get('group', '') or '').lower()
                 song = (d.metadata.get('song', '') or '').lower()
@@ -175,12 +288,72 @@ class RouterIntegratedNodes(AgenticKoreanLearningNodes):
                 fields.update(concepts)
                 if any(tok in fields for tok in q_tokens):
                     filtered.append(d)
+            if filtered:
+                kpop_db_docs = filtered
 
-        if filtered:
-            kpop_db_docs = filtered
-
+        # 최종적으로 최대 5개만 반환
         kpop_db_docs = kpop_db_docs[:db_limit]
-        print(f"   ✅ DB 검색 완료: {len(kpop_db_docs)}개 K-pop 문장")
+        
+        # 검증: 반환되는 문서 정보 확인
+        if has_filters:
+            returned_groups = set()
+            returned_members = set()
+            returned_agencies = set()
+            returned_fandoms = set()
+            returned_concepts = set()
+            returned_years = set()
+            returned_types = set()
+            
+            for d in kpop_db_docs:
+                g = d.metadata.get('group', '')
+                if g:
+                    returned_groups.add(g)
+                
+                member_names = d.metadata.get('member_names', [])
+                returned_members.update([m.lower() for m in member_names])
+                
+                agency = d.metadata.get('agency', '')
+                if agency:
+                    returned_agencies.add(agency)
+                
+                fandom = d.metadata.get('fandom', '')
+                if fandom:
+                    returned_fandoms.add(fandom)
+                
+                concepts = d.metadata.get('concepts', [])
+                returned_concepts.update([c.lower() for c in concepts if isinstance(c, str)])
+                
+                members = d.metadata.get('members', [])
+                for m in members:
+                    debut = m.get('debut', '')
+                    if debut and len(debut) >= 4:
+                        try:
+                            returned_years.add(int(debut[:4]))
+                        except ValueError:
+                            pass
+                
+                # 그룹 타입 추론
+                group_type = get_group_type(g)
+                if group_type:
+                    returned_types.add(group_type)
+            
+            print(f"   ✅ DB 검색 완료: {len(kpop_db_docs)}개 K-pop 문장")
+            if returned_groups:
+                print(f"   📋 반환된 그룹: {list(returned_groups)}")
+            if returned_members:
+                print(f"   📋 반환된 멤버: {list(returned_members)[:5]}")
+            if returned_agencies:
+                print(f"   📋 반환된 소속사: {list(returned_agencies)}")
+            if returned_fandoms:
+                print(f"   📋 반환된 팬덤: {list(returned_fandoms)}")
+            if returned_concepts:
+                print(f"   📋 반환된 컨셉: {list(returned_concepts)}")
+            if returned_years:
+                print(f"   📋 반환된 데뷔 연도: {sorted(list(returned_years))}")
+            if returned_types:
+                print(f"   📋 반환된 그룹 타입: {list(returned_types)}")
+        else:
+            print(f"   ✅ DB 검색 완료: {len(kpop_db_docs)}개 K-pop 문장")
         
         return {
             "kpop_docs": kpop_db_docs
@@ -253,35 +426,3 @@ class RouterIntegratedNodes(AgenticKoreanLearningNodes):
         return {
             "rerank_count": new_count
         }
-        
-    def llm_query_rewrite_node(self, state: GraphState) -> GraphState:
-        """
-        LLM 기반 쿼리 재작성 노드 (고급 기능)
-        재검색으로도 결과가 부족할 때 사용
-        """
-        print("\n🤖 [LLM 재작성] 지능형 검색어 개선")
-        
-        decision = state.get("routing_decision")
-        quality_check = state.get("quality_check", {})
-        
-        if not decision:
-            return {}
-        
-        # 2회 이상 재시도한 리트리버에 대해 LLM 재작성 시도
-        for strategy in decision.strategies:
-            if strategy.retry_count >= 2:  # 2회 이상 재시도 후 LLM 사용
-                retriever_type = strategy.retriever_type
-                
-                failure_reason = f"검색 결과 부족 ({quality_check.get(f'{retriever_type.value}_count', 0)}개)"
-                
-                improved_query = self.router.rewrite_query_with_llm(
-                    original_query=strategy.query,
-                    retriever_type=retriever_type,
-                    difficulty=state.get("difficulty_level", "intermediate"),
-                    failure_reason=failure_reason
-                )
-                
-                # 쿼리 업데이트
-                strategy.query = improved_query
-        
-        return {"routing_decision": decision}

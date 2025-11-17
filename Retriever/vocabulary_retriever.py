@@ -144,7 +144,7 @@ class TOPIKVocabularyRetriever:
 
     def invoke(self, query: str, level: str, epsilon: float = 0.2) -> List[Document]:
         """
-        난이도 준수 + 랜덤성 + 다양성(MMR)로 3개 반환
+        난이도 준수 + 랜덤성 + 다양성(MMR)로 5개 반환
         - 1순위: 요청 난이도와 정확히 일치하는 후보
         - 2순위: 인접 난이도(±1)에서 보충
         - 3순위: 그래도 부족하면 최소량만 임시 보충
@@ -170,18 +170,18 @@ class TOPIKVocabularyRetriever:
         # ε-greedy: 소량 탐험(레벨 내)
         take_explore = 1 if random.random() < epsilon else 0
 
-        # 우선순위대로 채우기 (가중 랜덤 → 탐험 → 보충)
+        # 우선순위대로 채우기 (가중 랜덤 → 탐험 → 보충) - 5개로 증가
         if exact:
-            picked += self._weighted_sample(exact, k=3 - len(picked))
-        if len(picked) < 3 and take_explore:
-            picked += self._epsilon_explore(level, m=min(1, 3 - len(picked)))
-        if len(picked) < 3 and near:
-            picked += self._weighted_sample(near, k=3 - len(picked))
-        if len(picked) < 3 and far:
+            picked += self._weighted_sample(exact, k=5 - len(picked))
+        if len(picked) < 5 and take_explore:
+            picked += self._epsilon_explore(level, m=min(1, 5 - len(picked)))
+        if len(picked) < 5 and near:
+            picked += self._weighted_sample(near, k=5 - len(picked))
+        if len(picked) < 5 and far:
             # 정말 부족할 때만 아주 소량 보충 (난이도 비약 방지)
-            picked += self._weighted_sample(far, k=3 - len(picked))
+            picked += self._weighted_sample(far, k=5 - len(picked))
 
-        picked = picked[:3]
+        picked = picked[:5]
 
         # 최근 캐시에 등록(중복 회피)
         for d in picked:

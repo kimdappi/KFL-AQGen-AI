@@ -1,6 +1,6 @@
 """
 라우터 통합 Agentic RAG 그래프
-지능형 라우팅 기능이 포함된 LangGraph 워크플로우
+지능형 라우팅 기능이 포함된 LangGraph 워크플로우 (graph 구현)
 수정 완료
 """
 
@@ -58,8 +58,8 @@ class RouterAgenticGraph:
         # 랭크 다시 
         workflow.add_node("rerank", self.nodes.rerank_node)
         
-        # 생성
-        workflow.add_node("generate", self.nodes.generate_sentences_with_kpop)
+        # 생성 (문장 생성 없이 정보 추출 후 문제 생성)
+        workflow.add_node("generate", self.nodes.generate_question_directly)
         
         # output 포맷
         workflow.add_node("format_output", self.nodes.format_output_agentic)
@@ -148,12 +148,18 @@ class RouterAgenticGraph:
             quality_check={},
             routing_decision=None,
             search_strategies=[],
-            rerank_count=0,  
-            rerank_decision=None
+            rerank_count=0,
+            question_payload=None,
+            sentence_data=None,
+            target_grade=None
         )
         
         result = self.app.invoke(inputs, config)
-        return result['final_output']
+        # final_output과 question_payload 모두 반환
+        return {
+            'final_output': result.get('final_output', ''),
+            'question_payload': result.get('question_payload')
+        }
     
     def stream(self, input_text: str, config=None):
         """그래프 워크플로우 스트리밍 실행"""
@@ -171,7 +177,9 @@ class RouterAgenticGraph:
             routing_decision=None,
             search_strategies=[],
             rerank_count=0,
-            rerank_decision=None
+            question_payload=None,
+            sentence_data=None,
+            target_grade=None
         )
         
         for output in self.app.stream(inputs, config):
