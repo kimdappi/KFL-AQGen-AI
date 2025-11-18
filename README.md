@@ -49,7 +49,7 @@ KFL-AQGen-AI/
 │   ├── router.py                     # 지능형 라우터 (검색 전략 결정)
 │   ├── nodes.py                      # 기본 노드 (정보 추출, 문제 생성용 payload 구성)
 │   ├── nodes_router_intergration.py  # 라우터 통합 노드
-│   ├── graph.py                      # 기본 그래프 (레거시)
+│   ├── graph.py                      # 기본 그래프 (레거시)X - 지금은 없음 그래프 전부 graph_agentic_router
 │   └── graph_agentic_router.py       # 라우터 통합 그래프 (메인)
 │
 ├── 📂 output/                        # 출력 결과
@@ -94,19 +94,19 @@ KFL-AQGen-AI/
 **파일: `agents.py` → `QueryAnalysisAgent.analyze()`**
 - 쿼리 분석 (난이도, 주제, K-pop 필요성)
 - **동적 필터 조건 추출**: 그룹, 멤버, 소속사, 팬덤, 컨셉, 데뷔 연도, 그룹 타입
-- **임베딩 기반 그룹명 자동 매칭**: 하드코딩 없이 "아이브" → "IVE" 자동 변환
+- **임베딩 기반 그룹명 자동 매칭**
 - 출력: `query_analysis` (difficulty, topic, needs_kpop, kpop_filters)
 
-#### 노드 2: `routing`
+#### 노드 2: `routing`- 어떤 리트리버를 활성화 할지 결정
 **파일: `Ragsystem/nodes_router_intergration.py` → `routing_node()`**
 - **파일: `Ragsystem/router.py` → `IntelligentRouter.route()`**
 - 검색 전략 결정
-  - **Vocabulary 리트리버**: 무조건 활성화
-  - **Grammar 리트리버**: 문법 관련 키워드("문법", "패턴", "grammar", "pattern", "표현", "구조")가 있을 때만 활성화
-  - **K-pop 리트리버**: K-pop 관련 내용이 쿼리에 있을 때만 활성화
-- 출력: `routing_decision` (strategies)
+  - **Vocabulary 리트리버**: (현재는 일단 트리거)
+  - **Grammar 리트리버**: 문법 관련 키워드 있을 때만 활성화
+  - **K-pop 리트리버**: K-pop 관련 내용이 쿼리에 있을 때 활성화
+- 출력: `routing_decision` (전략 수립)
 
-#### 노드 3-5: 리트리버 실행 (순차)
+#### 노드 3-5: 리트리버 실행 (우선순위 따라서)
 **파일: `Ragsystem/nodes_router_intergration.py`**
 
 **3-1. `retrieve_vocabulary`**
@@ -115,7 +115,7 @@ KFL-AQGen-AI/
   - `basic` (TOPIK 1-2): `data/words/TOPIK1.csv`, `TOPIK2.csv`
   - `intermediate` (TOPIK 3-4): `data/words/TOPIK3.csv`, `TOPIK4.csv`
   - `advanced` (TOPIK 5-6): `data/words/TOPIK5.csv`, `TOPIK6.csv`
-- 최대 5개 단어 추출 (자연스러운 문제 생성을 위해 증가)
+- 최대 5개 단어 추출 (자연스러운 문제 생성을 위해)
 - 출력: `vocabulary_docs`
 
 **3-2. `retrieve_grammar`**
@@ -127,13 +127,13 @@ KFL-AQGen-AI/
 - 1개 문법 추출
 - 출력: `grammar_docs`
 
-**3-3. `retrieve_kpop`** (조건부)
+**3-3. `retrieve_kpop`**
 - **파일: `Retriever/kpop_retriever.py` → `KpopSentenceRetriever.invoke()`**
 - K-pop DB에서 그룹/멤버 정보 검색
 - 쿼리에 K-pop 키워드가 있을 때만 활성화
 - **동적 필터링**: 그룹, 멤버, 소속사, 팬덤, 컨셉, 데뷔 연도, 그룹 타입으로 필터링
 - **임베딩 기반 그룹명 매칭**: 임계치 0.75로 정확한 매칭
-- 최대 5개 정보 추출 (더 풍부한 컨텍스트 제공)
+- 최대 5개 정보 추출 (더 풍부한 컨텍스트)
 - 출력: `kpop_docs`
 
 #### 노드 6: `check_quality`
@@ -176,7 +176,7 @@ test_maker.py 호출 (question_payload 전달)
 
 #### 3-1. 문제 유형 선택
 **`select_best_schema(payload)`**
-- LLM으로 최적 문제 유형 선택
+- LLM으로 가지고 온 payload 기반 최적 문제 유형 선택 및 생성 - 현재는 여섯 유형 다 만들게 되어 있긴 함
 - 6가지 유형:
   - `fill_in_blank`: 빈칸 채우기
   - `match_and_connect`: 문장 연결하기
@@ -195,7 +195,6 @@ test_maker.py 호출 (question_payload 전달)
   - `sentence_connection`: 두 절로 분해 가능한 문장들
   - 기타: 일반 예문들
 - **번역투 방지**: 영어 단어/컨셉트는 한국어로 번역하여 사용
-  - 예: "self-love" → "자기 사랑", "youth" → "청춘", "storytelling" → "스토리텔링"
 - **요구사항**:
   - 목표 문법 반드시 사용
   - 최소 2개 이상의 학습 단어 자연스럽게 포함
@@ -253,7 +252,7 @@ output/final_v.1.json에 저장
 │         │   └─► JSON에서 문법 1개 추출                       │
 │         │                                                    │
 │         └─► retrieve_kpop (kpop_retriever.py) [조건부]      │
-│             └─► 임베딩 기반 매칭 + 동적 필터링              │
+│             └─► 임베딩 기반 매칭 + 동적 필터링 (필요 정보)          │
 │                 └─► JSON에서 K-pop 정보 최대 5개 추출        │
 │                                                              │
 │         ▼                                                    │
@@ -314,9 +313,9 @@ output/final_v.1.json에 저장
   2. `routing` → 검색 전략 결정
   3. `retrieve_vocabulary` → 어휘 검색
   4. `retrieve_grammar` → 문법 검색
-  5. `retrieve_kpop` → K-pop 검색 (조건부)
+  5. `retrieve_kpop` → K-pop 검색 
   6. `check_quality` → 품질 검증
-  7. `rerank` → 재검색 (조건부)
+  7. `rerank` → 재검색 (조건부 필요시)
   8. `generate` → 정보 추출 및 payload 구성
   9. `format_output` → 출력 포맷팅
 
@@ -351,7 +350,7 @@ output/final_v.1.json에 저장
 #### `Retriever/vocabulary_retriever.py`
 - **`TOPIKVocabularyRetriever`**: TOPIK 어휘 검색
 - 난이도별 CSV 파일에서 단어 검색
-- MMR + BM25 앙상블 검색
+- MMR + BM25 앙상블 검색 - 현재는 의도적으로 노이즈 추가된것 +e-greedy 탐색
 - 난이도 매핑:
   - `basic` → TOPIK 1-2급
   - `intermediate` → TOPIK 3-4급
@@ -409,12 +408,12 @@ output/final_v.1.json에 저장
 
 #### `config.py`
 - 파일 경로 설정
-- LLM 설정 (temperature, max_completion_tokens)
+- LLM 설정 
 - 리트리버 설정
 
 #### `utils.py`
 - `get_group_type()`: 그룹명으로 그룹 타입 판단 (girl_group, boy_group)
-- `detect_difficulty_from_text()`: 텍스트에서 난이도 감지 (하드코딩 방식 - 효율적)
+- `detect_difficulty_from_text()`: 텍스트에서 난이도 감지 
 - `extract_words_from_docs()`: 문서에서 단어 추출
 - `extract_grammar_with_grade()`: 문서에서 문법 추출
 
@@ -588,9 +587,9 @@ LLM_CONFIG = {
   - 키워드: "케이팝", "kpop", "k-pop", "가사", "lyrics", "노래", "song", "아이돌", "idol", "음악", "music", 그룹명 등
 
 #### 2. 검색 전략 수립
-- **우선순위 설정**: 어휘(1) → 문법(2) → K-pop(3)
-- **검색 파라미터**: 난이도별 검색 개수 및 방식 조정
-- **쿼리 최적화**: 각 리트리버 특성에 맞는 검색어 생성
+- **우선순위 설정**
+- **검색 파라미터**
+- **쿼리 최적화**
 
 #### 3. 품질 기반 재검색
 - **품질 기준**: 어휘 5개 이상, 문법 1개 이상, K-pop 3개 이상
@@ -676,20 +675,6 @@ faiss-cpu>=1.8.0  # 또는 faiss-gpu
 - **API 키 오류**: `.env` 파일에 올바른 OpenAI API 키가 설정되었는지 확인
 - **데이터 파일 누락**: `data/` 폴더에 필요한 CSV/JSON 파일들이 있는지 확인
 - **Temperature 오류**: `gpt-5` 모델은 `temperature=1.0`만 지원 (기본값)
-
-### 디버깅
-- 콘솔 출력에서 각 단계별 진행상황 확인
-- 그래프 실행 결과의 `question_payload`로 추출된 정보 확인
-- 에러 메시지에서 상세한 원인 확인
-
-## 📄 라이선스
-
-내부 프로젝트 용도로 사용되는 예시입니다. 외부 배포 시 데이터셋 저작권(K-pop 가사/문장 등)을 확인하세요.
-
-## 🤝 기여
-
-프로젝트 개선을 위한 제안이나 버그 리포트는 언제든 환영합니다!
-
 ---
 
 **KFL-AQGen-AI** - 지능형 한국어 학습 문제 자동 생성 시스템 🚀
