@@ -4,7 +4,7 @@ import json
 import random
 from openai import OpenAI
 from dotenv import load_dotenv
-
+from config import MODEL_NAME
 
 load_dotenv()
 client = OpenAI()
@@ -256,7 +256,7 @@ AGENT_PROMPT_TEMPLATE = """\
   "rationale": "위 3단계 분석에 기반한 구체적인 선택 이유(string)"
 }}"""
 #config.py에서 변경된 MODEL_NAME과 temperature를 반영합니다.
-def call_llm(prompt: str, model: str = "gpt-5", temperature: float = 1.0, require_json: bool = True) -> str:
+def call_llm(prompt: str, model: str =MODEL_NAME, temperature: float = 1.0, require_json: bool = True) -> str:
     """OpenAI 모델을 호출하는 범용 함수"""
     try:
         messages = [

@@ -1,6 +1,7 @@
 """
 프로젝트 설정 파일
 """
+MODEL_NAME = "gpt-5"
 
 # 파일 경로 설정
 TOPIK_PATHS = {

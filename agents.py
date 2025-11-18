@@ -7,6 +7,7 @@ K-pop 그룹 필터링 지원 추가
 from typing import Dict, Any
 from langchain_openai import ChatOpenAI
 import json
+from config import MODEL_NAME
 
 
 class QueryAnalysisAgent:
@@ -17,7 +18,7 @@ class QueryAnalysisAgent:
     """
     
     def __init__(self, llm=None, kpop_retriever=None):
-        self.llm = llm or ChatOpenAI(model="gpt-5", temperature=0)
+        self.llm = llm or ChatOpenAI(model=MODEL_NAME, temperature=0)
         self.kpop_retriever = kpop_retriever  # 임베딩 기반 매칭을 위해 필요
     
     def analyze(self, query: str) -> Dict[str, Any]:

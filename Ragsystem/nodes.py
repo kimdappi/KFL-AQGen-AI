@@ -10,7 +10,7 @@ from utils import (
     extract_grammar_with_grade,
     get_group_type,
 )
-from config import LLM_CONFIG
+from config import LLM_CONFIG, MODEL_NAME
 from agents import QueryAnalysisAgent, QualityCheckAgent
 
 
@@ -23,7 +23,7 @@ class KoreanLearningNodes:
         self.grammar_retriever = grammar_retriever
         self.kpop_retriever = kpop_retriever
         self.llm = llm or ChatOpenAI(
-            model="gpt-5",
+            model=MODEL_NAME,
             temperature=LLM_CONFIG.get("temperature", 0.7),
             max_completion_tokens=LLM_CONFIG.get("max_completion_tokens", 1000),
         )
