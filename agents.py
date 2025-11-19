@@ -51,6 +51,7 @@ Available K-pop groups in database: {available_groups_str}
 Available K-pop metadata fields for filtering:
 - group: Group name (e.g., "BLACKPINK", "BTS", "TWICE")
 - members: Member names (e.g., "Jisoo", "RM", "Nayeon")
+- member_roles: Member roles (e.g., "rapper", "vocal", "dancer", "leader")
 - agency: Agency name (e.g., "YG Entertainment", "BIGHIT MUSIC")
 - fandom: Fandom name (e.g., "BLINK", "ARMY", "ONCE")
 - concepts: Concepts (e.g., "girl crush", "hip-hop", "self-love", "youth")
@@ -81,6 +82,11 @@ Extract ALL filter conditions mentioned in the query. Only include fields that a
 - members: List of member names mentioned (e.g., ["Jisoo", "RM"], or [])
   * Extract individual member names: "지수", "Jisoo", "RM", "제니" → ["Jisoo", "Jennie"]
   
+- member_roles: List of member roles mentioned (e.g., ["rapper", "vocal"], or [])
+  * Extract if mentioned: "래퍼", "rapper", "보컬", "vocal", "댄서", "dancer", "리더", "leader"
+  * Korean → English: "래퍼" → "rapper", "보컬" → "vocal", "댄서" → "dancer", "리더" → "leader"
+  * Examples: "걸그룹 래퍼들" → ["rapper"], "보컬 멤버들" → ["vocal"]
+  
 - agencies: List of agency names (e.g., ["YG Entertainment"], or [])
   * Extract if mentioned: "YG", "SM", "JYP", "BIGHIT" etc.
   
@@ -106,6 +112,8 @@ Extract ALL filter conditions mentioned in the query. Only include fields that a
 - "BLINK 팬덤" → {{"fandoms": ["BLINK"]}}
 - "걸크러시 컨셉의 2016년 데뷔 그룹" → {{"concepts": ["girl crush"], "debut_year": 2016}}
 - "블랙핑크의 지수와 제니" → {{"groups": ["BLACKPINK"], "members": ["Jisoo", "Jennie"]}}
+- "걸그룹 래퍼들" → {{"group_type": "girl_group", "member_roles": ["rapper"]}}
+- "보컬 멤버들" → {{"member_roles": ["vocal"]}}
 
 JSON format:
 {{
@@ -115,6 +123,7 @@ JSON format:
   "kpop_filters": {{
     "groups": ["GROUP1", "GROUP2"] or [],
     "members": ["MEMBER1", "MEMBER2"] or [],
+    "member_roles": ["rapper", "vocal", "dancer", "leader"] or [],
     "agencies": ["AGENCY1"] or [],
     "fandoms": ["FANDOM1"] or [],
     "concepts": ["concept1", "concept2"] or [],
@@ -164,37 +173,73 @@ Respond ONLY with valid JSON, no additional text.
             
             filters['groups'] = list(normalized_groups)
             
-            # 멤버 이름 표준화 (한국어 → 영어 변환을 위한 하드코딩)
+            # 멤버 이름 표준화 (K-pop 데이터에서 동적 추출)
             if 'members' not in filters:
                 filters['members'] = []
-            member_map = {
-                "지수": "Jisoo", "제니": "Jennie", "로제": "Rosé", "리사": "Lisa",
-                "RM": "RM", "진": "Jin", "슈가": "Suga", "제이홉": "J-Hope",
-                "지민": "Jimin", "뷔": "V", "정국": "Jungkook",
-                "나연": "Nayeon", "정연": "Jeongyeon", "모모": "Momo",
-                "사나": "Sana", "지효": "Jihyo", "미나": "Mina",
-                "다현": "Dahyun", "채영": "Chaeyoung", "쯔위": "Tzuyu"
-            }
             normalized_members = []
-            for m in filters.get('members', []):
-                m_lower = m.lower().strip()
-                mapped = member_map.get(m) or member_map.get(m_lower) or m
-                normalized_members.append(mapped)
+            if self.kpop_retriever and hasattr(self.kpop_retriever, 'kpop_data'):
+                # K-pop 데이터에서 모든 멤버 이름 추출
+                all_member_names = set()
+                for doc in self.kpop_retriever.kpop_data:
+                    member_names = doc.metadata.get('member_names', [])
+                    all_member_names.update([name.lower() for name in member_names if name])
+                
+                # 쿼리에서 추출한 멤버명을 실제 데이터와 매칭
+                for m in filters.get('members', []):
+                    m_lower = m.lower().strip()
+                    # 정확히 일치하는 경우
+                    if m_lower in all_member_names:
+                        # 원본 대소문자 찾기
+                        for doc in self.kpop_retriever.kpop_data:
+                            member_names = doc.metadata.get('member_names', [])
+                            for name in member_names:
+                                if name.lower() == m_lower:
+                                    normalized_members.append(name)
+                                    break
+                            if normalized_members and normalized_members[-1].lower() == m_lower:
+                                break
+                    else:
+                        # 일치하지 않으면 원본 사용 (LLM이 이미 표준 이름으로 추출했을 수 있음)
+                        normalized_members.append(m)
+            else:
+                # kpop_retriever가 없으면 원본 사용
+                normalized_members = filters.get('members', [])
             filters['members'] = list(set(normalized_members))
             
-            # 소속사 표준화 (한국어 → 영어 변환을 위한 하드코딩)
+            # 소속사 표준화 (K-pop 데이터에서 동적 추출)
             if 'agencies' not in filters:
                 filters['agencies'] = []
-            agency_map = {
-                "yg": "YG Entertainment", "sm": "SM Entertainment", "jyp": "JYP Entertainment",
-                "빅히트": "BIGHIT MUSIC", "하이브": "HYBE", "스타쉽": "Starship Entertainment",
-                "에이도어": "ADOR", "플레디스": "Pledis Entertainment", "소스뮤직": "SOURCE MUSIC"
-            }
             normalized_agencies = []
-            for a in filters.get('agencies', []):
-                a_lower = a.lower().strip()
-                mapped = agency_map.get(a_lower) or a
-                normalized_agencies.append(mapped)
+            if self.kpop_retriever and hasattr(self.kpop_retriever, 'kpop_data'):
+                # K-pop 데이터에서 모든 소속사 추출
+                all_agencies = set()
+                for doc in self.kpop_retriever.kpop_data:
+                    agency = doc.metadata.get('agency', '')
+                    if agency:
+                        all_agencies.add(agency.lower())
+                
+                # 쿼리에서 추출한 소속사를 실제 데이터와 매칭
+                for a in filters.get('agencies', []):
+                    a_lower = a.lower().strip()
+                    # 부분 일치 검색
+                    matched = False
+                    for agency_lower in all_agencies:
+                        if a_lower in agency_lower or agency_lower in a_lower:
+                            # 원본 대소문자 찾기
+                            for doc in self.kpop_retriever.kpop_data:
+                                agency = doc.metadata.get('agency', '')
+                                if agency and agency.lower() == agency_lower:
+                                    normalized_agencies.append(agency)
+                                    matched = True
+                                    break
+                            if matched:
+                                break
+                    if not matched:
+                        # 일치하지 않으면 원본 사용
+                        normalized_agencies.append(a)
+            else:
+                # kpop_retriever가 없으면 원본 사용
+                normalized_agencies = filters.get('agencies', [])
             filters['agencies'] = list(set(normalized_agencies))
             
             # 팬덤 표준화
@@ -202,29 +247,39 @@ Respond ONLY with valid JSON, no additional text.
                 filters['fandoms'] = []
             filters['fandoms'] = [f.strip() for f in filters.get('fandoms', []) if f.strip()]
             
-            # 컨셉 표준화 (한국어 → 영어 변환을 위한 하드코딩)
+            # 컨셉 표준화 (K-pop 데이터에서 동적 추출)
             if 'concepts' not in filters:
                 filters['concepts'] = []
-            concept_map = {
-                "걸크러시": "girl crush",
-                "힙합": "hip-hop",
-                "자신감": "confidence",
-                "자기사랑": "self-love",
-                "청춘": "youth",
-                "스토리텔링": "storytelling",
-                "밝은": "bright",
-                "귀여운": "cute",
-                "에너지": "energetic",
-                "이중성": "duality",
-                "자체제작": "self-producing",
-                "퍼포먼스": "performance",
-                "무서움": "fearless"
-            }
             normalized_concepts = []
-            for concept in filters.get('concepts', []):
-                concept_lower = concept.lower().strip()
-                mapped = concept_map.get(concept_lower) or concept_map.get(concept) or concept_lower
-                normalized_concepts.append(mapped)
+            if self.kpop_retriever and hasattr(self.kpop_retriever, 'kpop_data'):
+                # K-pop 데이터에서 모든 컨셉 추출
+                all_concepts = set()
+                for doc in self.kpop_retriever.kpop_data:
+                    concepts = doc.metadata.get('concepts', [])
+                    if isinstance(concepts, list):
+                        all_concepts.update([c.lower() for c in concepts if isinstance(c, str)])
+                
+                # 쿼리에서 추출한 컨셉을 실제 데이터와 매칭
+                for concept in filters.get('concepts', []):
+                    concept_lower = concept.lower().strip()
+                    # 정확히 일치하는 경우
+                    if concept_lower in all_concepts:
+                        # 원본 대소문자 찾기
+                        for doc in self.kpop_retriever.kpop_data:
+                            concepts = doc.metadata.get('concepts', [])
+                            if isinstance(concepts, list):
+                                for c in concepts:
+                                    if isinstance(c, str) and c.lower() == concept_lower:
+                                        normalized_concepts.append(c)
+                                        break
+                            if normalized_concepts and normalized_concepts[-1].lower() == concept_lower:
+                                break
+                    else:
+                        # 일치하지 않으면 원본 사용 (LLM이 이미 표준 이름으로 추출했을 수 있음)
+                        normalized_concepts.append(concept)
+            else:
+                # kpop_retriever가 없으면 원본 사용
+                normalized_concepts = filters.get('concepts', [])
             filters['concepts'] = list(set(normalized_concepts))
             
             # 데뷔 연도 정수 변환
@@ -271,6 +326,7 @@ Respond ONLY with valid JSON, no additional text.
         """
         임베딩 기반으로 그룹명을 표준화
         kpop_retriever의 _match_groups_by_query() 활용
+        한글 그룹명도 더 잘 인식하도록 개선
         """
         if not self.kpop_retriever or not group_name:
             return None
@@ -279,9 +335,9 @@ Respond ONLY with valid JSON, no additional text.
             # retriever의 임베딩 매칭 메서드 사용
             ranked = self.kpop_retriever._match_groups_by_query(group_name)
             if ranked and len(ranked) > 0:
-                # 상위 1개 중 임계치 이상이면 반환
+                # 상위 1개 중 임계치 이상이면 반환 (상위 1위는 0.60으로 낮춤)
                 best_match, score = ranked[0]
-                threshold = self.kpop_retriever.group_match_threshold if self.kpop_retriever else 0.75
+                threshold = 0.60  # 한글 그룹명 인식을 위해 임계치 낮춤
                 if score >= threshold:
                     return best_match
         except Exception as e:
@@ -293,6 +349,7 @@ Respond ONLY with valid JSON, no additional text.
     def _extract_groups_from_query(self, query: str) -> list[str]:
         """
         쿼리 전체에서 그룹명을 임베딩 기반으로 추출
+        한글 그룹명도 더 잘 인식하도록 개선
         """
         if not self.kpop_retriever:
             return []
@@ -302,9 +359,15 @@ Respond ONLY with valid JSON, no additional text.
             ranked = self.kpop_retriever._match_groups_by_query(query)
             extracted = []
             threshold = self.kpop_retriever.group_match_threshold if self.kpop_retriever else 0.75
-            for name, score in ranked[:3]:  # 상위 3개까지 확인
-                if score >= threshold:  # 임계치 이상만
+            
+            # 상위 3개까지 확인
+            for i, (name, score) in enumerate(ranked[:3]):
+                # 상위 1위는 임계치를 0.60으로 낮춰서 더 관대하게 매칭
+                if i == 0 and score >= 0.60:
                     extracted.append(name)
+                elif score >= threshold:
+                    extracted.append(name)
+            
             return extracted
         except Exception:
             return []

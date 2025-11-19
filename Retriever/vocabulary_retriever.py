@@ -1,22 +1,49 @@
 # -------------------------------------
-# TOPIK 단어 Retriever (난이도 준수 + 랜덤성 강화 + MMR)
+# TOPIK 단어 Retriever (BGE Reranker 적용)
 # -------------------------------------
 import time, random, hashlib
 from collections import deque
 from typing import List, Dict
 import pandas as pd
+import torch
+from transformers import AutoModelForSequenceClassification, AutoTokenizer
 from langchain.schema import Document
 from langchain.vectorstores import FAISS
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.retrievers import EnsembleRetriever, BM25Retriever
 
-class TOPIKVocabularyRetriever:
-    """TOPIK 단어 CSV 파일 기반 Retriever (난이도 준수 + 랜덤성 + MMR)"""
+class BGEReranker:
+    """BGE-reranker-v2-m3 기반 reranker"""
+    def __init__(self):
+        self.tokenizer = AutoTokenizer.from_pretrained('BAAI/bge-reranker-v2-m3')
+        self.model = AutoModelForSequenceClassification.from_pretrained('BAAI/bge-reranker-v2-m3')
+        self.model.eval()
+        if torch.cuda.is_available():
+            self.model = self.model.cuda()
     
-    # 난이도 정규화
+    def rerank(self, query: str, docs: List[Document], top_k: int = 10) -> List[Document]:
+        if not docs:
+            return []
+        
+        pairs = [[query, d.page_content] for d in docs]
+        with torch.no_grad():
+            inputs = self.tokenizer(pairs, padding=True, truncation=True, 
+                                   return_tensors='pt', max_length=512)
+            if torch.cuda.is_available():
+                inputs = {k: v.cuda() for k, v in inputs.items()}
+            
+            scores = self.model(**inputs, return_dict=True).logits.view(-1).float().cpu()
+        
+        ranked_idx = scores.argsort(descending=True)[:top_k]
+        return [docs[i] for i in ranked_idx]
+
+
+class TOPIKVocabularyRetriever:
+    """TOPIK 단어 CSV 파일 기반 Retriever (BGE Reranker + 난이도 준수)"""
+    
     LEVEL_ORDER = ["basic", "intermediate", "advanced"]
     NEAR_LEVELS = {
-        "basic":        ["basic", "intermediate"],          # 부족할 때 인접 난이도 보충 순서
+        "basic":        ["basic", "intermediate"],
         "intermediate": ["intermediate", "basic", "advanced"],
         "advanced":     ["advanced", "intermediate"]
     }
@@ -25,8 +52,11 @@ class TOPIKVocabularyRetriever:
         self.csv_paths = csv_paths
         self.vocabulary_data = {}
         self.retrievers = {}
-        self.level_docs_flat = {}     # ε-greedy용 전체 풀
-        self.recent_words = deque(maxlen=200)  # 최근 노출 억제
+        self.level_docs_flat = {}
+        self.recent_words = deque(maxlen=200)  # 전역 최근 단어 (모든 쿼리 공통)
+        self.query_recent_words = {}  # 쿼리별 최근 단어 캐시 (쿼리별 중복 방지)
+        self.query_call_count = {}  # 쿼리별 실행 횟수 (매번 다른 결과 보장)
+        self.reranker = BGEReranker()  # Reranker 초기화
         self._load_vocabulary()
         self._create_retrievers()
     
@@ -41,7 +71,7 @@ class TOPIKVocabularyRetriever:
                         vocabulary = row.get('Vocabulary', '')
                         wordclass = row.get('Wordclass', '')
                         guide = row.get('Guide', '')
-                        topik_level = str(row.get('Level', '')).strip()  # CSV의 Level 그대로 보관(숫자/문자)
+                        topik_level = str(row.get('Level', '')).strip()
                         
                         doc_content = (
                             f"단어: {vocabulary}\n"
@@ -52,12 +82,12 @@ class TOPIKVocabularyRetriever:
                         doc = Document(
                             page_content=doc_content,
                             metadata={
-                                'difficulty_level': level,    # 우리 시스템 난이도
+                                'difficulty_level': level,
                                 'source': path,
                                 'word': vocabulary,
                                 'wordclass': wordclass,
                                 'guide': guide,
-                                'topik_level': topik_level,   # 원본 TOPIK Level
+                                'topik_level': topik_level,
                                 'file_name': path.split('/')[-1].replace('.csv', '')
                             }
                         )
@@ -67,33 +97,29 @@ class TOPIKVocabularyRetriever:
             self.vocabulary_data[level] = level_documents
     
     def _create_retrievers(self):
-        """레벨별 retriever 생성: MMR + fetch_k로 후보 다양화"""
+        """레벨별 retriever 생성: 일반 similarity search (reranker가 다양성 처리)"""
         embeddings = OpenAIEmbeddings()
         for level, documents in self.vocabulary_data.items():
             if not documents:
                 continue
 
-            self.level_docs_flat[level] = documents  # ε-greedy 탐험용 전체 풀 저장
+            self.level_docs_flat[level] = documents
 
             vectorstore = FAISS.from_documents(documents, embeddings)
-            # 다양성 강제: MMR + 넓은 fetch_k
+            # MMR 제거, 일반 검색으로 변경 (reranker가 정렬)
             vector_retriever = vectorstore.as_retriever(
-                search_type="mmr",
-                search_kwargs={"k": 30, "fetch_k": 300, "lambda_mult": 0.5}
+                search_kwargs={"k": 80}  # 넓게 가져와서 reranker에게 위임
             )
 
             bm25_retriever = BM25Retriever.from_documents(documents)
-            bm25_retriever.k = 60  # 텍스트 키워드 기반 후보폭 확대
+            bm25_retriever.k = 80
 
-            # 앙상블: 의미(임베딩) 0.6, 키워드 0.4
             ensemble_retriever = EnsembleRetriever(
                 retrievers=[vector_retriever, bm25_retriever],
                 weights=[0.6, 0.4]
             )
             self.retrievers[level] = ensemble_retriever
 
-
-    # 중복체크, 랜덤 및 난이도 유지
 
     def _dedup_by_word(self, docs: List[Document]) -> List[Document]:
         seen, unique = set(), []
@@ -104,90 +130,120 @@ class TOPIKVocabularyRetriever:
         return unique
 
     def _filter_recent(self, docs: List[Document]) -> List[Document]:
+        """전역 최근 단어 필터링"""
         return [d for d in docs if d.metadata.get('word', '').strip() not in self.recent_words]
+    
+    def _filter_recent_by_query(self, docs: List[Document], query: str) -> List[Document]:
+        """
+        쿼리별 최근 단어 필터링
+        같은 쿼리를 여러 번 실행해도 이전에 나온 단어 제외
+        """
+        if query not in self.query_recent_words:
+            self.query_recent_words[query] = deque(maxlen=50)  # 쿼리별 최근 50개
+        
+        recent = self.query_recent_words[query]
+        return [d for d in docs if d.metadata.get('word', '').strip() not in recent]
 
     def _seed_from_query(self, query: str):
-        # 쿼리 + 분 단위 타임슬라이스로 시드 변화
-        key = f"{query}:{int(time.time()//60)}"
+        """
+        쿼리 + 실행 횟수 기반 시드 생성
+        같은 쿼리라도 실행 횟수가 다르면 다른 결과 보장
+        """
+        # 쿼리별 실행 횟수 추적
+        if query not in self.query_call_count:
+            self.query_call_count[query] = 0
+        self.query_call_count[query] += 1
+        
+        # 쿼리 + 실행 횟수로 시드 생성 (매번 다른 결과)
+        key = f"{query}:{self.query_call_count[query]}"
         seed = int(hashlib.md5(key.encode()).hexdigest(), 16) & 0xFFFFFFFF
         random.seed(seed)
+    
+    def _query_hash_based_sample(self, candidates: List[Document], query: str, k: int) -> List[Document]:
+        """
+        쿼리 해시 기반 가중 랜덤 샘플링
+        - 같은 쿼리면 같은 단어 선택 (일관성)
+        - 다른 쿼리면 다른 단어 선택 (다양성 보장)
+        - "블랙핑크 관련 중급" vs "스트레이키즈 관련 중급" → 다른 단어 선택
+        """
+        if not candidates:
+            return []
+        
+        # 쿼리 해시로 시드 생성 (쿼리별로 고유한 시드)
+        query_hash = int(hashlib.md5(query.encode()).hexdigest(), 16) & 0xFFFFFFFF
+        random.seed(query_hash)
+        
+        # 순위 기반 가중치 (상위 단어가 더 높은 확률, 하지만 랜덤성도 포함)
+        weights = [1/(i+1) for i in range(len(candidates))]
+        
+        picked = []
+        used_indices = set()
+        
+        while len(picked) < min(k, len(candidates)):
+            idx = random.choices(range(len(candidates)), weights=weights, k=1)[0]
+            if idx not in used_indices:
+                used_indices.add(idx)
+                picked.append(candidates[idx])
+        
+        return picked
 
     def _level_match(self, target_level: str, doc_level: str) -> bool:
-        # 시스템 난이도 정확 일치
         return target_level == doc_level
 
     def _within_near_levels(self, target_level: str, doc_level: str) -> bool:
-        # 인접 난이도 허용(부족 시 보충)
         return doc_level in self.NEAR_LEVELS.get(target_level, [target_level])
 
-    def _weighted_sample(self, candidates: List[Document], k: int) -> List[Document]:
-        # 순위 기반 가중치(1/rank) 비복원 샘플링 
-        if not candidates:
-            return []
-        weights = [1/(i+1) for i in range(len(candidates))]
-        picked, used = [], set()
-        while len(picked) < min(k, len(candidates)):
-            idx = random.choices(range(len(candidates)), weights=weights, k=1)[0]
-            if idx in used: 
-                continue
-            used.add(idx)
-            picked.append(candidates[idx])
-        return picked
 
-    def _epsilon_explore(self, level: str, m: int) -> List[Document]:
-        # 완전 랜덤 탐험(ε-greedy) 최근 단어 제외 후 랜덤 
-        pool = self._filter_recent(self.level_docs_flat.get(level, []))
-        if len(pool) <= m:
-            random.shuffle(pool); return pool
-        return random.sample(pool, m)
-
-
-    def invoke(self, query: str, level: str, epsilon: float = 0.2) -> List[Document]:
+    def invoke(self, query: str, level: str) -> List[Document]:
         """
-        난이도 준수 + 랜덤성 + 다양성(MMR)로 5개 반환
-        - 1순위: 요청 난이도와 정확히 일치하는 후보
-        - 2순위: 인접 난이도(±1)에서 보충
-        - 3순위: 그래도 부족하면 최소량만 임시 보충
+        BGE Reranker + 쿼리 해시 기반 다양성 보장 검색
+        1. 앙상블로 80개 후보 수집
+        2. Reranker로 재정렬 (쿼리 관련성 고려)
+        3. 난이도 필터링
+        4. 쿼리 해시 기반 가중 랜덤 샘플링 (쿼리별 다른 단어 보장)
+        
+        예: "블랙핑크 관련 중급" vs "스트레이키즈 관련 중급" → 다른 단어 선택
         """
+        # 쿼리 해시로 시드 고정 (같은 쿼리면 같은 결과, 다른 쿼리면 다른 결과)
         self._seed_from_query(query)
-
+        
         retriever = self.retrievers.get(level)
         if not retriever:
             return []
 
-        # 풍부한 후보 수집(MMR+BM25 앙상블 결과)
+        # 1단계: 넓게 후보 수집
         docs = retriever.get_relevant_documents(query)
-        docs = self._dedup_by_word(docs)[:60]   # 다양성 유지
-        docs = self._filter_recent(docs)        # 최근 노출 회피
+        docs = self._dedup_by_word(docs)[:80]
+        docs = self._filter_recent(docs)  # 전역 최근 단어 제외
+        docs = self._filter_recent_by_query(docs, query)  # 쿼리별 최근 단어 제외 (중복 방지)
 
-        # 난이도 우선 필터
-        exact = [d for d in docs if self._level_match(level, d.metadata.get('difficulty_level', ''))]
-        near  = [d for d in docs if d not in exact and self._within_near_levels(level, d.metadata.get('difficulty_level', ''))]
-        far   = [d for d in docs if d not in exact and d not in near]  # 그 외(되도록 지양)
+        if not docs:
+            return []
 
-        picked: List[Document] = []
+        # 2단계: BGE Reranker로 재정렬 (쿼리-단어 관련성 고려)
+        reranked = self.reranker.rerank(query, docs, top_k=30)
 
-        # ε-greedy: 소량 탐험(레벨 내)
-        take_explore = 1 if random.random() < epsilon else 0
+        # 3단계: 난이도 필터링
+        exact = [d for d in reranked if self._level_match(level, d.metadata.get('difficulty_level', ''))]
+        near = [d for d in reranked if d not in exact and self._within_near_levels(level, d.metadata.get('difficulty_level', ''))]
 
-        # 우선순위대로 채우기 (가중 랜덤 → 탐험 → 보충) - 5개로 증가
+        # 4단계: 실행 횟수 기반 가중 랜덤 샘플링 (매번 다른 결과 보장)
+        picked = []
         if exact:
-            picked += self._weighted_sample(exact, k=5 - len(picked))
-        if len(picked) < 5 and take_explore:
-            picked += self._epsilon_explore(level, m=min(1, 5 - len(picked)))
+            # 실행 횟수 기반 샘플링 (같은 쿼리라도 매번 다른 단어)
+            picked += self._query_hash_based_sample(exact, query, k=5 - len(picked))
         if len(picked) < 5 and near:
-            picked += self._weighted_sample(near, k=5 - len(picked))
-        if len(picked) < 5 and far:
-            # 정말 부족할 때만 아주 소량 보충 (난이도 비약 방지)
-            picked += self._weighted_sample(far, k=5 - len(picked))
+            picked += self._query_hash_based_sample(near, query, k=5 - len(picked))
 
         picked = picked[:5]
 
-        # 최근 캐시에 등록(중복 회피)
+        # 최근 캐시 업데이트 (전역 + 쿼리별)
         for d in picked:
             w = d.metadata.get('word', '').strip()
             if w:
-                self.recent_words.append(w)
+                self.recent_words.append(w)  # 전역 캐시
+                if query not in self.query_recent_words:
+                    self.query_recent_words[query] = deque(maxlen=50)
+                self.query_recent_words[query].append(w)  # 쿼리별 캐시
 
         return picked
-

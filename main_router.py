@@ -6,7 +6,6 @@ import json
 import uuid
 from dotenv import load_dotenv
 from langchain_core.runnables import RunnableConfig
-# 
 from Retriever.vocabulary_retriever import TOPIKVocabularyRetriever
 from Retriever.grammar_retriever import GrammarRetriever
 from Retriever.kpop_retriever import KpopSentenceRetriever
@@ -44,6 +43,9 @@ def main():
         kpop_retriever
     )
     print("   ✅ 그래프 구축 완료")
+    
+    # 그래프 구조 출력
+    graph.print_graph_structure()
     
     # 설정
     config = RunnableConfig(

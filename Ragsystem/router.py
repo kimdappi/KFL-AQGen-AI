@@ -66,7 +66,7 @@ class IntelligentRouter:
     - 필요 시 LLM 사용한 쿼리 개선
     """
     
-    # 리트리버 활성화 판단용 트리거 키워드 (ON/OFF 스위치)
+    # 리트리버 활성화 판단용 트리거 키워드 기반
     VOCABULARY_TRIGGERS = {
         "단어", "어휘", "vocabulary", "word", "voca", "TOPIK",
         "명사", "동사", "형용사", "부사"
@@ -79,7 +79,10 @@ class IntelligentRouter:
     KPOP_TRIGGERS = {
         "케이팝", "kpop", "k-pop", "가사", "lyrics", "노래", "song",
         "아이돌", "idol", "음악", "music",
-        "bts", "blackpink", "뉴진스", "newjeans", "아이브", "ive"
+        "bts", "blackpink", "뉴진스", "newjeans", "아이브", "ive",
+        # 한글 그룹명 추가
+        "방탄소년단", "블랙핑크", "트와이스", "르세라핌", "에스파",
+        "세븐틴", "스트레이키즈", "엑소", "레드벨벳", "걸그룹", "보이그룹"
     }
     
     def __init__(self, llm=None):
@@ -110,8 +113,8 @@ class IntelligentRouter:
         strategies = []
         reasons = []
         
-        # 1. Vocabulary Retriever Activation
-        # 무조건 활성화
+        # 1. 단어 리트리버 활성화
+
         vocab_query = self._extract_vocab_query(query, topic, difficulty)
         strategies.append(SearchStrategy(
             retriever_type=RetrieverType.VOCABULARY,
@@ -121,7 +124,7 @@ class IntelligentRouter:
         ))
         reasons.append(f"Vocabulary search (query: '{vocab_query}', level: {difficulty})")
         
-        # 2. Grammar Retriever Activation
+       
         # 문법 관련 키워드가 있을 때만 활성화
         if self._should_activate_grammar(query_lower, topic_lower):
             grammar_query = self._extract_grammar_query(query, topic, difficulty)
@@ -133,10 +136,11 @@ class IntelligentRouter:
             ))
             reasons.append(f"Grammar search (query: '{grammar_query}', level: {difficulty})")
         
-        # 3. K-pop Retriever Activation (DB only)
+       
         # K-pop 관련 내용이 쿼리에 있을 때만 활성화
-        if self._should_activate_kpop(query_lower, topic_lower):
-            kpop_query = self._extract_kpop_query(query, topic)
+        # query_analysis의 needs_kpop도 확인
+        if self._should_activate_kpop(query_lower, topic_lower, query_analysis):
+            kpop_query = self._extract_kpop_query(query, topic, query_analysis)
             strategies.append(SearchStrategy(
                 retriever_type=RetrieverType.KPOP,
                 query=kpop_query,
@@ -145,7 +149,7 @@ class IntelligentRouter:
             ))
             reasons.append(f"K-pop search (DB only, query: '{kpop_query}')")
         
-        # Sort by priority
+        # 중요도 순 정렬화
         strategies.sort(key=lambda x: x.priority)
         
         reasoning = " | ".join(reasons)
@@ -177,12 +181,32 @@ class IntelligentRouter:
             return True
         return False
     
-    def _should_activate_kpop(self, query: str, topic: str) -> bool:
-        """K-pop 리트리버 활성화 여부 확인"""
-        if any(kw in query for kw in self.KPOP_TRIGGERS):
+    def _should_activate_kpop(self, query: str, topic: str, query_analysis: Optional[Dict] = None) -> bool:
+        """
+        K-pop 리트리버 활성화 여부 확인
+        - query_analysis의 needs_kpop 우선 확인
+        - 키워드 매칭도 확인
+        """
+        # 1. query_analysis의 needs_kpop 우선 확인 (가장 정확)
+        if query_analysis:
+            needs_kpop = query_analysis.get('needs_kpop', False)
+            if needs_kpop:
+                return True
+            
+            # kpop_filters에 그룹이 있으면 활성화
+            kpop_filters = query_analysis.get('kpop_filters', {})
+            if kpop_filters.get('groups'):
+                return True
+        
+        # 2. 키워드 매칭 확인
+        query_lower = query.lower()
+        topic_lower = topic.lower()
+        
+        if any(kw in query_lower for kw in self.KPOP_TRIGGERS):
             return True
-        if any(kw in topic for kw in self.KPOP_TRIGGERS):
+        if any(kw in topic_lower for kw in self.KPOP_TRIGGERS):
             return True
+        
         return False
     
     def _extract_vocab_query(self, query: str, topic: str, difficulty: str) -> str:
@@ -211,15 +235,30 @@ class IntelligentRouter:
         
         return f"{query[:20]} {difficulty}"
     
-    def _extract_kpop_query(self, query: str, topic: str) -> str:
-        """K-pop 검색용 최적화된 쿼리 생성"""
+    def _extract_kpop_query(self, query: str, topic: str, query_analysis: Optional[Dict] = None) -> str:
+        """
+        K-pop 검색용 최적화된 쿼리 생성
+        query_analysis의 kpop_filters에서 그룹명 우선 추출
+        """
+        # 1. query_analysis에서 그룹명 추출 (가장 정확)
+        if query_analysis:
+            kpop_filters = query_analysis.get('kpop_filters', {})
+            groups = kpop_filters.get('groups', [])
+            if groups:
+                # 첫 번째 그룹명 사용
+                return f"{groups[0]} 한국어 학습"
+        
+        # 2. 키워드 매칭
+        query_lower = query.lower()
         for kw in self.KPOP_TRIGGERS:
-            if kw in query.lower():
+            if kw in query_lower:
                 return f"{kw} 한국어 학습"
         
+        # 3. topic 사용
         if topic:
             return f"{topic} K-pop"
         
+        # 4. 기본값
         return "K-pop 한국어"
     
     def _calculate_confidence(

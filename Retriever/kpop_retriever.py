@@ -126,11 +126,31 @@ class KpopSentenceRetriever:
     def _match_groups_by_query(self, query: str) -> List[Tuple[str, float]]:
         """
         질의 임베딩과 그룹명 임베딩을 비교해 유사도 순으로 정렬 반환
+        한글 그룹명도 더 잘 인식하도록 개선
         """
         if not self.group_name_index:
             return []
         try:
-            qv = np.array(self.embeddings.embed_query(query), dtype=np.float32)
+            # 쿼리에서 그룹명 관련 부분만 추출 시도
+            query_for_matching = query
+            
+            # 한글 그룹명 패턴 감지 (방탄소년단, 블랙핑크, 트와이스 등)
+            import re
+            korean_group_patterns = [
+                r'방탄소년단', r'블랙핑크', r'트와이스', r'아이브', r'뉴진스',
+                r'르세라핌', r'에스파', r'세븐틴', r'스트레이키즈', r'엑소',
+                r'레드벨벳', r'아이들', r'있지', r'에이핑크', r'마마무'
+            ]
+            
+            for pattern in korean_group_patterns:
+                if re.search(pattern, query):
+                    # 패턴이 발견되면 해당 부분만 사용
+                    match = re.search(pattern, query)
+                    if match:
+                        query_for_matching = match.group(0)
+                        break
+            
+            qv = np.array(self.embeddings.embed_query(query_for_matching), dtype=np.float32)
             scored = []
             for name, vec in self.group_name_index.items():
                 sim = self._cosine_sim(qv, vec)
@@ -142,7 +162,7 @@ class KpopSentenceRetriever:
 
     def invoke(self, query: str, level: str = None) -> List[Document]:
         """
-        질의 -> 그그룹명 임베딩 매칭으로 타깃 그룹 선별
+        질의 -> 그룹명 임베딩 매칭으로 타깃 그룹 선별
         임계치 이상이면 해당 그룹 문서만 반환
         실패시 일반 FAISS 검색 + 상위 20 랜덤 10 
         """
@@ -157,10 +177,14 @@ class KpopSentenceRetriever:
             ranked = self._match_groups_by_query(query)
             selected_groups = []
             if ranked:
-                # 상위 k개 중 임계치 이상인 것만 채택
-                for name, score in ranked[:self.group_match_topk]:
-                    if score >= self.group_match_threshold:
+                # 상위 3개까지 확인하고, 임계치보다 약간 낮아도 상위 1위면 채택
+                for i, (name, score) in enumerate(ranked[:3]):
+                    if i == 0 and score >= 0.60:  # 상위 1위는 임계치를 0.60으로 낮춤
                         selected_groups.append(name)
+                    elif score >= self.group_match_threshold:  # 나머지는 기존 임계치
+                        selected_groups.append(name)
+                    if len(selected_groups) >= self.group_match_topk:
+                        break
 
             # 타깃 그룹이 있으면 그 문서만 반환
             if selected_groups:

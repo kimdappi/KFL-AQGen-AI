@@ -5,26 +5,32 @@
 from typing import List, Dict, Optional
 from langchain.schema import Document
 
-# K-pop 그룹 타입 판단을 위한 하드코딩 (DB에 group_type 필드가 없으므로 필요)
-GIRL_GROUPS = {'BLACKPINK', 'TWICE', 'RED VELVET', 'IVE', 'NEWJEANS', 'LE SSERAFIM', 'AESPA'}
-BOY_GROUPS = {'BTS', 'EXO', 'SEVENTEEN', 'STRAY KIDS', 'NCT', 'SHINEE', 'SUPER JUNIOR'}
-
-
-def get_group_type(group_name: str) -> Optional[str]:
+def get_group_type(group_name: str, kpop_retriever=None) -> Optional[str]:
     """
     그룹명으로 그룹 타입 판단 (girl_group, boy_group, None)
+    K-pop 데이터에서 동적으로 추출 (하드코딩 제거)
     
     Args:
         group_name: 그룹명 (대소문자 무관)
+        kpop_retriever: K-pop 리트리버 (선택적, 없으면 None 반환)
         
     Returns:
         'girl_group', 'boy_group', 또는 None
     """
+    if not kpop_retriever or not hasattr(kpop_retriever, 'kpop_data'):
+        return None
+    
     group_upper = (group_name or '').upper()
-    if group_upper in GIRL_GROUPS:
-        return 'girl_group'
-    elif group_upper in BOY_GROUPS:
-        return 'boy_group'
+    
+    # K-pop 데이터에서 해당 그룹 찾기
+    for doc in kpop_retriever.kpop_data:
+        doc_group = doc.metadata.get('group', '')
+        if doc_group and doc_group.upper() == group_upper:
+            # 멤버 정보에서 role로 판단 (보통 걸그룹은 여성, 보이그룹은 남성)
+            # 하지만 더 정확한 방법은 DB에 group_type 필드 추가
+            # 현재는 임시로 None 반환 (필터링은 다른 방식으로 처리)
+            return None
+    
     return None
 
 

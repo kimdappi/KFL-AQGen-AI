@@ -3,18 +3,17 @@ LangGraph 노드 정의 (개선된 재생성 로직 - 간결 버전)
 """
 from typing import List, Dict, Any
 
-from langchain.chat_models import ChatOpenAI
+from langchain_openai import ChatOpenAI
 from Ragsystem.schema import GraphState
 from utils import (
     extract_words_from_docs,
     extract_grammar_with_grade,
-    get_group_type,
 )
 from config import LLM_CONFIG
 from agents import QueryAnalysisAgent, QualityCheckAgent
 
 
-#기본 RAG 노드
+# 기본 RAG 노드
 class KoreanLearningNodes:
     """한국어 학습 노드 클래스"""
 
@@ -43,8 +42,7 @@ class KoreanLearningNodes:
         return {"grammar_docs": grammar_docs}
 
 
-
-#Agentic RAG 노드 - 쿼리 분석
+# Agentic RAG 노드 - 쿼리 분석
 class AgenticKoreanLearningNodes(KoreanLearningNodes):
     """Agentic RAG 노드 - 리트리버 정보 기반 자연스러운 3문장 생성 (간결 버전)"""
 
@@ -54,7 +52,7 @@ class AgenticKoreanLearningNodes(KoreanLearningNodes):
         self.query_agent = QueryAnalysisAgent(llm, kpop_retriever=kpop_retriever)
         self.quality_agent = QualityCheckAgent(llm)
 
-    #Agents Nodes 
+    # Agents Nodes
 
     def analyze_query_agent(self, state: GraphState) -> GraphState:
         """쿼리 분석 에이전트 노드"""
@@ -115,39 +113,60 @@ class AgenticKoreanLearningNodes(KoreanLearningNodes):
         kpop_docs,
     ):
         """
-        K-pop 문서에서 메타데이터 추출
-        주의: 필터링은 이미 retrieve_kpop_routed에서 벡터 기반 검색과 메타데이터 필터링으로 완료됨
-        이 함수는 단순히 메타데이터를 추출하여 구조화된 형태로 변환하는 역할만 수행
+        K-pop 문서에서 메타데이터 추출 및 통합
+        - 같은 그룹의 문서가 여러 개 있어도 그룹별로 통합하여 중복 제거
+        - 모든 멤버, 소속사, 팬덤, 컨셉 등 풍부한 정보 포함
         """
         kpop_metadata: List[Dict[str, Any]] = []
 
         if not kpop_docs:
             return kpop_metadata
 
-        # 이미 필터링된 문서들에서 메타데이터만 추출 (최대 5개)
-        for doc in kpop_docs[:5]:
+        # 그룹별로 정보 통합 (중복 제거)
+        groups_dict = {}
+        
+        for doc in kpop_docs:
             meta = doc.metadata
             group = meta.get("group", "")
             if not group:
                 continue
-
-            # 전체 그룹 정보를 하나의 메타데이터로 저장 (모든 정보 포함)
-            full_meta = {
-                "group": group,
-                "agency": meta.get("agency", ""),
-                "fandom": meta.get("fandom", ""),
-                "concepts": meta.get("concepts", []),
-                "members": [
-                    {
-                        "name": m.get("name", ""),
-                        "role": m.get("role", ""),
-                    }
-                    for m in meta.get("members", [])  # 모든 멤버 포함
-                ],
-            }
-            kpop_metadata.append(full_meta)
-
-        return kpop_metadata
+            
+            # 이미 해당 그룹 정보가 있으면 통합, 없으면 새로 추가
+            if group not in groups_dict:
+                groups_dict[group] = {
+                    "group": group,
+                    "agency": meta.get("agency", ""),
+                    "fandom": meta.get("fandom", ""),
+                    "concepts": list(set(meta.get("concepts", []))),  # 중복 제거
+                    "members": {}  # 멤버별로 중복 제거하기 위해 dict 사용
+                }
+            
+            # 멤버 정보 통합 (중복 제거)
+            members = meta.get("members", [])
+            for m in members:
+                if isinstance(m, dict):
+                    member_name = m.get("name", "")
+                    if member_name and member_name not in groups_dict[group]["members"]:
+                        groups_dict[group]["members"][member_name] = {
+                            "name": member_name,
+                            "role": m.get("role", ""),
+                        }
+            
+            # 컨셉 통합 (중복 제거)
+            concepts = meta.get("concepts", [])
+            if concepts:
+                existing_concepts = set(groups_dict[group]["concepts"])
+                existing_concepts.update(concepts)
+                groups_dict[group]["concepts"] = list(existing_concepts)
+        
+        # 그룹별 정보를 리스트로 변환 (멤버는 리스트로)
+        for group_info in groups_dict.values():
+            group_info["members"] = list(group_info["members"].values())
+            kpop_metadata.append(group_info)
+        
+        # 그룹이 지정된 경우: 해당 그룹만 반환 (보통 1개)
+        # 그룹이 지정되지 않은 경우: 최대 5개 그룹 반환
+        return kpop_metadata[:5]
 
     def generate_question_directly(self, state: GraphState) -> GraphState:
         """
@@ -187,7 +206,7 @@ class AgenticKoreanLearningNodes(KoreanLearningNodes):
             kpop_metadata = self._process_kpop_docs_enhanced(
                 state.get("kpop_docs", []),
             )
-            kpop_metadata = kpop_metadata[:5]  # 최대 5개로 증가
+            # 그룹별로 통합된 정보 반환 (그룹이 지정되면 1개, 미지정 시 최대 5개)
             
             # 실제 추출된 정보 확인
             extracted_groups = set([m.get("group", "") for m in kpop_metadata])

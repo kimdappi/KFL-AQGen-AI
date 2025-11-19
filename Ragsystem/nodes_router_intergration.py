@@ -144,18 +144,16 @@ class RouterIntegratedNodes(AgenticKoreanLearningNodes):
         
         # DB 검색만 수행
         db_limit = strategy.params.get("db_limit", 5)
-        kpop_db_docs = self.kpop_retriever.invoke(strategy.query, level)
+        
         # 동적 필터링: kpop_filters 객체를 기반으로 모든 메타데이터 필드 필터링
         qa = state.get('query_analysis', {})
         kpop_filters = qa.get('kpop_filters', {}) if qa else {}
-        
-        filtered = []
-        filter_reasons = []
         
         # 필터링 조건이 있으면 적용
         has_filters = any([
             kpop_filters.get('groups'),
             kpop_filters.get('members'),
+            kpop_filters.get('member_roles'),
             kpop_filters.get('agencies'),
             kpop_filters.get('fandoms'),
             kpop_filters.get('concepts'),
@@ -163,17 +161,46 @@ class RouterIntegratedNodes(AgenticKoreanLearningNodes):
             kpop_filters.get('group_type')
         ])
         
+        # 필터링 조건이 있으면 그룹명을 직접 사용하여 검색 (더 정확)
+        if has_filters and kpop_filters.get('groups'):
+            # 그룹명이 있으면 해당 그룹 문서만 직접 가져오기
+            specified_groups = [g.strip() for g in kpop_filters['groups'] if g]
+            specified_groups_lower = {g.lower() for g in specified_groups}
+            print(f"   🔍 필터링 조건 감지: 그룹 {specified_groups}")
+            
+            # 모든 K-pop 데이터에서 지정된 그룹만 필터링 (대소문자 무시)
+            all_kpop_docs = self.kpop_retriever.kpop_data if hasattr(self.kpop_retriever, 'kpop_data') else []
+            kpop_db_docs = []
+            for doc in all_kpop_docs:
+                doc_group = (doc.metadata.get('group', '') or '').strip()
+                doc_group_lower = doc_group.lower()
+                # 정확 일치 확인 (대소문자 무시)
+                if doc_group in specified_groups or doc_group_lower in specified_groups_lower:
+                    kpop_db_docs.append(doc)
+            
+            print(f"   ✅ 그룹 필터링 결과: {len(kpop_db_docs)}개 문서 (그룹: {specified_groups})")
+        else:
+            # 필터링 조건이 없거나 그룹명이 없으면 일반 검색
+            kpop_db_docs = self.kpop_retriever.invoke(strategy.query, level)
+        
+        filtered = []
+        filter_reasons = []
+        
         if has_filters:
             for d in kpop_db_docs:
                 match = True
                 doc_reasons = []
                 
-                # 1. 그룹 필터링
+                # 1. 그룹 필터링 (대소문자 무시, 공백 제거)
                 if kpop_filters.get('groups'):
-                    g = (d.metadata.get('group', '') or '').lower()
-                    sg_set = {g.lower() for g in kpop_filters['groups']}
-                    if g in sg_set:
-                        doc_reasons.append(f"그룹: {d.metadata.get('group')}")
+                    doc_group = (d.metadata.get('group', '') or '').strip()
+                    doc_group_lower = doc_group.lower()
+                    specified_groups = [g.strip() for g in kpop_filters['groups'] if g]
+                    specified_groups_lower = {g.lower() for g in specified_groups}
+                    
+                    # 정확 일치 또는 부분 일치 확인
+                    if doc_group_lower in specified_groups_lower or doc_group in specified_groups:
+                        doc_reasons.append(f"그룹: {doc_group}")
                     else:
                         match = False
                         continue
@@ -186,6 +213,19 @@ class RouterIntegratedNodes(AgenticKoreanLearningNodes):
                     if member_match:
                         matched_members = [sm for sm in specified_members if sm in doc_member_names]
                         doc_reasons.append(f"멤버: {', '.join(matched_members)}")
+                    else:
+                        match = False
+                        continue
+                
+                # 2-1. 멤버 role 필터링 (래퍼, 보컬, 댄서, 리더 등)
+                if match and kpop_filters.get('member_roles'):
+                    doc_members = d.metadata.get('members', [])
+                    doc_roles = [m.get('role', '').lower() for m in doc_members if isinstance(m, dict) and m.get('role')]
+                    specified_roles = [r.lower() for r in kpop_filters['member_roles']]
+                    role_match = any(sr in doc_roles for sr in specified_roles)
+                    if role_match:
+                        matched_roles = [sr for sr in specified_roles if sr in doc_roles]
+                        doc_reasons.append(f"역할: {', '.join(matched_roles)}")
                     else:
                         match = False
                         continue
@@ -248,7 +288,7 @@ class RouterIntegratedNodes(AgenticKoreanLearningNodes):
                 # 7. 그룹 타입 필터링 (걸그룹/보이그룹)
                 if match and kpop_filters.get('group_type'):
                     group_name = d.metadata.get('group', '')
-                    doc_group_type = get_group_type(group_name)
+                    doc_group_type = get_group_type(group_name, self.kpop_retriever)
                     
                     if doc_group_type == kpop_filters['group_type']:
                         doc_reasons.append(f"타입: {kpop_filters['group_type']}")
@@ -267,9 +307,46 @@ class RouterIntegratedNodes(AgenticKoreanLearningNodes):
                     print(f"   🔍 필터링 적용: {', '.join(set(filter_reasons))}")
                 print(f"   ✅ 필터링 결과: {len(kpop_db_docs)}개 문서")
             else:
-                # 필터링 조건에 맞는 문서가 없으면 빈 리스트 반환 (정확도 보장)
-                kpop_db_docs = []
+                # 필터링 조건에 맞는 문서가 없으면 디버깅 정보 출력
                 print(f"   ⚠️ 필터링 조건에 맞는 문서를 찾을 수 없습니다.")
+                print(f"   📋 필터링 조건:")
+                if kpop_filters.get('groups'):
+                    print(f"      - 그룹: {kpop_filters['groups']}")
+                if kpop_filters.get('members'):
+                    print(f"      - 멤버: {kpop_filters['members']}")
+                if kpop_filters.get('member_roles'):
+                    print(f"      - 역할: {kpop_filters['member_roles']}")
+                if kpop_filters.get('agencies'):
+                    print(f"      - 소속사: {kpop_filters['agencies']}")
+                if kpop_filters.get('fandoms'):
+                    print(f"      - 팬덤: {kpop_filters['fandoms']}")
+                if kpop_filters.get('concepts'):
+                    print(f"      - 컨셉: {kpop_filters['concepts']}")
+                if kpop_filters.get('debut_year'):
+                    print(f"      - 데뷔 연도: {kpop_filters['debut_year']}")
+                if kpop_filters.get('group_type'):
+                    print(f"      - 그룹 타입: {kpop_filters['group_type']}")
+                print(f"   📊 검색된 문서 수: {len(kpop_db_docs)}개")
+                if kpop_db_docs:
+                    print(f"   📄 검색된 문서의 그룹: {[d.metadata.get('group', '') for d in kpop_db_docs[:5]]}")
+                
+                # 필터링 실패 시에도 원본 검색 결과를 반환 (최소한의 정보라도 제공)
+                # 단, 그룹 필터만 있는 경우는 빈 리스트 반환 (정확도 보장)
+                if kpop_filters.get('groups') and not any([
+                    kpop_filters.get('members'),
+                    kpop_filters.get('member_roles'),
+                    kpop_filters.get('agencies'),
+                    kpop_filters.get('fandoms'),
+                    kpop_filters.get('concepts'),
+                    kpop_filters.get('debut_year'),
+                    kpop_filters.get('group_type')
+                ]):
+                    # 그룹 필터만 있고 매칭 실패 → 빈 리스트
+                    kpop_db_docs = []
+                else:
+                    # 다른 필터도 있으면 원본 검색 결과 반환 (부분 매칭 허용)
+                    print(f"   ⚠️ 필터링 실패했지만 원본 검색 결과 {len(kpop_db_docs)}개 반환")
+                    kpop_db_docs = kpop_db_docs[:db_limit]
         else:
             # 필터링 조건이 없으면 토큰 기반 매칭
             raw_query = state.get('input_text', '')
@@ -294,10 +371,11 @@ class RouterIntegratedNodes(AgenticKoreanLearningNodes):
         # 최종적으로 최대 5개만 반환
         kpop_db_docs = kpop_db_docs[:db_limit]
         
-        # 검증: 반환되는 문서 정보 확인
+        # 검증: 반환되는 문서 정보 확인 및 그룹 필터 검증
         if has_filters:
             returned_groups = set()
             returned_members = set()
+            returned_roles = set()
             returned_agencies = set()
             returned_fandoms = set()
             returned_concepts = set()
@@ -309,8 +387,19 @@ class RouterIntegratedNodes(AgenticKoreanLearningNodes):
                 if g:
                     returned_groups.add(g)
                 
-                member_names = d.metadata.get('member_names', [])
-                returned_members.update([m.lower() for m in member_names])
+                # 멤버 role 추출
+                members = d.metadata.get('members', [])
+                for m in members:
+                    if isinstance(m, dict):
+                        role = m.get('role', '')
+                        if role:
+                            returned_roles.add(role.lower())
+                        debut = m.get('debut', '')
+                        if debut and len(debut) >= 4:
+                            try:
+                                returned_years.add(int(debut[:4]))
+                            except ValueError:
+                                pass
                 
                 agency = d.metadata.get('agency', '')
                 if agency:
@@ -323,25 +412,38 @@ class RouterIntegratedNodes(AgenticKoreanLearningNodes):
                 concepts = d.metadata.get('concepts', [])
                 returned_concepts.update([c.lower() for c in concepts if isinstance(c, str)])
                 
-                members = d.metadata.get('members', [])
-                for m in members:
-                    debut = m.get('debut', '')
-                    if debut and len(debut) >= 4:
-                        try:
-                            returned_years.add(int(debut[:4]))
-                        except ValueError:
-                            pass
-                
                 # 그룹 타입 추론
-                group_type = get_group_type(g)
+                group_type = get_group_type(g, self.kpop_retriever)
                 if group_type:
                     returned_types.add(group_type)
+            
+            # 그룹 필터가 있으면 반환된 그룹이 모두 필터 조건에 맞는지 검증
+            if kpop_filters.get('groups'):
+                specified_groups = [g.strip() for g in kpop_filters['groups'] if g]
+                specified_groups_lower = {g.lower() for g in specified_groups}
+                invalid_groups = []
+                for returned_group in returned_groups:
+                    returned_group_lower = returned_group.lower()
+                    if returned_group not in specified_groups and returned_group_lower not in specified_groups_lower:
+                        invalid_groups.append(returned_group)
+                
+                if invalid_groups:
+                    print(f"   ⚠️ 경고: 필터 조건에 맞지 않는 그룹이 포함됨: {invalid_groups}")
+                    # 필터 조건에 맞지 않는 그룹 제거
+                    kpop_db_docs = [d for d in kpop_db_docs 
+                                   if (d.metadata.get('group', '') in specified_groups or 
+                                       d.metadata.get('group', '').lower() in specified_groups_lower)]
+                    returned_groups = {g for g in returned_groups 
+                                     if (g in specified_groups or g.lower() in specified_groups_lower)}
+                    print(f"   ✅ 필터링 재적용: {len(kpop_db_docs)}개 문서만 반환 (그룹: {list(returned_groups)})")
             
             print(f"   ✅ DB 검색 완료: {len(kpop_db_docs)}개 K-pop 문장")
             if returned_groups:
                 print(f"   📋 반환된 그룹: {list(returned_groups)}")
             if returned_members:
                 print(f"   📋 반환된 멤버: {list(returned_members)[:5]}")
+            if returned_roles:
+                print(f"   📋 반환된 역할: {list(returned_roles)}")
             if returned_agencies:
                 print(f"   📋 반환된 소속사: {list(returned_agencies)}")
             if returned_fandoms:

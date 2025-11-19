@@ -90,75 +90,130 @@ KFL-AQGen-AI/
 
 **파일: `Ragsystem/graph_agentic_router.py`**
 
-#### 노드 1: `analyze_query`
-**파일: `agents.py` → `QueryAnalysisAgent.analyze()`**
+#### 그래프 구조 시각화
+
+실행 시 그래프 구조가 자동으로 출력됩니다. `graph.print_graph_structure()` 메서드로 언제든 확인 가능합니다.
+
+```
+Entry
+  │
+  ▼
+analyze_query ──┐
+  │             │
+  ▼             │
+routing ────────┘
+  │
+  ├─[활성화된 리트리버만 병렬 실행]─┐
+  │                                  │
+  ├─> retrieve_vocabulary ──────────┤
+  ├─> retrieve_grammar ──────────────┤ (병렬)
+  └─> retrieve_kpop ─────────────────┘
+  │
+  ▼ (모든 리트리버 완료 후 수렴)
+check_quality
+  │
+  ├─[sufficient]──────────┐
+  │                        │
+  └─[insufficient]        │
+     │                     │
+     ▼                     │
+  rerank ──────────────────┘
+     │                     │
+     └─> check_quality ────┘
+              │
+              ▼
+         generate
+              │
+              ▼
+      format_output
+              │
+              ▼
+            END
+```
+
+#### 노드 상세 설명
+
+**1️⃣ analyze_query** (`agents.py` → `QueryAnalysisAgent.analyze()`)
 - 쿼리 분석 (난이도, 주제, K-pop 필요성)
 - **동적 필터 조건 추출**: 그룹, 멤버, 소속사, 팬덤, 컨셉, 데뷔 연도, 그룹 타입
 - **임베딩 기반 그룹명 자동 매칭**: 하드코딩 없이 "아이브" → "IVE" 자동 변환
-- 출력: `query_analysis` (difficulty, topic, needs_kpop, kpop_filters)
+- 출력: `query_analysis`, `difficulty_level`
 
-#### 노드 2: `routing`
-**파일: `Ragsystem/nodes_router_intergration.py` → `routing_node()`**
-- **파일: `Ragsystem/router.py` → `IntelligentRouter.route()`**
+**2️⃣ routing** (`Ragsystem/router.py` → `IntelligentRouter.route()`)
 - 검색 전략 결정
   - **Vocabulary 리트리버**: 무조건 활성화
   - **Grammar 리트리버**: 문법 관련 키워드("문법", "패턴", "grammar", "pattern", "표현", "구조")가 있을 때만 활성화
   - **K-pop 리트리버**: K-pop 관련 내용이 쿼리에 있을 때만 활성화
-- 출력: `routing_decision` (strategies)
+- 출력: `routing_decision`, `search_strategies`
 
-#### 노드 3-5: 리트리버 실행 (순차)
-**파일: `Ragsystem/nodes_router_intergration.py`**
-
-**3-1. `retrieve_vocabulary`**
-- **파일: `Retriever/vocabulary_retriever.py` → `TOPIKVocabularyRetriever.invoke()`**
+**3️⃣ retrieve_vocabulary** (`Retriever/vocabulary_retriever.py`)
+- 어휘 검색 (항상 활성화)
+- **임베딩**: OpenAI `text-embedding-3-large`
+- **검색 방식**: Vector Search (0.6) + BM25 (0.4) 앙상블 → BGE Reranker 재정렬
+- **다양성 보장**: 쿼리 해시 기반 가중 랜덤 샘플링
+  - 같은 쿼리 → 같은 단어 (일관성)
+  - 다른 쿼리 → 다른 단어 (다양성)
 - 난이도별 TOPIK 단어 검색
   - `basic` (TOPIK 1-2): `data/words/TOPIK1.csv`, `TOPIK2.csv`
   - `intermediate` (TOPIK 3-4): `data/words/TOPIK3.csv`, `TOPIK4.csv`
   - `advanced` (TOPIK 5-6): `data/words/TOPIK5.csv`, `TOPIK6.csv`
-- 최대 5개 단어 추출 (자연스러운 문제 생성을 위해 증가)
+- **중복 방지**: 전역 최근 200개 + 쿼리별 최근 50개 제외
+- 최대 5개 단어 추출
 - 출력: `vocabulary_docs`
 
-**3-2. `retrieve_grammar`**
-- **파일: `Retriever/grammar_retriever.py` → `GrammarRetriever.invoke()`**
+**4️⃣ retrieve_grammar** (`Retriever/grammar_retriever.py`)
+- 문법 검색 (문법 관련 키워드 있을 때만 활성화)
+- **임베딩**: OpenAI `text-embedding-3-large`
+- **검색 방식**: Vector Search (0.6) + BM25 (0.4) 앙상블 → BGE Reranker 재정렬 (선택적)
+- **다양성 보장**: 실행 횟수 기반 랜덤 샘플링
+  - 같은 쿼리라도 매번 다른 문법 선택
 - 난이도별 문법 검색
   - `basic`: `data/grammar/grammar_list_A.json`
   - `intermediate`: `data/grammar/grammar_list_B.json`
   - `advanced`: `data/grammar/grammar_list_C.json`
-- 1개 문법 추출
+- **중복 방지**: 쿼리별 최근 50개 문법 제외
+- Grade 정렬 후 상위 50개 중 랜덤 샘플링
+- 최대 10개 문법 추출
 - 출력: `grammar_docs`
 
-**3-3. `retrieve_kpop`** (조건부)
-- **파일: `Retriever/kpop_retriever.py` → `KpopSentenceRetriever.invoke()`**
-- K-pop DB에서 그룹/멤버 정보 검색
-- 쿼리에 K-pop 키워드가 있을 때만 활성화
-- **동적 필터링**: 그룹, 멤버, 소속사, 팬덤, 컨셉, 데뷔 연도, 그룹 타입으로 필터링
-- **임베딩 기반 그룹명 매칭**: 임계치 0.75로 정확한 매칭
-- 최대 5개 정보 추출 (더 풍부한 컨텍스트 제공)
+**5️⃣ retrieve_kpop** (`Retriever/kpop_retriever.py`)
+- K-pop 검색 (K-pop 관련 키워드 있을 때만 활성화)
+- **임베딩**: OpenAI `text-embedding-3-large` (멀티링구얼)
+- **검색 방식**: 
+  1. 그룹명 임베딩 매칭 (우선) - 코사인 유사도, 임계치 0.75
+  2. 일반 FAISS 벡터 검색 (폴백)
+- **임베딩 기반 그룹명 매칭**: 한글/영어 자동 변환
+  - 예: "아이브" → "IVE" (유사도 0.85)
+  - 예: "블랙핑크" → "BLACKPINK" (유사도 0.88)
+- **동적 필터링**: 그룹, 멤버, **멤버 역할**, 소속사, 팬덤, 컨셉, 데뷔 연도, 그룹 타입으로 필터링
+- 최대 5개 정보 추출
 - 출력: `kpop_docs`
 
-#### 노드 6: `check_quality`
-**파일: `Ragsystem/nodes_router_intergration.py` → `check_quality_agent()`**
+**6️⃣ check_quality** (`Ragsystem/nodes_router_intergration.py` → `check_quality_agent()`)
 - 검색 결과 품질 검증
-- 기준: 어휘 5개 이상, 문법 1개 이상, K-pop 3개 이상(필요시)
+- 기준: 어휘 3개 이상, 문법 1개 이상, K-pop 3개 이상(필요시)
 - 출력: `quality_check` (sufficient 여부)
 
-#### 노드 7: `rerank` (조건부)
-**파일: `Ragsystem/nodes_router_intergration.py` → `rerank_node()`**
+**7️⃣ rerank** (조건부, `Ragsystem/nodes_router_intergration.py` → `rerank_node()`)
 - 품질 부족 시 재검색 (최대 1회)
-- 다시 `check_quality`로 이동
+- 부족한 리트리버만 재검색
+- `rerank_count` 증가 후 `check_quality`로 돌아감
 
-#### 노드 8: `generate`
-**파일: `Ragsystem/nodes.py` → `generate_question_directly()`**
+**8️⃣ generate** (`Ragsystem/nodes.py` → `generate_question_directly()`)
 - **문장 생성 없이 정보만 추출**
-- 단어 5개 추출 (난이도에 맞는 것, 자연스러운 문제 생성을 위해 증가)
-- 문법 1개 추출 (난이도에 맞는 것)
-- K-pop 정보 최대 5개 추출 (쿼리에 K-pop 관련이 있을 때만, 더 풍부한 컨텍스트 제공)
+- 단어 5개, 문법 1개, K-pop 정보 최대 5개 추출
 - **동적 필터링 적용**: kpop_filters 기반으로 필터링된 정보만 사용
 - 문제 생성용 payload 구성
-- 출력: `question_payload` (그래프 결과에서 직접 반환)
+- 출력: `question_payload`, `sentence_data`
 
-#### 노드 9: `format_output`
-**파일: `Ragsystem/nodes.py` → `format_output_agentic()`**
+**⚡ 병렬 실행 성능**
+
+리트리버들은 라우팅 결정 후 **병렬로 실행**됩니다:
+- **선형 실행**: 3개 리트리버 = 약 3초 (순차 실행)
+- **병렬 실행**: 3개 리트리버 = 약 1초 (가장 긴 것 기준)
+- **성능 향상**: 약 3배 빠른 실행 속도
+
+**9️⃣ format_output** (`Ragsystem/nodes.py` → `format_output_agentic()`)
 - 최종 출력 포맷팅
 - 출력: `final_output` (문자열)
 
@@ -346,28 +401,158 @@ output/final_v.1.json에 저장
   - 각 리트리버별 최적화된 쿼리 생성
   - 재검색 전략 결정
 
-### 🔍 데이터 처리
+### 🔍 리트리버 상세 설명
 
-#### `Retriever/vocabulary_retriever.py`
-- **`TOPIKVocabularyRetriever`**: TOPIK 어휘 검색
-- 난이도별 CSV 파일에서 단어 검색
-- MMR + BM25 앙상블 검색
-- 난이도 매핑:
-  - `basic` → TOPIK 1-2급
-  - `intermediate` → TOPIK 3-4급
-  - `advanced` → TOPIK 5-6급
+각 리트리버는 서로 다른 임베딩 및 정보 추출 방식을 사용합니다.
 
-#### `Retriever/grammar_retriever.py`
-- **`GrammarRetriever`**: 문법 패턴 검색
-- 난이도별 JSON 파일에서 문법 검색
-- 벡터 검색 + BM25 앙상블
+#### `Retriever/vocabulary_retriever.py` - 어휘 리트리버
 
-#### `Retriever/kpop_retriever.py`
-- **`KpopSentenceRetriever`**: K-pop 정보 검색
-- **임베딩 기반 그룹명 매칭**: 멀티링구얼 임베딩으로 한글/영어 자동 매칭
-- 그룹명 전용 임베딩 인덱스 (`group_name_index`) 구축
-- 임계치: 0.75 (정확한 매칭 보장)
-- 그룹, 멤버, 소속사, 팬덤, 컨셉 정보 추출
+**임베딩 방식:**
+- **모델**: OpenAI `text-embedding-3-large` (기본값)
+- **벡터 저장소**: FAISS (고속 유사도 검색)
+- **하이브리드 검색**: Vector Search (0.6) + BM25 (0.4) 앙상블
+  - Vector Search: 의미 기반 검색 (임베딩 유사도)
+  - BM25: 키워드 기반 검색 (TF-IDF)
+
+**정보 추출 방식:**
+1. **초기 후보 수집** (80개)
+   - 앙상블 리트리버로 넓게 후보 수집
+   - 중복 단어 제거 (`_dedup_by_word`)
+   - 전역 최근 단어 필터링 (최근 200개 제외)
+   - 쿼리별 최근 단어 필터링 (쿼리별 최근 50개 제외)
+
+2. **BGE Reranker 재정렬** (상위 30개)
+   - 모델: `BAAI/bge-reranker-v2-m3`
+   - 쿼리-문서 쌍을 직접 비교하여 관련성 점수 계산
+   - 의미적 관련성과 키워드 매칭을 모두 고려
+
+3. **난이도 필터링**
+   - 정확 매칭: 목표 난이도와 일치하는 단어 우선
+   - 근접 난이도: 정확 매칭 부족 시 인접 난이도 허용
+     - `basic` → `basic`, `intermediate`
+     - `intermediate` → `intermediate`, `basic`, `advanced`
+     - `advanced` → `advanced`, `intermediate`
+
+4. **쿼리 해시 기반 다양성 보장**
+   - 쿼리별 고유 시드 생성 (쿼리 해시 기반)
+   - 가중 랜덤 샘플링 (순위 기반 가중치: `1/(i+1)`)
+   - 같은 쿼리 → 같은 단어 선택 (일관성)
+   - 다른 쿼리 → 다른 단어 선택 (다양성)
+   - 예: "블랙핑크 관련 중급" vs "스트레이키즈 관련 중급" → 다른 단어 선택
+
+5. **최종 선택** (최대 5개)
+   - 실행 횟수 기반 시드로 매번 다른 결과 보장
+   - 쿼리별 최근 단어 캐시 업데이트
+
+**출력 형식:**
+```python
+Document(
+    page_content="단어: 회복\n품사: 명사\n설명: ...\nTOPIK 레벨: 3",
+    metadata={
+        'difficulty_level': 'intermediate',
+        'word': '회복',
+        'wordclass': '명사',
+        'guide': '...',
+        'topik_level': '3'
+    }
+)
+```
+
+#### `Retriever/grammar_retriever.py` - 문법 리트리버
+
+**임베딩 방식:**
+- **모델**: OpenAI `text-embedding-3-large` (기본값)
+- **벡터 저장소**: FAISS
+- **하이브리드 검색**: Vector Search (0.6) + BM25 (0.4) 앙상블
+  - Vector Search: 문법 패턴의 의미적 유사도 검색
+  - BM25: 문법 이름, 설명, 예문의 키워드 매칭
+
+**정보 추출 방식:**
+1. **초기 후보 수집** (50개)
+   - 앙상블 리트리버로 넓게 후보 수집
+
+2. **BGE Reranker 재정렬** (상위 30개, 선택적)
+   - 후보가 20개 이상일 때만 실행
+   - 쿼리-문법 관련성 향상
+
+3. **쿼리별 최근 문법 필터링**
+   - 쿼리별 최근 50개 문법 제외 (중복 방지)
+   - 캐시가 가득 차면 초기화 후 재검색
+
+4. **Grade 정렬**
+   - `grade` 필드 기준 오름차순 정렬
+   - 낮은 등급(1-2)부터 높은 등급(5-6) 순서
+
+5. **실행 횟수 기반 랜덤 샘플링**
+   - 쿼리 + 실행 횟수로 시드 생성
+   - 같은 쿼리라도 매번 다른 문법 선택
+   - 상위 50개 후보 중 랜덤 샘플링 (최대 10개)
+
+6. **쿼리별 최근 문법 캐시 업데이트**
+
+**출력 형식:**
+```python
+Document(
+    page_content="문법: -(으)면서\n등급: 3\n레벨: intermediate\n설명: ...\n예문: ...",
+    metadata={
+        'level': 'intermediate',
+        'grade': 3,
+        'grammar': '-(으)면서',
+        'level_code': 'intermediate',
+        'source': 'data/grammar/grammar_list_B.json'
+    }
+)
+```
+
+#### `Retriever/kpop_retriever.py` - K-pop 리트리버
+
+**임베딩 방식:**
+- **모델**: OpenAI `text-embedding-3-large` (멀티링구얼 지원)
+- **벡터 저장소**: FAISS (전체 문서 검색용)
+- **그룹명 전용 인덱스**: `group_name_index` (Dict[str, np.ndarray])
+  - 각 그룹명(영문)만 별도로 임베딩하여 저장
+  - 한글/영어 모두 같은 임베딩 공간에서 비교 가능
+
+**정보 추출 방식:**
+1. **그룹명 임베딩 매칭** (우선)
+   - 쿼리를 임베딩하여 그룹명 인덱스와 코사인 유사도 계산
+   - 임계치: **0.75** (정확한 매칭 보장)
+   - 상위 k개 중 임계치 이상인 그룹만 선택
+   - 예: "아이브" → "IVE" (유사도 0.85) ✅
+   - 예: "블랙핑크" → "BLACKPINK" (유사도 0.88) ✅
+
+2. **타깃 그룹 문서 필터링**
+   - 매칭된 그룹의 문서만 반환
+   - 랜덤 셔플 후 최대 10개 선택
+
+3. **폴백: 일반 벡터 검색**
+   - 그룹명 매칭 실패 시 FAISS 벡터 검색
+   - 상위 20개 중 랜덤 10개 선택
+
+**문서 구조:**
+```python
+Document(
+    page_content="K-pop Group: BLACKPINK\nAgency: YG Entertainment\nFandom: BLINK\nConcepts: girl crush, hip-hop, confidence\nMembers: Jisoo, Jennie, Rosé, Lisa\n그룹: BLACKPINK\n소속사: YG Entertainment\n팬덤: BLINK\n컨셉: 걸크러시, 힙합, 자신감",
+    metadata={
+        'group': 'BLACKPINK',
+        'agency': 'YG Entertainment',
+        'fandom': 'BLINK',
+        'concepts': ['girl crush', 'hip-hop', 'confidence'],
+        'debut': '2016-08-08',
+        'members': [
+            {'name': 'Jisoo', 'role': 'vocal', 'debut': '2016-08-08'},
+            {'name': 'Jennie', 'role': 'rapper', 'debut': '2016-08-08'},
+            ...
+        ],
+        'member_names': ['Jisoo', 'Jennie', 'Rosé', 'Lisa']
+    }
+)
+```
+
+**동적 필터링** (라우터 통합 노드에서 수행):
+- 그룹명, 멤버명, 멤버 역할, 소속사, 팬덤, 컨셉, 데뷔 연도, 그룹 타입으로 필터링
+- 여러 조건이 있으면 모두 만족하는 문서만 선택
+- 필터링 결과가 없으면 빈 리스트 반환 (정확성 보장)
 
 ### 🤖 AI 에이전트
 
@@ -395,15 +580,17 @@ output/final_v.1.json에 저장
 - **`generate_question_item()`**: 문제 생성
   - 문장이 필요한 유형: 유형별 맞춤 문장 생성
   - 문제 유형별 템플릿 사용
+  - **자연스러운 일상 문장 생성**: 학습 단어 억지 사용 금지, K-pop 정보 자연스럽게 활용
+  - **목표 문법 위치 명확화**: 문제 유형에 따라 필요한 위치에만 사용
 - **`create_korean_test_set()`**: 문제 세트 생성 (6개)
 
 **6가지 문제 유형**:
-1. `fill_in_blank`: 빈칸 채우기
-2. `match_and_connect`: 문장 연결하기
-3. `sentence_connection`: 문장 연결
-4. `sentence_creation`: 문장 생성
-5. `choice_completion`: 선택지 완성
-6. `dialogue_completion`: 대화 완성
+1. `fill_in_blank`: 빈칸 채우기 - 빈칸 부분에만 목표 문법 필요
+2. `match_and_connect`: 문장 연결하기 - 연결 부분에만 목표 문법 필요
+3. `sentence_connection`: 문장 연결 - 연결 부분에만 목표 문법 필요
+4. `sentence_creation`: 문장 생성 - 전체 문장에 목표 문법 필요
+5. `choice_completion`: 선택지 완성 - 선택지 중 정답에만 목표 문법 필요
+6. `dialogue_completion`: 대화 완성 - 빈칸 부분에만 목표 문법 필요
 
 ### ⚙️ 설정 및 유틸리티
 
@@ -540,6 +727,167 @@ python main_router.py
   ...
 ]
 ```
+
+## 🔬 리트리버 임베딩 및 정보 추출 방식 상세
+
+### 📚 Vocabulary Retriever (어휘 리트리버)
+
+#### 임베딩 파이프라인
+
+```
+CSV 파일 로드
+    ↓
+Document 생성 (단어, 품사, 설명, TOPIK 레벨)
+    ↓
+OpenAI Embeddings (text-embedding-3-large)
+    ↓
+FAISS 벡터 저장소 구축
+    ↓
+BM25 인덱스 구축
+    ↓
+앙상블 리트리버 생성 (Vector 0.6 + BM25 0.4)
+```
+
+#### 검색 프로세스
+
+1. **후보 수집** (80개)
+   - 앙상블 리트리버로 넓게 수집
+   - 중복 단어 제거
+   - 최근 단어 필터링 (전역 200개 + 쿼리별 50개)
+
+2. **BGE Reranker 재정렬** (상위 30개)
+   - Cross-encoder 방식으로 쿼리-문서 쌍 직접 비교
+   - 관련성 점수 계산 후 재정렬
+
+3. **난이도 필터링**
+   - 정확 매칭 우선, 근접 난이도 허용
+
+4. **쿼리 해시 기반 샘플링**
+   - 쿼리 해시로 시드 고정 → 같은 쿼리면 같은 단어
+   - 가중 랜덤 샘플링 (순위 기반 가중치)
+
+5. **최종 선택** (5개)
+   - 실행 횟수 기반 시드로 매번 다른 결과
+
+#### 정보 추출
+
+- **추출 필드**: `word`, `wordclass`, `guide`, `topik_level`
+- **메타데이터**: `difficulty_level`, `source`, `file_name`
+
+---
+
+### 📖 Grammar Retriever (문법 리트리버)
+
+#### 임베딩 파이프라인
+
+```
+JSON 파일 로드
+    ↓
+Document 생성 (문법, 등급, 레벨, 설명, 예문)
+    ↓
+OpenAI Embeddings (text-embedding-3-large)
+    ↓
+FAISS 벡터 저장소 구축
+    ↓
+BM25 인덱스 구축
+    ↓
+앙상블 리트리버 생성 (Vector 0.6 + BM25 0.4)
+```
+
+#### 검색 프로세스
+
+1. **후보 수집** (50개)
+   - 앙상블 리트리버로 넓게 수집
+
+2. **BGE Reranker 재정렬** (상위 30개, 선택적)
+   - 후보가 20개 이상일 때만 실행
+
+3. **쿼리별 최근 문법 필터링**
+   - 쿼리별 최근 50개 제외
+
+4. **Grade 정렬**
+   - 낮은 등급부터 높은 등급 순서
+
+5. **실행 횟수 기반 랜덤 샘플링**
+   - 쿼리 + 실행 횟수로 시드 생성
+   - 상위 50개 중 랜덤 선택 (최대 10개)
+
+#### 정보 추출
+
+- **추출 필드**: `grammar`, `grade`, `level_code`, `description`, `example`
+- **메타데이터**: `level`, `source`
+
+---
+
+### 🎵 K-pop Retriever (K-pop 리트리버)
+
+#### 임베딩 파이프라인
+
+```
+JSON 파일 로드
+    ↓
+Document 생성 (그룹, 소속사, 팬덤, 컨셉, 멤버 정보)
+    ↓
+OpenAI Embeddings (text-embedding-3-large, 멀티링구얼)
+    ↓
+FAISS 벡터 저장소 구축 (전체 문서 검색용)
+    ↓
+그룹명 전용 임베딩 인덱스 구축 (group_name_index)
+    ↓
+각 그룹명만 별도 임베딩하여 Dict[str, np.ndarray]로 저장
+```
+
+#### 검색 프로세스
+
+1. **그룹명 임베딩 매칭** (우선)
+   ```
+   쿼리 임베딩 생성
+       ↓
+   그룹명 인덱스와 코사인 유사도 계산
+       ↓
+   임계치 0.75 이상인 그룹 선택
+       ↓
+   해당 그룹 문서만 반환 (랜덤 셔플, 최대 10개)
+   ```
+
+2. **폴백: 일반 벡터 검색**
+   - 그룹명 매칭 실패 시 FAISS 벡터 검색
+   - 상위 20개 중 랜덤 10개
+
+#### 정보 추출
+
+- **추출 필드**: `group`, `agency`, `fandom`, `concepts`, `members`, `debut`
+- **멤버 정보**: `name`, `role`, `debut`
+- **메타데이터**: `source`, `member_names`
+
+#### 동적 필터링 (라우터 통합 노드에서 수행)
+
+필터링 조건이 있으면 다음 순서로 적용:
+
+1. **그룹명 필터**: `kpop_filters['groups']`
+2. **멤버명 필터**: `kpop_filters['members']`
+3. **멤버 역할 필터**: `kpop_filters['member_roles']` (래퍼, 보컬, 댄서, 리더)
+4. **소속사 필터**: `kpop_filters['agencies']`
+5. **팬덤 필터**: `kpop_filters['fandoms']`
+6. **컨셉 필터**: `kpop_filters['concepts']`
+7. **데뷔 연도 필터**: `kpop_filters['debut_year']`
+8. **그룹 타입 필터**: `kpop_filters['group_type']` (girl_group, boy_group)
+
+**필터링 로직**:
+- 여러 조건이 있으면 **모두 만족**하는 문서만 선택 (AND 조건)
+- 필터링 결과가 없으면 빈 리스트 반환 (정확성 보장)
+
+---
+
+### 🔄 리트리버 비교표
+
+| 리트리버 | 임베딩 모델 | 검색 방식 | Reranker | 다양성 보장 | 중복 방지 |
+|---------|------------|----------|----------|-----------|----------|
+| **Vocabulary** | text-embedding-3-large | Vector (0.6) + BM25 (0.4) | BGE Reranker | 쿼리 해시 기반 | 전역 200개 + 쿼리별 50개 |
+| **Grammar** | text-embedding-3-large | Vector (0.6) + BM25 (0.4) | BGE Reranker (선택적) | 실행 횟수 기반 | 쿼리별 50개 |
+| **K-pop** | text-embedding-3-large (멀티링구얼) | 그룹명 매칭 (우선) + FAISS (폴백) | 없음 | 랜덤 셔플 | 없음 |
+
+---
 
 ## 🔧 설정 (`config.py`)
 
