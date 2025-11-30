@@ -2,435 +2,951 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <title>문제집 생성 데모</title>
+  <title>KFL-AQGen-AI</title>
+
+  <!-- ✅ 웹폰트(CDN) — 화면에서만 사용됨 -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap"
+    rel="stylesheet"
+  />
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: #f5f7fb;
-      color: #222;
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      padding: 40px 16px;
-    }
-    .app {
-      width: 100%;
-      max-width: 960px;
-      background: #ffffff;
-      border-radius: 16px;
-      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.12);
-      padding: 24px 24px 32px;
-    }
-    .app-header {
-      margin-bottom: 20px;
-      border-bottom: 1px solid #e5e7eb;
-      padding-bottom: 12px;
-    }
-    .app-header h1 {
-      font-size: 1.4rem;
-      margin-bottom: 4px;
-    }
-    .app-header p {
-      font-size: 0.9rem;
-      color: #6b7280;
-    }
-    form {
-      margin-top: 16px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-    label {
-      font-size: 0.95rem;
-      margin-bottom: 6px;
-      display: block;
-    }
-    .input-wrapper {
-      flex: 1 1 260px;
-      min-width: 0;
-    }
-    input[type="text"] {
-      width: 100%;
-      padding: 10px 12px;
-      border-radius: 8px;
-      border: 1px solid #d1d5db;
-      font-size: 0.95rem;
-      outline: none;
-      transition: border-color 0.15s ease, box-shadow 0.15s ease;
-    }
-    input[type="text"]:focus {
-      border-color: #6366f1;
-      box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.3);
-    }
-    button {
-      padding: 10px 18px;
-      border-radius: 999px;
-      border: none;
-      background: #4f46e5;
-      color: #ffffff;
-      font-size: 0.95rem;
-      font-weight: 600;
-      cursor: pointer;
-      white-space: nowrap;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      transition: background 0.15s ease, transform 0.05s ease;
-    }
-    button:hover {
-      background: #4338ca;
-    }
-    button:active {
-      transform: scale(0.98);
-    }
-    button:disabled {
-      background: #9ca3af;
-      cursor: default;
-      transform: none;
-    }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
-    .status {
-      margin-top: 16px;
-      font-size: 0.88rem;
-      color: #6b7280;
-    }
+/* 밝은 하늘색 B2B 느낌 배경 */
+body {
+  font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    sans-serif;
+  background: linear-gradient(
+      135deg,
+      rgba(220, 242, 255, 0.9),
+      rgba(240, 248, 255, 1)
+    ),
+    #e0f2fe;
+  color: #111827;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 40px 16px;
+}
 
-    /* 로딩 오버레이 */
-    .loading-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(15, 23, 42, 0.18);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 999;
-      backdrop-filter: blur(2px);
-    }
-    .loading-box {
-      background: #ffffff;
-      padding: 24px 28px;
-      border-radius: 16px;
-      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.25);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
-      min-width: 220px;
-    }
-    .spinner {
-      width: 40px;
-      height: 40px;
-      border-radius: 999px;
-      border: 4px solid #e5e7eb;
-      border-top-color: #4f46e5;
-      animation: spin 0.9s linear infinite;
-    }
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
-    }
-    .loading-text {
-      font-size: 0.95rem;
-      text-align: center;
-      color: #374151;
-    }
-    .loading-sub {
-      font-size: 0.78rem;
-      color: #9ca3af;
-    }
+/* 메인 래퍼: 얇은 테두리 + 밝은 배경 */
+.app {
+  width: 100%;
+  max-width: 1080px;
+  background: #ffffff;
+  border-radius: 18px;
+  box-shadow: 0 18px 40px rgba(148, 163, 184, 0.35);
+  padding: 28px 32px 32px;
+  border: 1px solid #d4d4d8;
+}
 
-    /* 결과 영역 */
-    .results {
-      margin-top: 28px;
-    }
-    .results-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      margin-bottom: 12px;
-      border-bottom: 1px solid #e5e7eb;
-      padding-bottom: 6px;
-    }
-    .results-header h2 {
-      font-size: 1.05rem;
-    }
-    .results-header span {
-      font-size: 0.8rem;
-      color: #9ca3af;
-    }
+/* 헤더: 여유 있는 간격 */
+.app-header {
+  margin-bottom: 22px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #e5e7eb;
+}
+.app-header h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 6px;
+}
+.app-header p {
+  font-size: 0.92rem;
+  color: #4b5563;
+  line-height: 1.7;
+}
 
-    .query-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: #eef2ff;
-      color: #4338ca;
-      border-radius: 999px;
-      padding: 4px 10px;
-      font-size: 0.8rem;
-      margin-top: 4px;
-    }
+/* 시작 화면 안내 */
+.start-screen {
+  margin-top: 12px;
+}
+.start-screen-intro {
+  font-size: 0.9rem;
+  color: #475569;
+  margin-bottom: 14px;
+  line-height: 1.7;
+}
 
-    .problem-list {
-      margin-top: 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
+/* 폼 영역: 요소 사이 간격 넉넉하게 */
+form {
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: flex-end;
+}
+label {
+  font-size: 0.88rem;
+  margin-bottom: 6px;
+  display: block;
+  color: #334155;
+}
+.input-wrapper {
+  flex: 1 1 320px;
+  min-width: 0;
+}
 
-    .problem-card {
-      border-radius: 12px;
-      border: 1px solid #e5e7eb;
-      padding: 14px 16px;
-      background: #f9fafb;
-    }
-    .problem-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      margin-bottom: 8px;
-      gap: 6px;
-    }
-    .problem-title {
-      font-weight: 600;
-      font-size: 0.95rem;
-    }
-    .problem-meta {
-      font-size: 0.75rem;
-      color: #9ca3af;
-      text-transform: uppercase;
-    }
-    .problem-label {
-      display: inline-flex;
-      align-items: center;
-      font-size: 0.75rem;
-      border-radius: 999px;
-      padding: 2px 8px;
-      background: #eef2ff;
-      color: #4f46e5;
-    }
+/* 텍스트 입력 */
+input[type='text'] {
+  width: 100%;
+  padding: 11px 13px;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  font-size: 0.95rem;
+  outline: none;
+  background: #ffffff;
+  color: #111827;
+  transition: 0.15s ease;
+}
+input[type='text']::placeholder {
+  color: #9ca3af;
+}
+input[type='text']:focus {
+  border-color: #38bdf8;
+  box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.25);
+}
 
-    .problem-body {
-      font-size: 0.9rem;
-      color: #374151;
-      line-height: 1.5;
-      margin-top: 4px;
-      white-space: pre-line;
-    }
+/* 버튼 기본 */
+button {
+  padding: 10px 22px;
+  border-radius: 999px;
+  border: none;
+  background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+  color: #ffffff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.18s ease;
+}
+button:hover {
+  background: linear-gradient(135deg, #0ea5e9, #0284c7);
+}
+button:disabled {
+  background: #cbd5e1;
+  color: #64748b;
+  cursor: default;
+}
 
-    .problem-section-title {
-      margin-top: 8px;
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: #6b7280;
-    }
+/* 상태 텍스트 */
+.status {
+  margin-top: 10px;
+  font-size: 0.82rem;
+  color: #6b7280;
+}
 
-    ul {
-      margin-top: 4px;
-      margin-left: 18px;
-      font-size: 0.88rem;
-    }
-    li + li {
-      margin-top: 2px;
-    }
+/* 상단 툴바 */
+.toolbar {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin: 18px 0 10px;
+}
 
-    details {
-      margin-top: 8px;
-      font-size: 0.85rem;
-    }
-    details > summary {
-      cursor: pointer;
-      color: #4f46e5;
-      list-style: none;
-    }
-    details > summary::-webkit-details-marker {
-      display: none;
-    }
-    .answer-block {
-      margin-top: 4px;
-      padding: 6px 8px;
-      background: #f3f4ff;
-      border-radius: 8px;
-      font-size: 0.85rem;
-      color: #111827;
-      white-space: pre-line;
-    }
+/* 문제 풀기: 연한 아웃라인 버튼 */
+.toolbar button:first-child {
+  background: #f8fafc;
+  color: #1f2933;
+  border: 1px solid #cbd5e1;
+}
+.toolbar button:first-child:hover {
+  background: #e5f0fb;
+  border-color: #93c5fd;
+}
 
-    .error {
-      margin-top: 12px;
-      font-size: 0.85rem;
-      color: #b91c1c;
-    }
+/* PDF 추출: 초록 계열 */
+.toolbar button:last-child {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+}
+.toolbar button:last-child:hover {
+  background: linear-gradient(135deg, #16a34a, #15803d);
+}
 
-    @media (max-width: 640px) {
-      .app {
-        padding: 18px 14px 24px;
-      }
-      .app-header h1 {
-        font-size: 1.2rem;
-      }
-    }
-  </style>
+/* 로딩 오버레이 */
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(148, 163, 184, 0.3);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+  backdrop-filter: blur(3px);
+}
+.loading-box {
+  background: #ffffff;
+  padding: 24px 30px;
+  border-radius: 16px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.3);
+  text-align: center;
+}
+.spinner {
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  border: 4px solid #e5e7eb;
+  border-top-color: #38bdf8;
+  animation: spin 0.85s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.loading-text {
+  font-size: 0.95rem;
+  color: #0f172a;
+  margin-top: 10px;
+}
+.loading-sub {
+  font-size: 0.78rem;
+  color: #6b7280;
+  margin-top: 3px;
+}
+
+/* 결과 영역 헤더 */
+.results {
+  margin-top: 10px;
+}
+.results-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #e5e7eb;
+}
+.results-header h2 {
+  font-size: 1.05rem;
+  color: #0f172a;
+}
+.results-header span {
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+/* 쿼리칩 */
+.query-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #e0f2fe;
+  color: #075985;
+  border-radius: 999px;
+  padding: 4px 12px;
+  font-size: 0.8rem;
+  margin-top: 6px;
+  border: 1px solid #bae6fd;
+}
+
+/* 문제 리스트 */
+.problem-list {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 문제별 카드 (Rounded Rectangle + 여백 넉넉) */
+.problem-card {
+  position: relative;
+  padding: 36px 36px 40px;  /* ← 텍스트 확실히 안쪽으로 */
+  margin: 24px 0;
+  border-radius: 16px;
+  border: 1px solid #d4d4d8;
+  background: #ffffff;
+  box-shadow:
+    0 10px 22px rgba(148, 163, 184, 0.20),
+    0 0 0 1px rgba(203, 213, 225, 0.45);
+  line-height: 1.85;
+}
+
+/* 마지막 문항 아래 여백만 */
+.problem-card:last-child {
+  border-bottom: none;
+}
+
+/* 번호 + 제목 줄 */
+.problem-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+  padding-left: 4px;
+}
+
+/* 번호 동그라미 */
+.problem-badge {
+  min-width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  border: 1px solid #93c5fd;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-weight: 700;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 8px;
+}
+
+/* 문제 유형 이름 */
+.problem-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #111827;
+}
+.problem-meta {
+  font-size: 0.72rem;
+  color: #9ca3af;
+}
+
+/* 유형 라벨 */
+.problem-label {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.75rem;
+  border-radius: 999px;
+  padding: 5px 12px;
+  background: #e5f0ff;
+  color: #1d4ed8;
+  margin-bottom: 8px;
+  margin-left: 4px;
+}
+
+/* 본문 전체 간격 */
+.problem-body {
+  font-size: 0.92rem;
+  color: #111827;
+  line-height: 1.9;
+  margin-top: 8px;
+  padding: 0 4px;
+}
+
+/* 블록 공통 (지시문 / 보기 / 문항 / 대화 등) */
+.block {
+  border-radius: 12px;
+  padding: 18px 22px;  /* ← 카드 안에서도 꽤 안쪽 */
+  margin-top: 20px;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+}
+
+/* 블록 타입별 색감 */
+.block--instruction {
+  border-left: 3px solid #3b82f6;
+  background: #f3f4ff;
+}
+.block--example {
+  border-left: 3px solid #f97316;
+  background: #fff7ed;
+}
+.block--question {
+  border-left: 3px solid #22c55e;
+  background: #f0fdf4;
+}
+.block--options {
+  border-left: 3px solid #0ea5e9;
+  background: #f0f9ff;
+}
+.block--dialogue {
+  border-left: 3px solid #6366f1;
+  background: #eef2ff;
+}
+
+.block-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #4b5563;
+  margin-bottom: 6px;
+}
+.block-text {
+  font-size: 0.95rem;
+  color: #111827;
+  line-height: 1.85;
+  white-space: pre-line;
+  padding-left: 2px;
+}
+
+/* 보기 리스트 */
+.options-list {
+  list-style: none;
+  margin: 6px 0 0 0;
+  padding: 0;
+}
+.options-list li + li {
+  margin-top: 4px;
+}
+
+/* 보기 pill */
+.option-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid #bfdbfe;
+  background: #eff6ff;
+  font-size: 0.9rem;
+}
+.option-pill-index {
+  font-weight: 700;
+  color: #1d4ed8;
+}
+
+/* 대화 한 줄 스타일 */
+.dialogue-line {
+  margin-top: 2px;
+}
+.dialogue-speaker {
+  font-weight: 600;
+  margin-right: 4px;
+}
+
+/* 정답 입력 + 비교 칸 */
+.answer-area {
+  margin-top: 22px;
+  padding: 20px 24px;
+  border-radius: 14px;
+  border: 1px dashed #cbd5e1;
+  background: #f9fafb;
+  font-size: 0.86rem;
+  color: #374151;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.answer-area-column {
+  flex: 1 1 220px;
+  min-width: 0;
+}
+.answer-area-column--compare {
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 8px 10px;
+  border: 1px solid #e5e7eb;
+}
+.answer-area-label {
+  font-weight: 600;
+  margin-bottom: 6px;
+  font-size: 0.9rem;
+  color: #111827;
+}
+.answer-line {
+  border-bottom: 1px solid #d1d5db;
+  height: 20px;
+  margin-top: 6px;
+}
+.answer-multiline {
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  height: 70px;
+  margin-top: 6px;
+  background: #ffffff;
+}
+.answer-compare-text {
+  font-size: 0.86rem;
+  margin-top: 2px;
+  white-space: pre-line;
+  color: #111827;
+}
+
+/* details (정답·해설) */
+details {
+  margin-top: 10px;
+  font-size: 0.86rem;
+}
+details > summary {
+  cursor: pointer;
+  color: #2563eb;
+  list-style: none;
+}
+details > summary::before {
+  content: '⮟ ';
+  font-size: 0.75rem;
+}
+details[open] > summary::before {
+  content: '⮝ ';
+}
+details > summary::-webkit-details-marker {
+  display: none;
+}
+.answer-block {
+  margin-top: 6px;
+  padding: 14px 18px;
+  background: #f3f4f6;
+  border-radius: 12px;
+  font-size: 0.92rem;
+  color: #111827;
+  white-space: pre-line;
+  border: 1px solid #e5e7eb;
+}
+
+/* 에러 메시지 */
+.error {
+  margin-top: 12px;
+  font-size: 0.84rem;
+  color: #dc2626;
+}
+
+/* 인쇄용 (PDF) */
+@media print {
+  body {
+    background: #ffffff;
+    padding: 0;
+  }
+  .app {
+    background: #ffffff;
+    box-shadow: none;
+    border-radius: 0;
+    border: none;
+    padding: 18px 18px 24px;
+  }
+  .toolbar,
+  .loading-overlay,
+  #start-screen,
+  .error {
+    display: none !important;
+  }
+  .problem-card {
+    box-shadow: none;
+    border-radius: 0;
+    padding: 18px 0 18px;
+    border-bottom: 1px solid #d4d4d8;
+  }
+}
+
+/* 모바일에서 여백 살짝 줄이기 */
+@media (max-width: 640px) {
+  .app {
+    padding: 22px 18px 24px;
+  }
+  form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .problem-card {
+    padding: 24px 20px 28px;
+    margin: 18px 0;
+  }
+}
+/* 섹션 타이틀 (지시문, <보기>, ① 앞 문장들, ② 뒷 문장들 등) 공통 스타일 */
+.problem-section-title {
+  margin-top: 18px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #4b5563;
+  letter-spacing: 0.05em;
+}
+
+/* 맨 처음 섹션 타이틀(보통 '지시문')은 위 여백 조금만 */
+.problem-body > .problem-section-title:first-child {
+  margin-top: 6px;
+}
+
+/* 섹션 타이틀 바로 아래 오는 내용 박스를 카드처럼 */
+.problem-section-title + div,
+.problem-section-title + ul {
+  margin-top: 6px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+  font-size: 0.9rem;
+  line-height: 1.8;
+}
+
+/* 특히 ① 앞 문장들 / ② 뒷 문장들 리스트를 문제집처럼 정리 */
+.problem-section-title + ul {
+  list-style: decimal;
+  padding-left: 1.6rem;
+}
+.problem-section-title + ul li + li {
+  margin-top: 4px;
+}
+
+</style>
+
+  
 </head>
 <body>
   <div class="app">
     <div class="app-header">
-      <h1>JSON → 문제집 변환 데모</h1>
-      <p>1. 쿼리를 입력한 뒤 <strong>문제 생성</strong>을 누르면, 10초간 로딩 후 JSON 파일을 문제집 형태로 보여줍니다.</p>
+      <h1>KFL-AQGen-AI</h1>
     </div>
 
-    <form id="query-form">
-      <div class="input-wrapper">
-        <label for="query-input">쿼리를 입력하시오</label>
-        <input
-          type="text"
-          id="query-input"
-          placeholder="예) 블랙핑크 맞춤법 문제 생성"
-          autocomplete="off"
-        />
+    <!-- 시작 화면: 쿼리 입력 + 처음 시작 -->
+    <div class="start-screen" id="start-screen">
+      <div class="start-screen-intro">
+        원하는 주제나 키워드로 쿼리를 입력하고, '처음 시작' 버튼을 눌러
+        문제 생성을 시작하세요.
       </div>
-      <div>
-        <label style="visibility:hidden;">버튼</label>
-        <button type="submit" id="generate-btn">
-          문제 생성
-        </button>
-      </div>
-    </form>
-
-    <div class="status" id="status-text">
-      JSON 파일: <code>final_v.1.json</code> 을 사용합니다. (같은 폴더에 두어야 합니다.)
+      <form id="query-form">
+        <div class="input-wrapper">
+          <label for="query-input">쿼리를 입력하시오</label>
+          <input
+            type="text"
+            id="query-input"
+            placeholder="예) 아이브 중급 수준 문법 문제 생성"
+            autocomplete="off"
+          />
+        </div>
+        <div>
+          <label style="visibility: hidden">버튼</label>
+          <button type="submit" id="start-btn">처음 시작</button>
+        </div>
+      </form>
+      <div class="status">※ 쿼리 입력 시 문제가 생성됩니다.</div>
     </div>
 
-    <div class="results" id="results" style="display:none;">
-      <div class="results-header">
-        <h2>생성된 문제집</h2>
-        <span id="result-count"></span>
+    <!-- 문제 / PDF 화면 -->
+    <div id="workbook-screen" style="display: none">
+      <div class="toolbar">
+        <button type="button" id="solve-btn">문제 풀기</button>
+        <button type="button" id="pdf-btn">PDF 추출</button>
       </div>
-      <div id="query-chip-wrap"></div>
-      <div class="problem-list" id="problem-list"></div>
-    </div>
 
-    <div class="error" id="error-text" style="display:none;"></div>
+      <div class="results" id="results">
+        <div class="results-header">
+          <h2>생성된 문제집</h2>
+          <span id="result-count"></span>
+        </div>
+        <div id="query-chip-wrap"></div>
+        <div class="problem-list" id="problem-list"></div>
+      </div>
+
+      <div class="error" id="error-text" style="display: none"></div>
+    </div>
   </div>
 
   <!-- 로딩 오버레이 -->
   <div class="loading-overlay" id="loading-overlay">
     <div class="loading-box">
       <div class="spinner"></div>
-      <div class="loading-text">문제를 생성하고 있습니다...</div>
-      <div class="loading-sub">약 10초 정도 소요됩니다.</div>
+      <div class="loading-text">문제를 준비하고 있습니다...</div>
+      <div class="loading-sub">약 10초 정도 걸립니다.</div>
     </div>
   </div>
 
   <script>
-    const form = document.getElementById("query-form");
-    const queryInput = document.getElementById("query-input");
-    const generateBtn = document.getElementById("generate-btn");
-    const loadingOverlay = document.getElementById("loading-overlay");
-    const resultsEl = document.getElementById("results");
-    const problemListEl = document.getElementById("problem-list");
-    const resultCountEl = document.getElementById("result-count");
-    const errorTextEl = document.getElementById("error-text");
-    const queryChipWrap = document.getElementById("query-chip-wrap");
+    /***********************
+     * 1. DOM 레퍼런스
+     ***********************/
+    const startScreenEl = document.getElementById('start-screen');
+    const workbookScreenEl = document.getElementById('workbook-screen');
 
-    form.addEventListener("submit", (e) => {
+    const form = document.getElementById('query-form');
+    const queryInput = document.getElementById('query-input');
+    const startBtn = document.getElementById('start-btn');
+    const solveBtn = document.getElementById('solve-btn');
+    const pdfBtn = document.getElementById('pdf-btn');
+
+    const loadingOverlay = document.getElementById('loading-overlay');
+    const resultsEl = document.getElementById('results');
+    const problemListEl = document.getElementById('problem-list');
+    const resultCountEl = document.getElementById('result-count');
+    const errorTextEl = document.getElementById('error-text');
+    const queryChipWrap = document.getElementById('query-chip-wrap');
+
+    /***********************
+     * 2. 문제 JSON (final_v.1 기반, 데모용)
+     ***********************/
+    const QUESTIONS = [
+      {
+        schema_id: 'Q_generated_1',
+        format: 'fill_in_blank',
+        input: {
+          instruction:
+            '아이브는 스타쉽 엔터테인먼트 소속이며, 팬덤 다이브와 함께 우아함·자기 사랑·걸크러시 콘셉트를 보여 줍니다. 아래 문장들은 멤버 유진, 가을, 레이, 원영, 리즈, 이서의 활동과 관련된 예입니다. <보기>와 같이 괄호 안의 단어를 사용하여 문장을 완성하십시오.',
+          example: {
+            stem: '레이와 원영은 갈비탕을 같이 ___ . (먹다)',
+            answer: '먹어요'
+          },
+          stem_with_blank:
+            '아이브는 우아함과 걸크러시를 휴대폰으로 같이 ___ . ({hint})',
+          hint: '보여주다'
+        },
+        answer: {
+          completed_sentence:
+            '아이브는 우아함과 걸크러시를 휴대폰으로 같이 보여줘요.'
+        },
+        rationale:
+          '괄호 안의 기본형 ‘보여주다’를 해요체 현재 시제로 활용하면 ‘보여줘요’가 됩니다. 문맥상 아이브가 콘셉트를 드러내는 동작을 나타내므로 동사 활용이 적절합니다.'
+      },
+      {
+        schema_id: 'Q_generated_IVE_connect_001',
+        format: 'match_and_connect',
+        input: {
+          instruction:
+            '다음 절들을 연결하여 <보기>와 같이 하나의 문장을 만드십시오. 아래 절들은 스타쉽 엔터테인먼트 소속 그룹 아이브, 팬덤 다이브, 멤버 유진·가을·레이·원영(멤버 리즈·이서 포함), 그리고 아이브의 콘셉트인 걸크러시와 자기애와 관련된 내용입니다.',
+          example: {
+            clause_A: '가을과 레이가 헬스클럽에 가고',
+            clause_B: '걸크러시를 같이 느껴요',
+            connected:
+              '가을과 레이가 헬스클럽에 가고 걸크러시를 같이 느껴요.'
+          },
+          clause_set_A: [
+            '다이브가 헬스클럽에서 같이 운동하고',
+            '수업에서 대부분이 휴대폰을 끄고',
+            '스타쉽에서 대부분은 같이 회의하고',
+            '원영과 유진이 도서관에서 같이 공부하고'
+          ],
+          clause_set_B: [
+            '아이브 영상을 봐요',
+            '휴대폰을 정리해요',
+            '갈비탕을 먹어요',
+            '휴대폰을 꺼요'
+          ]
+        },
+        answer: {
+          connected_sentences: [
+            '다이브가 헬스클럽에서 같이 운동하고 갈비탕을 먹어요.',
+            '수업에서 대부분이 휴대폰을 끄고 아이브 영상을 봐요.',
+            '스타쉽에서 대부분은 같이 회의하고 휴대폰을 정리해요.',
+            '원영과 유진이 도서관에서 같이 공부하고 휴대폰을 꺼요.'
+          ]
+        },
+        rationale:
+          "각 문장은 동작의 나열을 나타내는 '-고'로 자연스럽게 이어집니다. 아이브(스타쉽 엔터테인먼트), 팬덤 다이브, 멤버(유진·가을·레이·원영)와 콘셉트(걸크러시, 자기애) 정보를 맥락으로 활용하되, 실제 연결은 입력 문장의 절만 분해·재조합하여 완성했습니다."
+      },
+      {
+        schema_id: 'Q_generated_1',
+        format: 'sentence_connection',
+        input: {
+          instruction:
+            "아이브는 스타쉽 엔터테인먼트 소속으로, 팬덤 이름은 다이브이며, 멤버는 유진·가을·레이·원영·리즈·이서이고 콘셉트는 우아함, 자기 사랑, 걸크러시입니다. 다음 두 문장을 <보기>와 같이 '-고'를 사용하여 한 문장으로 만드십시오.",
+          example: {
+            clause_A: '스타쉽 엔터테인먼트 소속이에요.',
+            clause_B: '대부분 같이 봐요.',
+            connected: '스타쉽 엔터테인먼트 소속이고 대부분 같이 봐요.'
+          },
+          clause_A: '우아한 아이브를 좋아해요.',
+          clause_B: '대부분 다이브랑 같이 응원해요.'
+        },
+        answer: {
+          connected_sentence:
+            '우아한 아이브를 좋아하고 대부분 다이브랑 같이 응원해요.'
+        },
+        rationale:
+          "'-고'는 두 동작이나 상태를 나열하거나 순차적으로 연결할 때 사용합니다. 서술어가 '이다'일 때는 '이고'가 됩니다. 따라서 '좋아해요'와 '응원해요'를 '-고'로 연결하여 자연스럽게 한 문장으로 만들 수 있습니다."
+      },
+      {
+        schema_id: 'Q_generated_choice_1',
+        format: 'choice_completion',
+        input: {
+          prompt:
+            '아이브(IVE)를 좋아하는 다이브 팬들이 스타쉽 엔터테인먼트 회사 앞에 모였어요. 무대는 우아함, 자기 사랑, 그리고 걸크러시 느낌이 있었어요. 유진, 가을, 레이, 원영, 리즈, 이서가 인사했어요. 팬들은 대부분 갈비탕을 먹고, 근처 헬스클럽 앞에서 기다렸어요. 이제 팬들은 멤버들과 ____ 휴대폰으로 사진을 찍고 싶어요.',
+          options: ['같이', '같아서', '같은', '같아']
+        },
+        answer: {
+          completed_sentence:
+            '아이브(IVE)를 좋아하는 다이브 팬들이 스타쉽 엔터테인먼트 회사 앞에 모였어요. 무대는 우아함, 자기 사랑, 그리고 걸크러시 느낌이 있었어요. 유진, 가을, 레이, 원영, 리즈, 이서가 인사했어요. 팬들은 대부분 갈비탕을 먹고, 근처 헬스클럽 앞에서 기다렸어요. 이제 팬들은 멤버들과 같이 휴대폰으로 사진을 찍고 싶어요.'
+        },
+        rationale:
+          "‘같이’는 ‘함께’라는 뜻의 부사로 동사 ‘찍다’를 자연스럽게 꾸며 ‘멤버들과 같이 사진을 찍고 싶어요’가 됩니다. ‘같아서’는 이유를 이끄는 연결 어미, ‘같은’은 관형사형, ‘같아’는 평서형 어미라서 이 자리에 맞지 않습니다."
+      },
+      {
+        schema_id: 'Q_generated_1',
+        format: 'dialogue_completion',
+        input: {
+          dialogue_with_missing_turns: [
+            {
+              speaker: 'A',
+              text: '헬스클럽 운동 끝났어요? 배고파요. 여기 식당에서 같이 갈비탕 먹을래요?'
+            },
+            {
+              speaker: 'B',
+              text: '좋아요, 갈비탕 좋아해요. 아까 헬스클럽에서 아이브 노래가 나왔어요. 저는 팬덤 다이브예요. 아이브는 ___ 소속이에요.'
+            },
+            {
+              speaker: 'A',
+              text: '맞아요. 멤버는 유진, 가을, 레이, 원영, 리즈, 이서예요. 컨셉은 우아함, 자기 사랑, 걸크러시예요. 지금 휴대폰으로 무대 볼까요? 저는 원영 무대가 좋아요. 리즈 무대도 좋아요.'
+            }
+          ]
+        },
+        answer: {
+          completed_dialogue: [
+            {
+              speaker: 'A',
+              text: '헬스클럽 운동 끝났어요? 배고파요. 여기 식당에서 같이 갈비탕 먹을래요?'
+            },
+            {
+              speaker: 'B',
+              text: '좋아요, 갈비탕 좋아해요. 아까 헬스클럽에서 아이브 노래가 나왔어요. 저는 팬덤 다이브예요. 아이브는 스타쉽 엔터테인먼트 소속이에요.'
+            },
+            {
+              speaker: 'A',
+              text: '맞아요. 멤버는 유진, 가을, 레이, 원영, 리즈, 이서예요. 컨셉은 우아함, 자기 사랑, 걸크러시예요. 지금 휴대폰으로 무대 볼까요? 저는 원영 무대가 좋아요. 리즈 무대도 좋아요.'
+            }
+          ]
+        },
+        rationale:
+          "B가 아이브의 소속사를 말하는 자리이므로 빈칸은 ‘스타쉽 엔터테인먼트’가 자연스럽습니다. 이어서 A가 멤버와 컨셉을 열거해 흐름이 매끄럽고, 기본 문법인 -예요/어요 체가 자연스럽게 사용되었습니다."
+      },
+      {
+        schema_id: 'Q_generated_1',
+        format: 'sentence_creation',
+        input: {
+          instruction:
+            '아이브(스타쉽 엔터테인먼트 소속)와 팬덤 다이브, 멤버(유진, 가을, 레이, 원영, 리즈, 이서)의 활동과 컨셉(우아함, 자기 사랑, 걸크러시)을 떠올리며, <보기>와 같이 제시된 표현을 모두 사용해 자연스럽고 문맥에 맞는 문장을 완성하십시오.',
+          example: {
+            cues: ['다이브', '휴대폰으로', '같이', '걸크러시를 응원하다'],
+            answer: '다이브는 휴대폰으로 같이 걸크러시를 응원해요.'
+          },
+          cues: ['레이와 원영', '휴대폰으로', '대부분 찍다']
+        },
+        answer: {
+          created_sentence: '레이와 원영은 휴대폰으로 대부분 찍어요.'
+        },
+        rationale:
+          '원문에서 핵심 표현(주어, 도구, 빈도, 동사)을 추출해 자연스럽게 결합하면 같은 의미의 문장을 재구성할 수 있습니다. 아이브의 멤버와 그룹의 컨셉·팬덤·소속사 정보는 지시문과 예시 맥락에 반영했습니다.'
+      }
+    ];
+
+    let lastQuestions = [];
+    let lastQuery = '';
+
+    /***********************
+     * 3. 시작 화면: 쿼리 입력 → (10초 로딩) → 문제 화면
+     ***********************/
+    form.addEventListener('submit', (e) => {
       e.preventDefault();
-      errorTextEl.style.display = "none";
-      const query = queryInput.value.trim();
+      errorTextEl.style.display = 'none';
 
+      const query = queryInput.value.trim();
       if (!query) {
-        errorTextEl.textContent = "쿼리를 먼저 입력해 주세요.";
-        errorTextEl.style.display = "block";
+        errorTextEl.textContent = '쿼리를 먼저 입력해 주세요.';
+        errorTextEl.style.display = 'block';
         return;
       }
 
-      // 버튼 비활성 & 로딩 표시
-      generateBtn.disabled = true;
-      loadingOverlay.style.display = "flex";
+      startBtn.disabled = true;
+      loadingOverlay.style.display = 'flex';
 
-      // 10초 로딩 후 JSON 읽고 문제집으로 렌더링
       setTimeout(() => {
-        loadAndRenderWorkbook(query)
-          .catch((err) => {
-            console.error(err);
-            errorTextEl.textContent = "문제집을 생성하는 중 오류가 발생했습니다.";
-            errorTextEl.style.display = "block";
-          })
-          .finally(() => {
-            loadingOverlay.style.display = "none";
-            generateBtn.disabled = false;
-          });
+        lastQuestions = QUESTIONS;
+        lastQuery = query;
+
+        startScreenEl.style.display = 'none';
+        workbookScreenEl.style.display = 'block';
+
+        renderWorkbook(lastQuestions, lastQuery);
+
+        loadingOverlay.style.display = 'none';
+        startBtn.disabled = false;
       }, 10000);
     });
 
-    async function loadAndRenderWorkbook(query) {
-      // final_v.1.json을 fetch
-      const res = await fetch("../output/final_v.1.json");
-      if (!res.ok) {
-        throw new Error("JSON 파일을 불러올 수 없습니다.");
+    solveBtn.addEventListener('click', () => {
+      window.scrollTo({
+        top: workbookScreenEl.offsetTop,
+        behavior: 'smooth'
+      });
+    });
+
+    // ✅ PDF 추출: 인쇄 전에 모든 정답·해설(details)을 펼치고, 인쇄 후 원래대로 복구
+    pdfBtn.addEventListener('click', () => {
+      if (!lastQuestions || lastQuestions.length === 0) {
+        alert('먼저 문제를 준비해 주세요.');
+        return;
       }
-      const data = await res.json();
-      renderWorkbook(data, query);
-    }
 
+      const detailsEls = document.querySelectorAll('#problem-list details');
+      const previousState = Array.from(detailsEls).map((d) => d.open);
+
+      // 모든 정답·해설 펼치기
+      detailsEls.forEach((d) => {
+        d.open = true;
+      });
+
+      const afterPrintHandler = () => {
+        // 인쇄 후 이전 상태로 복구
+        detailsEls.forEach((d, i) => {
+          d.open = previousState[i];
+        });
+        window.removeEventListener('afterprint', afterPrintHandler);
+      };
+
+      window.addEventListener('afterprint', afterPrintHandler);
+
+      // 브라우저 인쇄 → 사용자가 "PDF로 저장" 선택
+      window.print();
+    });
+
+    /***********************
+     * 4. 화면 렌더링
+     ***********************/
     function renderWorkbook(items, query) {
-      problemListEl.innerHTML = "";
+      problemListEl.innerHTML = '';
 
-      // 쿼리 표시
-      queryChipWrap.innerHTML = "";
-      const chip = document.createElement("div");
-      chip.className = "query-chip";
-      chip.innerHTML = `<span>입력한 쿼리</span><strong>${escapeHtml(query)}</strong>`;
-      queryChipWrap.appendChild(chip);
+      queryChipWrap.innerHTML = '';
+      if (query) {
+        const chip = document.createElement('div');
+        chip.className = 'query-chip';
+        chip.innerHTML = `<span>입력한 쿼리</span><strong>${escapeHtml(
+          query
+        )}</strong>`;
+        queryChipWrap.appendChild(chip);
+      }
 
       items.forEach((item, idx) => {
-        const card = document.createElement("article");
-        card.className = "problem-card";
+        const card = document.createElement('article');
+        // ✨ 문항별 스타일 클래스 부여
+        card.className = `problem-card q-style-${idx + 1}`;
 
-        const header = document.createElement("div");
-        header.className = "problem-header";
+        const header = document.createElement('div');
+        header.className = 'problem-header';
 
-        const title = document.createElement("div");
-        title.className = "problem-title";
-        title.textContent = `문항 ${idx + 1}. ${formatToKorean(item.format)}`;
+        const title = document.createElement('div');
+        title.className = 'problem-title';
 
-        const meta = document.createElement("div");
-        meta.className = "problem-meta";
-        meta.textContent = item.schema_id || "";
+        const badge = document.createElement('div');
+        badge.className = 'problem-badge';
+        badge.textContent = idx + 1;
+
+        const titleText = document.createElement('span');
+        titleText.textContent = `${formatToKorean(item.format)}`;
+
+        title.appendChild(badge);
+        title.appendChild(titleText);
+
+        const meta = document.createElement('div');
+        meta.className = 'problem-meta';
+        meta.textContent = item.schema_id || '';
 
         header.appendChild(title);
         header.appendChild(meta);
 
-        const body = document.createElement("div");
-        body.className = "problem-body";
+        const body = document.createElement('div');
+        body.className = 'problem-body';
 
-        // 유형 라벨
-        const label = document.createElement("span");
-        label.className = "problem-label";
+        const label = document.createElement('span');
+        label.className = 'problem-label';
         label.textContent = formatToLabel(item.format);
         body.appendChild(label);
 
-        // 유형별로 문제 텍스트 구성
-        const typeBlock = document.createElement("div");
-        typeBlock.style.marginTop = "6px";
+        const typeBlock = document.createElement('div');
+        typeBlock.style.marginTop = '6px';
         typeBlock.appendChild(buildProblemBodyByFormat(item));
         body.appendChild(typeBlock);
 
-        // 정답/해설
-        const details = document.createElement("details");
-        const summary = document.createElement("summary");
-        summary.textContent = "정답 · 해설 보기";
+        const details = document.createElement('details');
+        const summary = document.createElement('summary');
+        summary.textContent = '정답 · 해설 보기';
         details.appendChild(summary);
 
-        const answerBlock = document.createElement("div");
-        answerBlock.className = "answer-block";
+        const answerBlock = document.createElement('div');
+        answerBlock.className = 'answer-block';
         answerBlock.textContent = buildAnswerText(item);
         details.appendChild(answerBlock);
 
@@ -442,89 +958,89 @@
       });
 
       resultCountEl.textContent = `총 ${items.length}문항`;
-      resultsEl.style.display = "block";
+      resultsEl.style.display = 'block';
     }
 
     function formatToKorean(format) {
       switch (format) {
-        case "match_and_connect":
-          return "연결어미 사용하여 문장 만들기";
-        case "fill_in_blank":
-          return "빈칸 채우기";
-        case "choice_completion":
-          return "선택형 문장 완성";
-        case "dialogue_completion":
-          return "대화 완성";
-        case "sentence_connection":
-          return "문장 연결";
-        case "sentence_creation":
-          return "문장 만들기";
+        case 'match_and_connect':
+          return '연결어미 사용하여 문장 만들기';
+        case 'fill_in_blank':
+          return '빈칸 채우기';
+        case 'choice_completion':
+          return '선택형 문장 완성';
+        case 'dialogue_completion':
+          return '대화 완성';
+        case 'sentence_connection':
+          return '문장 연결';
+        case 'sentence_creation':
+          return '문장 만들기';
         default:
-          return format;
+          return format || '';
       }
     }
 
     function formatToLabel(format) {
       switch (format) {
-        case "match_and_connect":
-          return "문장 연결";
-        case "fill_in_blank":
-          return "빈칸";
-        case "choice_completion":
-          return "선택형";
-        case "dialogue_completion":
-          return "대화";
-        case "sentence_connection":
-          return "대조 구문";
-        case "sentence_creation":
-          return "문장 생성";
+        case 'match_and_connect':
+          return '문장 연결';
+        case 'fill_in_blank':
+          return '빈칸';
+        case 'choice_completion':
+          return '선택형';
+        case 'dialogue_completion':
+          return '대화';
+        case 'sentence_connection':
+          return '대조 구문';
+        case 'sentence_creation':
+          return '문장 생성';
         default:
-          return format;
+          return format || '';
       }
     }
 
     function buildProblemBodyByFormat(item) {
-      const container = document.createElement("div");
+      const container = document.createElement('div');
       const input = item.input || {};
 
-      if (item.format === "match_and_connect") {
-        const inst = document.createElement("div");
-        inst.className = "problem-section-title";
-        inst.textContent = "지시문";
-        const instText = document.createElement("div");
-        instText.textContent = input.instruction || "";
+      if (item.format === 'match_and_connect') {
+        const inst = document.createElement('div');
+        inst.className = 'problem-section-title';
+        inst.textContent = '지시문';
+        const instText = document.createElement('div');
+        instText.textContent = input.instruction || '';
         container.appendChild(inst);
         container.appendChild(instText);
 
         if (input.example) {
-          const exTitle = document.createElement("div");
-          exTitle.className = "problem-section-title";
-          exTitle.textContent = "<보기>";
-          const exBody = document.createElement("div");
-          exBody.textContent =
-            `${input.example.clause_A} / ${input.example.clause_B} → ` +
-            `${input.example.connected}`;
+          const exTitle = document.createElement('div');
+          exTitle.className = 'problem-section-title';
+          exTitle.textContent = '<보기>';
+          const exBody = document.createElement('div');
+          exBody.textContent = `${input.example.clause_A} / ${
+            input.example.clause_B
+          } → ${input.example.connected}`;
           container.appendChild(exTitle);
           container.appendChild(exBody);
         }
 
         if (input.clause_set_A && input.clause_set_B) {
-          const aTitle = document.createElement("div");
-          aTitle.className = "problem-section-title";
-          aTitle.textContent = "① 앞 문장들";
-          const aList = document.createElement("ul");
+          const aTitle = document.createElement('div');
+          aTitle.className = 'problem-section-title';
+          aTitle.textContent = '① 앞 문장들';
+          const aList = document.createElement('ul');
           input.clause_set_A.forEach((c) => {
-            const li = document.createElement("li");
+            const li = document.createElement('li');
             li.textContent = c;
             aList.appendChild(li);
           });
 
-          const bTitle = document.createElement("div");
-          bTitle.className = "problem-section-title";
-          bTitle.textContent = "② 뒷 문장들";
-          const bList = document.createElement("ul");
+          const bTitle = document.createElement('div');
+          bTitle.className = 'problem-section-title';
+          bTitle.textContent = '② 뒷 문장들';
+          const bList = document.createElement('ul');
           input.clause_set_B.forEach((c) => {
-            const li = document.createElement("li");
+            const li = document.createElement('li');
             li.textContent = c;
             bList.appendChild(li);
           });
@@ -534,139 +1050,144 @@
           container.appendChild(bTitle);
           container.appendChild(bList);
         }
-      } else if (item.format === "fill_in_blank") {
-        const inst = document.createElement("div");
-        inst.className = "problem-section-title";
-        inst.textContent = "지시문";
-        const instText = document.createElement("div");
-        instText.textContent = input.instruction || "";
+      } else if (item.format === 'fill_in_blank') {
+        const inst = document.createElement('div');
+        inst.className = 'problem-section-title';
+        inst.textContent = '지시문';
+        const instText = document.createElement('div');
+        instText.textContent = input.instruction || '';
         container.appendChild(inst);
         container.appendChild(instText);
 
         if (input.example) {
-          const exTitle = document.createElement("div");
-          exTitle.className = "problem-section-title";
-          exTitle.textContent = "<보기>";
-          const exBody = document.createElement("div");
-          exBody.textContent =
-            `${input.example.stem.replace("___", "＿＿＿")} (${input.example.answer})`;
+          const exTitle = document.createElement('div');
+          exTitle.className = 'problem-section-title';
+          exTitle.textContent = '<보기>';
+          const exBody = document.createElement('div');
+          exBody.textContent = `${input.example.stem.replace(
+            '___',
+            '＿＿＿'
+          )} (${input.example.answer})`;
           container.appendChild(exTitle);
           container.appendChild(exBody);
         }
 
-        const qTitle = document.createElement("div");
-        qTitle.className = "problem-section-title";
-        qTitle.textContent = "문항";
-        const stem = document.createElement("div");
-        const stemText = (input.stem_with_blank || "").replace(
-          "{hint}",
-          input.hint || ""
+        const qTitle = document.createElement('div');
+        qTitle.className = 'problem-section-title';
+        qTitle.textContent = '문항';
+        const stem = document.createElement('div');
+        const stemText = (input.stem_with_blank || '').replace(
+          '{hint}',
+          input.hint || ''
         );
-        stem.textContent = stemText.replace("{hint}", input.hint || "");
+        stem.textContent = stemText;
         container.appendChild(qTitle);
         container.appendChild(stem);
-      } else if (item.format === "choice_completion") {
-        const pTitle = document.createElement("div");
-        pTitle.className = "problem-section-title";
-        pTitle.textContent = "문항";
-        const prompt = document.createElement("div");
-        prompt.textContent = input.prompt || "";
+      } else if (item.format === 'choice_completion') {
+        const pTitle = document.createElement('div');
+        pTitle.className = 'problem-section-title';
+        pTitle.textContent = '문항';
+        const prompt = document.createElement('div');
+        prompt.textContent = input.prompt || '';
         container.appendChild(pTitle);
         container.appendChild(prompt);
 
         if (input.options) {
-          const optTitle = document.createElement("div");
-          optTitle.className = "problem-section-title";
-          optTitle.textContent = "보기";
-          const ul = document.createElement("ul");
+          const optTitle = document.createElement('div');
+          optTitle.className = 'problem-section-title';
+          optTitle.textContent = '보기';
+          const ul = document.createElement('ul');
           input.options.forEach((opt, i) => {
-            const li = document.createElement("li");
+            const li = document.createElement('li');
             li.textContent = `${i + 1}) ${opt}`;
             ul.appendChild(li);
           });
           container.appendChild(optTitle);
           container.appendChild(ul);
         }
-      } else if (item.format === "dialogue_completion") {
-        const dTitle = document.createElement("div");
-        dTitle.className = "problem-section-title";
-        dTitle.textContent = "다음 대화를 읽고 빈 칸에 들어갈 말을 쓰시오.";
+      } else if (item.format === 'dialogue_completion') {
+        const dTitle = document.createElement('div');
+        dTitle.className = 'problem-section-title';
+        dTitle.textContent =
+          '다음 대화를 읽고 빈 칸에 들어갈 말을 쓰시오.';
         container.appendChild(dTitle);
 
-        const dialogDiv = document.createElement("div");
+        const dialogDiv = document.createElement('div');
         const lines = input.dialogue_with_missing_turns || [];
         const text = lines
           .map((turn) => {
-            if (turn.speaker === "B") {
-              // 빈 칸 처리
-              return "B: ________";
+            if (turn.speaker === 'B') {
+              return 'B: ________';
             }
             return `${turn.speaker}: ${turn.text}`;
           })
-          .join("\n");
+          .join('\n');
         dialogDiv.textContent = text;
         container.appendChild(dialogDiv);
-      } else if (item.format === "sentence_connection") {
-        const inst = document.createElement("div");
-        inst.className = "problem-section-title";
-        inst.textContent = "지시문";
-        const instText = document.createElement("div");
-        instText.textContent = input.instruction || "";
+      } else if (item.format === 'sentence_connection') {
+        const inst = document.createElement('div');
+        inst.className = 'problem-section-title';
+        inst.textContent = '지시문';
+        const instText = document.createElement('div');
+        instText.textContent = input.instruction || '';
         container.appendChild(inst);
         container.appendChild(instText);
 
-        const exTitle = document.createElement("div");
-        exTitle.className = "problem-section-title";
-        exTitle.textContent = "<보기>";
-        const exBody = document.createElement("div");
+        const exTitle = document.createElement('div');
+        exTitle.className = 'problem-section-title';
+        exTitle.textContent = '<보기>';
+        const exBody = document.createElement('div');
         if (input.example) {
-          exBody.textContent =
-            `${input.example.clause_A} / ${input.example.clause_B} → ${input.example.connected}`;
+          exBody.textContent = `${input.example.clause_A} / ${
+            input.example.clause_B
+          } → ${input.example.connected}`;
         }
-        const qTitle = document.createElement("div");
-        qTitle.className = "problem-section-title";
-        qTitle.textContent = "문항";
-        const qBody = document.createElement("div");
+        const qTitle = document.createElement('div');
+        qTitle.className = 'problem-section-title';
+        qTitle.textContent = '문항';
+        const qBody = document.createElement('div');
         qBody.textContent =
-          (input.clause_A || "") + " / " + (input.clause_B || "");
+          (input.clause_A || '') + ' / ' + (input.clause_B || '');
         container.appendChild(exTitle);
         container.appendChild(exBody);
         container.appendChild(qTitle);
         container.appendChild(qBody);
-      } else if (item.format === "sentence_creation") {
-        const inst = document.createElement("div");
-        inst.className = "problem-section-title";
-        inst.textContent = "지시문";
-        const instText = document.createElement("div");
-        instText.textContent = input.instruction || "";
+      } else if (item.format === 'sentence_creation') {
+        const inst = document.createElement('div');
+        inst.className = 'problem-section-title';
+        inst.textContent = '지시문';
+        const instText = document.createElement('div');
+        instText.textContent = input.instruction || '';
         container.appendChild(inst);
         container.appendChild(instText);
 
         if (input.example) {
-          const exTitle = document.createElement("div");
-          exTitle.className = "problem-section-title";
-          exTitle.textContent = "<보기>";
-          const exBody = document.createElement("div");
-          exBody.textContent =
-            `${input.example.cues.join(" / ")} → ${input.example.answer}`;
+          const exTitle = document.createElement('div');
+          exTitle.className = 'problem-section-title';
+          exTitle.textContent = '<보기>';
+          const exBody = document.createElement('div');
+          exBody.textContent = `${input.example.cues.join(
+            ' / '
+          )} → ${input.example.answer}`;
           container.appendChild(exTitle);
           container.appendChild(exBody);
         }
 
-        const qTitle = document.createElement("div");
-        qTitle.className = "problem-section-title";
-        qTitle.textContent = "문항 (다음 핵심 표현을 활용하여 문장을 만드시오)";
-        const qBody = document.createElement("div");
-        qBody.textContent = (input.cues || []).join(" / ");
+        const qTitle = document.createElement('div');
+        qTitle.className = 'problem-section-title';
+        qTitle.textContent =
+          '문항 (다음 핵심 표현을 활용하여 문장을 만드시오)';
+        const qBody = document.createElement('div');
+        qBody.textContent = (input.cues || []).join(' / ');
         container.appendChild(qTitle);
         container.appendChild(qBody);
       } else {
-        const rawTitle = document.createElement("div");
-        rawTitle.className = "problem-section-title";
-        rawTitle.textContent = "원본 JSON input";
-        const raw = document.createElement("pre");
-        raw.style.whiteSpace = "pre-wrap";
-        raw.style.fontSize = "0.78rem";
+        const rawTitle = document.createElement('div');
+        rawTitle.className = 'problem-section-title';
+        rawTitle.textContent = '원본 JSON input';
+        const raw = document.createElement('pre');
+        raw.style.whiteSpace = 'pre-wrap';
+        raw.style.fontSize = '0.78rem';
         raw.textContent = JSON.stringify(input, null, 2);
         container.appendChild(rawTitle);
         container.appendChild(raw);
@@ -678,53 +1199,52 @@
     function buildAnswerText(item) {
       const answer = item.answer || {};
       const rationale = answer.rationale || item.rationale;
+      let text = '';
 
-      let text = "";
-
-      if (item.format === "match_and_connect") {
+      if (item.format === 'match_and_connect') {
         if (answer.connected_sentences) {
-          text += "- 정답 예시 문장들:\n";
-          text += answer.connected_sentences.map((s) => "· " + s).join("\n");
-          text += "\n\n";
+          text += '- 정답 예시 문장들:\n';
+          text += answer.connected_sentences.map((s) => '· ' + s).join('\n');
+          text += '\n\n';
         }
-      } else if (item.format === "fill_in_blank") {
+      } else if (item.format === 'fill_in_blank') {
         if (answer.completed_sentence) {
-          text += "- 완성 문장:\n" + answer.completed_sentence + "\n\n";
+          text += '- 완성 문장:\n' + answer.completed_sentence + '\n\n';
         }
-      } else if (item.format === "choice_completion") {
+      } else if (item.format === 'choice_completion') {
         if (answer.completed_sentence) {
-          text += "- 정답 문장:\n" + answer.completed_sentence + "\n\n";
+          text += '- 정답 문장:\n' + answer.completed_sentence + '\n\n';
         }
-      } else if (item.format === "dialogue_completion") {
+      } else if (item.format === 'dialogue_completion') {
         if (answer.completed_dialogue) {
-          text += "- 완성 대화:\n";
+          text += '- 완성 대화:\n';
           text += answer.completed_dialogue
             .map((t) => `${t.speaker}: ${t.text}`)
-            .join("\n");
-          text += "\n\n";
+            .join('\n');
+          text += '\n\n';
         }
-      } else if (item.format === "sentence_connection") {
+      } else if (item.format === 'sentence_connection') {
         if (answer.connected_sentence) {
-          text += "- 연결된 문장:\n" + answer.connected_sentence + "\n\n";
+          text += '- 연결된 문장:\n' + answer.connected_sentence + '\n\n';
         }
-      } else if (item.format === "sentence_creation") {
+      } else if (item.format === 'sentence_creation') {
         if (answer.created_sentence) {
-          text += "- 예시 문장:\n" + answer.created_sentence + "\n\n";
+          text += '- 예시 문장:\n' + answer.created_sentence + '\n\n';
         }
       }
 
       if (rationale) {
-        text += "▶ 해설\n" + rationale;
+        text += '▶ 해설\n' + rationale;
       }
 
       return text.trim();
     }
 
     function escapeHtml(str) {
-      return str
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;");
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
     }
   </script>
 </body>

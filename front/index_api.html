@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>문제집 생성 데모</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f5f7fb;
+      color: #222;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 40px 16px;
+    }
+    .app {
+      width: 100%;
+      max-width: 960px;
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.12);
+      padding: 24px 24px 32px;
+    }
+    .app-header {
+      margin-bottom: 20px;
+      border-bottom: 1px solid #e5e7eb;
+      padding-bottom: 12px;
+    }
+    .app-header h1 {
+      font-size: 1.4rem;
+      margin-bottom: 4px;
+    }
+    .app-header p {
+      font-size: 0.9rem;
+      color: #6b7280;
+    }
+    form {
+      margin-top: 16px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    label {
+      font-size: 0.95rem;
+      margin-bottom: 6px;
+      display: block;
+    }
+    .input-wrapper {
+      flex: 1 1 260px;
+      min-width: 0;
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+    input[type="text"]:focus {
+      border-color: #6366f1;
+      box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.3);
+    }
+    button {
+      padding: 10px 18px;
+      border-radius: 999px;
+      border: none;
+      background: #4f46e5;
+      color: #ffffff;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.15s ease, transform 0.05s ease;
+    }
+    button:hover {
+      background: #4338ca;
+    }
+    button:active {
+      transform: scale(0.98);
+    }
+    button:disabled {
+      background: #9ca3af;
+      cursor: default;
+      transform: none;
+    }
+
+    .status {
+      margin-top: 16px;
+      font-size: 0.88rem;
+      color: #6b7280;
+    }
+
+    /* 로딩 오버레이 */
+    .loading-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.18);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+      backdrop-filter: blur(2px);
+    }
+    .loading-box {
+      background: #ffffff;
+      padding: 24px 28px;
+      border-radius: 16px;
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.25);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      min-width: 220px;
+    }
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border-radius: 999px;
+      border: 4px solid #e5e7eb;
+      border-top-color: #4f46e5;
+      animation: spin 0.9s linear infinite;
+    }
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+    .loading-text {
+      font-size: 0.95rem;
+      text-align: center;
+      color: #374151;
+    }
+    .loading-sub {
+      font-size: 0.78rem;
+      color: #9ca3af;
+    }
+
+    /* 결과 영역 (기존 화면) */
+    .results {
+      margin-top: 28px;
+    }
+    .results-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 12px;
+      border-bottom: 1px solid #e5e7eb;
+      padding-bottom: 6px;
+    }
+    .results-header h2 {
+      font-size: 1.05rem;
+    }
+    .results-header span {
+      font-size: 0.8rem;
+      color: #9ca3af;
+    }
+
+    .query-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #eef2ff;
+      color: #4338ca;
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 0.8rem;
+      margin-top: 4px;
+    }
+
+    .problem-list {
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .problem-card {
+      border-radius: 12px;
+      border: 1px solid #e5e7eb;
+      padding: 14px 16px;
+      background: #f9fafb;
+    }
+    .problem-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 8px;
+      gap: 6px;
+    }
+    .problem-title {
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+    .problem-meta {
+      font-size: 0.75rem;
+      color: #9ca3af;
+      text-transform: uppercase;
+    }
+    .problem-label {
+      display: inline-flex;
+      align-items: center;
+      font-size: 0.75rem;
+      border-radius: 999px;
+      padding: 2px 8px;
+      background: #eef2ff;
+      color: #4f46e5;
+    }
+
+    .problem-body {
+      font-size: 0.9rem;
+      color: #374151;
+      line-height: 1.5;
+      margin-top: 4px;
+      white-space: pre-line;
+    }
+
+    .problem-section-title {
+      margin-top: 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #6b7280;
+    }
+
+    ul {
+      margin-top: 4px;
+      margin-left: 18px;
+      font-size: 0.88rem;
+    }
+    li + li {
+      margin-top: 2px;
+    }
+
+    details {
+      margin-top: 8px;
+      font-size: 0.85rem;
+    }
+    details > summary {
+      cursor: pointer;
+      color: #4f46e5;
+      list-style: none;
+    }
+    details > summary::-webkit-details-marker {
+      display: none;
+    }
+    .answer-block {
+      margin-top: 4px;
+      padding: 6px 8px;
+      background: #f3f4ff;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      color: #111827;
+      white-space: pre-line;
+    }
+
+    .error {
+      margin-top: 12px;
+      font-size: 0.85rem;
+      color: #b91c1c;
+    }
+
+    /* ✅ PDF 다운로드용 화면 */
+    .download-screen {
+      margin-top: 32px;
+      text-align: center;
+      display: none;
+    }
+    .download-screen h2 {
+      font-size: 1.2rem;
+      margin-bottom: 8px;
+    }
+    .download-screen p {
+      font-size: 0.9rem;
+      color: #6b7280;
+      margin-bottom: 16px;
+    }
+
+    @media (max-width: 640px) {
+      .app {
+        padding: 18px 14px 24px;
+      }
+      .app-header h1 {
+        font-size: 1.2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="app-header">
+      <h1>JSON → 문제집 변환 데모</h1>
+      <p>쿼리를 입력한 뒤 <strong>문제 생성</strong>을 누르면, Agentic RAG로 문제집을 만든 뒤 PDF로 다운로드할 수 있습니다.</p>
+    </div>
+
+    <!-- 입력 폼 + 상태 문구 -->
+    <form id="query-form">
+      <div class="input-wrapper">
+        <label for="query-input">쿼리를 입력하시오</label>
+        <input
+          type="text"
+          id="query-input"
+          placeholder="예) 블랙핑크 맞춤법 문제 생성"
+          autocomplete="off"
+        />
+      </div>
+      <div>
+        <label style="visibility:hidden;">버튼</label>
+        <button type="submit" id="generate-btn">
+          문제 생성
+        </button>
+      </div>
+    </form>
+
+    <div class="status" id="status-text">
+      서버에서 생성된 JSON: <code>final_v.1.json</code> 을 기반으로 PDF 문제집을 만듭니다.
+    </div>
+
+    <!-- 기존 결과 렌더 영역 (필요하면 계속 쓸 수 있음, 지금은 화면전환 후엔 안 보이게) -->
+    <div class="results" id="results" style="display:none;">
+      <div class="results-header">
+        <h2>생성된 문제집</h2>
+        <span id="result-count"></span>
+      </div>
+      <div id="query-chip-wrap"></div>
+      <div class="problem-list" id="problem-list"></div>
+    </div>
+
+    <!-- ✅ 문제집 생성 완료 후 보여줄 화면 -->
+    <div class="download-screen" id="download-screen">
+      <h2>문제집 생성이 완료되었습니다.</h2>
+      <p>버튼을 클릭하여 PDF로 문제집을 다운받으세요.</p>
+      <button type="button" id="download-pdf-btn">PDF 다운로드</button>
+    </div>
+
+    <div class="error" id="error-text" style="display:none;"></div>
+  </div>
+
+  <!-- 로딩 오버레이 -->
+  <div class="loading-overlay" id="loading-overlay">
+    <div class="loading-box">
+      <div class="spinner"></div>
+      <div class="loading-text">문제를 생성하고 있습니다...</div>
+      <div class="loading-sub">문항 수에 따라 시간이 조금 걸릴 수 있습니다.</div>
+    </div>
+  </div>
+
+  <!-- ✅ jsPDF CDN -->
+  <!-- jsPDF: integrity / crossorigin 제거 버전 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <script>
+    const form = document.getElementById("query-form");
+    const queryInput = document.getElementById("query-input");
+    const generateBtn = document.getElementById("generate-btn");
+    const loadingOverlay = document.getElementById("loading-overlay");
+    const resultsEl = document.getElementById("results");
+    const problemListEl = document.getElementById("problem-list");
+    const resultCountEl = document.getElementById("result-count");
+    const errorTextEl = document.getElementById("error-text");
+    const queryChipWrap = document.getElementById("query-chip-wrap");
+    const downloadScreenEl = document.getElementById("download-screen");
+    const downloadPdfBtn = document.getElementById("download-pdf-btn");
+
+    // ✅ 마지막으로 생성된 문제들을 저장해 두는 전역 변수
+    let lastQuestions = [];
+    let lastQuery = "";
+
+    // ❗ 폼 submit 시: /generate 호출 → final_v.1.json도 만들어지고, 응답 questions로 PDF 준비
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      errorTextEl.style.display = "none";
+      const query = queryInput.value.trim();
+
+      if (!query) {
+        errorTextEl.textContent = "쿼리를 먼저 입력해 주세요.";
+        errorTextEl.style.display = "block";
+        return;
+      }
+
+      generateBtn.disabled = true;
+      loadingOverlay.style.display = "flex";
+
+      try {
+        console.log("[FRONT] /generate 호출 시작:", query);
+        const response = await fetch("http://127.0.0.1:8000/generate", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ query }),
+        });
+
+        console.log("[FRONT] /generate 응답 status:", response.status);
+
+        if (!response.ok) {
+          let msg = `서버 오류 (status ${response.status})`;
+          try {
+            const errData = await response.json();
+            console.error("[FRONT] /generate 에러 body:", errData);
+            if (errData.detail) msg = errData.detail;
+          } catch (_) {}
+          throw new Error(msg);
+        }
+
+        const data = await response.json();
+        console.log("[FRONT] /generate 응답 데이터:", data);
+
+        if (!data || !Array.isArray(data.questions)) {
+          throw new Error("응답 형식이 예상과 다릅니다. (questions 배열 없음)");
+        }
+
+        // ✅ 전역에 저장해두고, 화면을 PDF 안내 화면으로 전환
+        lastQuestions = data.questions;
+        lastQuery = data.query || query;
+
+        // (옵션) 화면에서 문제 미리 보고 싶으면 renderWorkbook도 호출 가능
+        // renderWorkbook(lastQuestions, lastQuery);
+
+        // 폼/기존 결과 숨기고 다운로드 안내 화면 보여주기
+        form.style.display = "none";
+        resultsEl.style.display = "none";
+        downloadScreenEl.style.display = "block";
+      } catch (err) {
+        console.error("[FRONT] 에러:", err);
+        errorTextEl.textContent =
+          "문제집을 생성하는 중 오류가 발생했습니다: " + (err.message || err);
+        errorTextEl.style.display = "block";
+      } finally {
+        loadingOverlay.style.display = "none";
+        generateBtn.disabled = false;
+      }
+    });
+
+    // ✅ PDF 다운로드 버튼 클릭 시: lastQuestions → PDF 생성
+    downloadPdfBtn.addEventListener("click", () => {
+      if (!lastQuestions || lastQuestions.length === 0) {
+        alert("먼저 문제를 생성해 주세요.");
+        return;
+      }
+      generatePdfFromQuestions(lastQuestions, lastQuery);
+    });
+
+    // 필요시 계속 쓸 수 있는 화면 렌더 함수 (지금은 디버그용 정도)
+    function renderWorkbook(items, query) {
+      console.log("[FRONT] renderWorkbook 호출, 문항 수:", items.length);
+
+      problemListEl.innerHTML = "";
+
+      // 쿼리 표시
+      queryChipWrap.innerHTML = "";
+      const chip = document.createElement("div");
+      chip.className = "query-chip";
+      chip.innerHTML = `<span>입력한 쿼리</span><strong>${escapeHtml(
+        query
+      )}</strong>`;
+      queryChipWrap.appendChild(chip);
+
+      items.forEach((item, idx) => {
+        const card = document.createElement("article");
+        card.className = "problem-card";
+
+        const header = document.createElement("div");
+        header.className = "problem-header";
+
+        const title = document.createElement("div");
+        title.className = "problem-title";
+        title.textContent = `문항 ${idx + 1}. ${formatToKorean(item.format)}`;
+
+        const meta = document.createElement("div");
+        meta.className = "problem-meta";
+        meta.textContent = item.schema_id || "";
+
+        header.appendChild(title);
+        header.appendChild(meta);
+
+        const body = document.createElement("div");
+        body.className = "problem-body";
+
+        const label = document.createElement("span");
+        label.className = "problem-label";
+        label.textContent = formatToLabel(item.format);
+        body.appendChild(label);
+
+        const typeBlock = document.createElement("div");
+        typeBlock.style.marginTop = "6px";
+        typeBlock.appendChild(buildProblemBodyByFormat(item));
+        body.appendChild(typeBlock);
+
+        const details = document.createElement("details");
+        details.className = "answer-details";
+        const summary = document.createElement("summary");
+        summary.textContent = "정답 · 해설 보기";
+        details.appendChild(summary);
+
+        const answerBlock = document.createElement("div");
+        answerBlock.className = "answer-block";
+        answerBlock.textContent = buildAnswerText(item);
+        details.appendChild(answerBlock);
+
+        card.appendChild(header);
+        card.appendChild(body);
+        card.appendChild(details);
+
+        problemListEl.appendChild(card);
+      });
+
+      resultCountEl.textContent = `총 ${items.length}문항`;
+      resultsEl.style.display = "block";
+    }
+
+    function formatToKorean(format) {
+      switch (format) {
+        case "match_and_connect":
+          return "연결어미 사용하여 문장 만들기";
+        case "fill_in_blank":
+          return "빈칸 채우기";
+        case "choice_completion":
+          return "선택형 문장 완성";
+        case "dialogue_completion":
+          return "대화 완성";
+        case "sentence_connection":
+          return "문장 연결";
+        case "sentence_creation":
+          return "문장 만들기";
+        default:
+          return format || "";
+      }
+    }
+
+    function formatToLabel(format) {
+      switch (format) {
+        case "match_and_connect":
+          return "문장 연결";
+        case "fill_in_blank":
+          return "빈칸";
+        case "choice_completion":
+          return "선택형";
+        case "dialogue_completion":
+          return "대화";
+        case "sentence_connection":
+          return "대조 구문";
+        case "sentence_creation":
+          return "문장 생성";
+        default:
+          return format || "";
+      }
+    }
+
+    function buildProblemBodyByFormat(item) {
+      const container = document.createElement("div");
+      const input = item.input || {};
+
+      if (item.format === "match_and_connect") {
+        const inst = document.createElement("div");
+        inst.className = "problem-section-title";
+        inst.textContent = "지시문";
+        const instText = document.createElement("div");
+        instText.textContent = input.instruction || "";
+        container.appendChild(inst);
+        container.appendChild(instText);
+
+        if (input.example) {
+          const exTitle = document.createElement("div");
+          exTitle.className = "problem-section-title";
+          exTitle.textContent = "<보기>";
+          const exBody = document.createElement("div");
+          exBody.textContent =
+            `${input.example.clause_A} / ${input.example.clause_B} → ` +
+            `${input.example.connected}`;
+          container.appendChild(exTitle);
+          container.appendChild(exBody);
+        }
+
+        if (input.clause_set_A && input.clause_set_B) {
+          const aTitle = document.createElement("div");
+          aTitle.className = "problem-section-title";
+          aTitle.textContent = "① 앞 문장들";
+          const aList = document.createElement("ul");
+          input.clause_set_A.forEach((c) => {
+            const li = document.createElement("li");
+            li.textContent = c;
+            aList.appendChild(li);
+          });
+
+          const bTitle = document.createElement("div");
+          bTitle.className = "problem-section-title";
+          bTitle.textContent = "② 뒷 문장들";
+          const bList = document.createElement("ul");
+          input.clause_set_B.forEach((c) => {
+            const li = document.createElement("li");
+            li.textContent = c;
+            bList.appendChild(li);
+          });
+
+          container.appendChild(aTitle);
+          container.appendChild(aList);
+          container.appendChild(bTitle);
+          container.appendChild(bList);
+        }
+      } else if (item.format === "fill_in_blank") {
+        const inst = document.createElement("div");
+        inst.className = "problem-section-title";
+        inst.textContent = "지시문";
+        const instText = document.createElement("div");
+        instText.textContent = input.instruction || "";
+        container.appendChild(inst);
+        container.appendChild(instText);
+
+        if (input.example) {
+          const exTitle = document.createElement("div");
+          exTitle.className = "problem-section-title";
+          exTitle.textContent = "<보기>";
+          const exBody = document.createElement("div");
+          exBody.textContent = `${input.example.stem.replace(
+            "___",
+            "＿＿＿"
+          )} (${input.example.answer})`;
+          container.appendChild(exTitle);
+          container.appendChild(exBody);
+        }
+
+        const qTitle = document.createElement("div");
+        qTitle.className = "problem-section-title";
+        qTitle.textContent = "문항";
+        const stem = document.createElement("div");
+        const stemText = (input.stem_with_blank || "").replace(
+          "{hint}",
+          input.hint || ""
+        );
+        stem.textContent = stemText.replace("{hint}", input.hint || "");
+        container.appendChild(qTitle);
+        container.appendChild(stem);
+      } else if (item.format === "choice_completion") {
+        const pTitle = document.createElement("div");
+        pTitle.className = "problem-section-title";
+        pTitle.textContent = "문항";
+        const prompt = document.createElement("div");
+        prompt.textContent = input.prompt || "";
+        container.appendChild(pTitle);
+        container.appendChild(prompt);
+
+        if (input.options) {
+          const optTitle = document.createElement("div");
+          optTitle.className = "problem-section-title";
+          optTitle.textContent = "보기";
+          const ul = document.createElement("ul");
+          input.options.forEach((opt, i) => {
+            const li = document.createElement("li");
+            li.textContent = `${i + 1}) ${opt}`;
+            ul.appendChild(li);
+          });
+          container.appendChild(optTitle);
+          container.appendChild(ul);
+        }
+      } else if (item.format === "dialogue_completion") {
+        const dTitle = document.createElement("div");
+        dTitle.className = "problem-section-title";
+        dTitle.textContent =
+          "다음 대화를 읽고 빈 칸에 들어갈 말을 쓰시오.";
+        container.appendChild(dTitle);
+
+        const dialogDiv = document.createElement("div");
+        const lines = input.dialogue_with_missing_turns || [];
+        const text = lines
+          .map((turn) => {
+            if (turn.speaker === "B") {
+              return "B: ________";
+            }
+            return `${turn.speaker}: ${turn.text}`;
+          })
+          .join("\n");
+        dialogDiv.textContent = text;
+        container.appendChild(dialogDiv);
+      } else if (item.format === "sentence_connection") {
+        const inst = document.createElement("div");
+        inst.className = "problem-section-title";
+        inst.textContent = "지시문";
+        const instText = document.createElement("div");
+        instText.textContent = input.instruction || "";
+        container.appendChild(inst);
+        container.appendChild(instText);
+
+        const exTitle = document.createElement("div");
+        exTitle.className = "problem-section-title";
+        exTitle.textContent = "<보기>";
+        const exBody = document.createElement("div");
+        if (input.example) {
+          exBody.textContent = `${input.example.clause_A} / ${input.example.clause_B} → ${input.example.connected}`;
+        }
+        const qTitle = document.createElement("div");
+        qTitle.className = "problem-section-title";
+        qTitle.textContent = "문항";
+        const qBody = document.createElement("div");
+        qBody.textContent =
+          (input.clause_A || "") + " / " + (input.clause_B || "");
+        container.appendChild(exTitle);
+        container.appendChild(exBody);
+        container.appendChild(qTitle);
+        container.appendChild(qBody);
+      } else if (item.format === "sentence_creation") {
+        const inst = document.createElement("div");
+        inst.className = "problem-section-title";
+        inst.textContent = "지시문";
+        const instText = document.createElement("div");
+        instText.textContent = input.instruction || "";
+        container.appendChild(inst);
+        container.appendChild(instText);
+
+        if (input.example) {
+          const exTitle = document.createElement("div");
+          exTitle.className = "problem-section-title";
+          exTitle.textContent = "<보기>";
+          const exBody = document.createElement("div");
+          exBody.textContent = `${input.example.cues.join(
+            " / "
+          )} → ${input.example.answer}`;
+          container.appendChild(exTitle);
+          container.appendChild(exBody);
+        }
+
+        const qTitle = document.createElement("div");
+        qTitle.className = "problem-section-title";
+        qTitle.textContent =
+          "문항 (다음 핵심 표현을 활용하여 문장을 만드시오)";
+        const qBody = document.createElement("div");
+        qBody.textContent = (input.cues || []).join(" / ");
+        container.appendChild(qTitle);
+        container.appendChild(qBody);
+      } else {
+        const rawTitle = document.createElement("div");
+        rawTitle.className = "problem-section-title";
+        rawTitle.textContent = "원본 JSON input";
+        const raw = document.createElement("pre");
+        raw.style.whiteSpace = "pre-wrap";
+        raw.style.fontSize = "0.78rem";
+        raw.textContent = JSON.stringify(input, null, 2);
+        container.appendChild(rawTitle);
+        container.appendChild(raw);
+      }
+
+      return container;
+    }
+
+    function buildAnswerText(item) {
+      const answer = item.answer || {};
+      const rationale = answer.rationale || item.rationale;
+
+      let text = "";
+
+      if (item.format === "match_and_connect") {
+        if (answer.connected_sentences) {
+          text += "- 정답 예시 문장들:\n";
+          text += answer.connected_sentences.map((s) => "· " + s).join("\n");
+          text += "\n\n";
+        }
+      } else if (item.format === "fill_in_blank") {
+        if (answer.completed_sentence) {
+          text += "- 완성 문장:\n" + answer.completed_sentence + "\n\n";
+        }
+      } else if (item.format === "choice_completion") {
+        if (answer.completed_sentence) {
+          text += "- 정답 문장:\n" + answer.completed_sentence + "\n\n";
+        }
+      } else if (item.format === "dialogue_completion") {
+        if (answer.completed_dialogue) {
+          text += "- 완성 대화:\n";
+          text += answer.completed_dialogue
+            .map((t) => `${t.speaker}: ${t.text}`)
+            .join("\n");
+          text += "\n\n";
+        }
+      } else if (item.format === "sentence_connection") {
+        if (answer.connected_sentence) {
+          text += "- 연결된 문장:\n" + answer.connected_sentence + "\n\n";
+        }
+      } else if (item.format === "sentence_creation") {
+        if (answer.created_sentence) {
+          text += "- 예시 문장:\n" + answer.created_sentence + "\n\n";
+        }
+      }
+
+      if (rationale) {
+        text += "▶ 해설\n" + rationale;
+      }
+
+      return text.trim();
+    }
+
+    // ✅ PDF 안에 넣을 문제 텍스트 (문제 부분만)
+    function buildPlainProblemText(item) {
+      const input = item.input || {};
+      let text = "";
+
+      if (item.format === "match_and_connect") {
+        if (input.instruction) {
+          text += "[지시문] " + input.instruction + "\n";
+        }
+        if (input.example) {
+          text += "<보기> "
+            + `${input.example.clause_A} / ${input.example.clause_B} → ${input.example.connected}\n`;
+        }
+        if (input.clause_set_A && input.clause_set_B) {
+          text += "① 앞 문장들:\n";
+          input.clause_set_A.forEach((c) => { text += "  - " + c + "\n"; });
+          text += "② 뒷 문장들:\n";
+          input.clause_set_B.forEach((c) => { text += "  - " + c + "\n"; });
+        }
+      } else if (item.format === "fill_in_blank") {
+        if (input.instruction) {
+          text += "[지시문] " + input.instruction + "\n";
+        }
+        if (input.example) {
+          text += "<보기> "
+            + input.example.stem.replace("___", "＿＿＿")
+            + " (" + input.example.answer + ")\n";
+        }
+        if (input.stem_with_blank) {
+          const stemText = (input.stem_with_blank || "").replace(
+            "{hint}",
+            input.hint || ""
+          );
+          text += "[문항] " + stemText + "\n";
+        }
+      } else if (item.format === "choice_completion") {
+        if (input.prompt) {
+          text += "[문항] " + input.prompt + "\n";
+        }
+        if (input.options) {
+          text += "[보기]\n";
+          input.options.forEach((opt, i) => {
+            text += `  ${i + 1}) ${opt}\n`;
+          });
+        }
+      } else if (item.format === "dialogue_completion") {
+        text += "[대화]\n";
+        const lines = input.dialogue_with_missing_turns || [];
+        lines.forEach((turn) => {
+          if (turn.speaker === "B") {
+            text += "B: ________\n";
+          } else {
+            text += `${turn.speaker}: ${turn.text}\n`;
+          }
+        });
+      } else if (item.format === "sentence_connection") {
+        if (input.instruction) {
+          text += "[지시문] " + input.instruction + "\n";
+        }
+        if (input.example) {
+          text += "<보기> "
+            + `${input.example.clause_A} / ${input.example.clause_B} → ${input.example.connected}\n`;
+        }
+        if (input.clause_A || input.clause_B) {
+          text += "[문항] "
+            + (input.clause_A || "") + " / " + (input.clause_B || "") + "\n";
+        }
+      } else if (item.format === "sentence_creation") {
+        if (input.instruction) {
+          text += "[지시문] " + input.instruction + "\n";
+        }
+        if (input.example) {
+          text += "<보기> "
+            + `${(input.example.cues || []).join(" / ")} → ${input.example.answer}\n`;
+        }
+        if (input.cues) {
+          text += "[문항] 다음 핵심 표현을 활용하여 문장을 만드시오:\n";
+          text += "  - " + (input.cues || []).join(" / ") + "\n";
+        }
+      } else {
+        text += JSON.stringify(input, null, 2);
+      }
+
+      return text.trim();
+    }
+
+    // ✅ PDF 생성 함수
+    function generatePdfFromQuestions(questions, query) {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF("p", "mm", "a4");
+
+      let y = 20;
+      const left = 15;
+      const lineHeight = 6;
+      const maxWidth = 180;
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(14);
+      doc.text("한국어 학습 문제집", left, y);
+      y += lineHeight;
+      doc.setFontSize(11);
+      if (query) {
+        const titleLine = `쿼리: ${query}`;
+        const lines = doc.splitTextToSize(titleLine, maxWidth);
+        lines.forEach((ln) => {
+          if (y > 280) {
+            doc.addPage();
+            y = 20;
+          }
+          doc.text(ln, left, y);
+          y += lineHeight;
+        });
+      }
+      y += 4;
+
+      questions.forEach((item, idx) => {
+        if (y > 280) {
+          doc.addPage();
+          y = 20;
+        }
+
+        doc.setFontSize(11);
+        doc.setFont("helvetica", "bold");
+        const title = `${idx + 1}. ${formatToKorean(item.format)}`;
+        doc.text(title, left, y);
+        y += lineHeight;
+
+        doc.setFont("helvetica", "normal");
+        const problemText = buildPlainProblemText(item);
+        if (problemText) {
+          const problemLines = doc.splitTextToSize(problemText, maxWidth);
+          problemLines.forEach((ln) => {
+            if (y > 280) {
+              doc.addPage();
+              y = 20;
+            }
+            doc.text(ln, left, y);
+            y += lineHeight;
+          });
+        }
+
+        const answerText = buildAnswerText(item);
+        if (answerText) {
+          y += 2;
+          if (y > 280) {
+            doc.addPage();
+            y = 20;
+          }
+          doc.setFont("helvetica", "bold");
+          doc.text("정답 및 해설", left, y);
+          y += lineHeight;
+          doc.setFont("helvetica", "normal");
+
+          const answerLines = doc.splitTextToSize(answerText, maxWidth);
+          answerLines.forEach((ln) => {
+            if (y > 280) {
+              doc.addPage();
+              y = 20;
+            }
+            doc.text(ln, left, y);
+            y += lineHeight;
+          });
+        }
+
+        y += lineHeight; // 문제 간 간격
+      });
+
+      const filename = query
+        ? `korean_workbook_${query.slice(0, 20)}.pdf`
+        : "korean_workbook.pdf";
+      doc.save(filename);
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+    }
+  </script>
+</body>
+</html>

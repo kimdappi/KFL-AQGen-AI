@@ -7,7 +7,7 @@ from typing import Dict, List, Set, Optional, Any
 from dataclasses import dataclass
 from enum import Enum
 from langchain_openai import ChatOpenAI
-from config import MODDEL_NAME
+from config import MODEL_NAME
 
 class RetrieverType(Enum):
     """사용 가능한 리트리버 타입"""
@@ -83,7 +83,7 @@ class IntelligentRouter:
     }
     
     def __init__(self, llm=None):
-        self.llm = llm or ChatOpenAI(model=MODDEL_NAME, temperature=0.3)
+        self.llm = llm or ChatOpenAI(model=MODEL_NAME, temperature=0.3)
     
     def route(
         self,
