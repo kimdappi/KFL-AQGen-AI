@@ -141,10 +141,6 @@ check_quality
 
 **2️⃣ routing** (`Ragsystem/router.py` → `IntelligentRouter.route()`)
 - 검색 전략 결정
-  - **Vocabulary 리트리버**: 무조건 활성화
-  - **Grammar 리트리버**: 문법 관련 키워드("문법", "패턴", "grammar", "pattern", "표현", "구조")가 있을 때만 활성화
-  - **K-pop 리트리버**: K-pop 관련 내용이 쿼리에 있을 때만 활성화
-- 출력: `routing_decision`, `search_strategies`
 
 **3️⃣ retrieve_vocabulary** (`Retriever/vocabulary_retriever.py`)
 - 어휘 검색 (항상 활성화)
@@ -429,16 +425,13 @@ output/final_v.1.json에 저장
 3. **난이도 필터링**
    - 정확 매칭: 목표 난이도와 일치하는 단어 우선
    - 근접 난이도: 정확 매칭 부족 시 인접 난이도 허용
-     - `basic` → `basic`, `intermediate`
-     - `intermediate` → `intermediate`, `basic`, `advanced`
-     - `advanced` → `advanced`, `intermediate`
 
 4. **쿼리 해시 기반 다양성 보장**
    - 쿼리별 고유 시드 생성 (쿼리 해시 기반)
    - 가중 랜덤 샘플링 (순위 기반 가중치: `1/(i+1)`)
    - 같은 쿼리 → 같은 단어 선택 (일관성)
    - 다른 쿼리 → 다른 단어 선택 (다양성)
-   - 예: "블랙핑크 관련 중급" vs "스트레이키즈 관련 중급" → 다른 단어 선택
+
 
 5. **최종 선택** (최대 5개)
    - 실행 횟수 기반 시드로 매번 다른 결과 보장
@@ -1006,38 +999,5 @@ faiss-cpu>=1.8.0  # 또는 faiss-gpu
 - ✅ **임베딩 기반 매칭**: 한글/영어 그룹명 자동 변환 (임계치 0.75)
 - ✅ **번역투 방지**: 영어 단어를 한국어로 자동 번역하여 자연스러운 문장 생성
 
-### 문제 유형별 문장 생성
-- `dialogue_completion`: 대화 형식 (A/B 턴)
-- `match_and_connect`: 분해/재조합 가능한 문장들 (자연스러운 조사 포함)
-- `sentence_connection`: 두 절로 분해 가능한 문장들
-- 기타: 일반 예문들
-
-### 정보 추출 개선
-- **단어**: 3개 → 5개 (자연스러운 문제 생성을 위해)
-- **K-pop**: 3개 → 최대 5개 (더 풍부한 컨텍스트 제공)
-- **동적 필터링**: 그룹, 멤버, 소속사, 팬덤, 컨셉, 데뷔 연도, 그룹 타입 지원
-
-## 🐛 문제 해결
-
-### 일반적인 오류
-- **FAISS 설치 오류**: `pip install faiss-cpu` 또는 `pip install faiss-gpu` 실행
-- **API 키 오류**: `.env` 파일에 올바른 OpenAI API 키가 설정되었는지 확인
-- **데이터 파일 누락**: `data/` 폴더에 필요한 CSV/JSON 파일들이 있는지 확인
-- **Temperature 오류**: `gpt-5` 모델은 `temperature=1.0`만 지원 (기본값)
-
-### 디버깅
-- 콘솔 출력에서 각 단계별 진행상황 확인
-- 그래프 실행 결과의 `question_payload`로 추출된 정보 확인
-- 에러 메시지에서 상세한 원인 확인
-
-## 📄 라이선스
-
-내부 프로젝트 용도로 사용되는 예시입니다. 외부 배포 시 데이터셋 저작권(K-pop 가사/문장 등)을 확인하세요.
-
-## 🤝 기여
-
-프로젝트 개선을 위한 제안이나 버그 리포트는 언제든 환영합니다!
-
----
 
 **KFL-AQGen-AI** - 지능형 한국어 학습 문제 자동 생성 시스템 🚀
