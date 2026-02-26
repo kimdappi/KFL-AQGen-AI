@@ -3,6 +3,8 @@
 > **한국어 학습용 문항 자동 생성 시스템**  
 > 지능형 라우터 기반 Agentic RAG 시스템으로 TOPIK 어휘, 문법, K-pop 문맥을 결합해 난이도별 한국어 학습 문제를 자동 생성합니다.
 
+📺 [Youtube link](https://youtu.be/fQ7O41c6G0I)
+
 [![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://python.org)
 [![LangGraph](https://img.shields.io/badge/LangGraph-0.6+-green.svg)](https://github.com/langchain-ai/langgraph)
 [![OpenAI](https://img.shields.io/badge/OpenAI-GPT--5-orange.svg)](https://openai.com)
